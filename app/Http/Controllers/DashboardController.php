@@ -18,8 +18,9 @@ class DashboardController extends Controller
 
     public function user() {
         $user_id=Auth::user()->id;
-        $owners = Owner::with(['society', 'apartment'])->where('user_id',$user_id)->get() ->groupBy('society_id');
-        $societyOwnerCounts = Owner::select('society_id')->selectRaw('count(*) as total')->where('user_id',$user_id)->groupBy('society_id')->pluck('total', 'society_id');
+        $owners = Owner::with(['apartment','apartment.society'])->where('user_id',$user_id)->get()->groupBy('apartment_detail_id');
+        $societyOwnerCounts = Owner::select('apartment_detail_id')->selectRaw('count(*) as total')->where('user_id',$user_id)->groupBy('apartment_detail_id')->pluck('total', 'apartment_detail_id');
+    
         return view('dashboards.user',compact('owners','societyOwnerCounts'));
     }
 }

@@ -17,6 +17,6 @@ class ApartmentDetail extends Model
 
     public function owners()
     {
-        return $this->hasMany(Owner::class,'building_id');
+        return $this->hasMany(Owner::class,'apartment_detail_id');
     }
 }

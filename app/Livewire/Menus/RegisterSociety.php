@@ -12,9 +12,7 @@ use Livewire\WithFileUploads;
 class RegisterSociety extends Component
 {
     use WithFileUploads;
-    public $society_id;
-    public $building_id;
-    public $apartment_number;
+    public $apartment_detail_id;
 
     public $society = []; // list of societies
     public $buildingOptions = []; // options populated based on selected society
@@ -26,7 +24,7 @@ class RegisterSociety extends Component
     public $formData = [
         'society_id'=>'',
         'building_id'=>'',
-        'apartment_number'=>'',
+        'apartment_detail_id'=>'',
         'owners' => [
             ['owner_name' => '', 'email' => '', 'phone' => '']
         ],
@@ -51,9 +49,7 @@ class RegisterSociety extends Component
     public function updatedFormDataSocietyId($value)
     {
         $this->buildingOptions = ApartmentDetail::where('society_id', $value)->select('id', 'building_name')->get();
-
-        $this->building_id = '';
-        $this->apartment_number = '';
+        $this->apartment_detail_id = '';
         $this->flatOptions = [];
     }
 
@@ -62,7 +58,7 @@ class RegisterSociety extends Component
         $this->flatOptions = ApartmentDetail::where('id', $value)->select('id','apartment_number')
             ->get();
 
-        $this->apartment_number = '';
+        $this->apartment_detail_id = '';
     }
 
     public function addOwner()
@@ -84,11 +80,17 @@ class RegisterSociety extends Component
 
     public function nextStep()
     {
-        $this->validate($this->rules[$this->currentStep] ?? []);
-        if (!$this->formSaved) {
-            $this->save();
+        if($this->currentStep==4){
+            session()->flash('success', 'Form submitted successfully!');
+            $this->reset(['formData']);
+            $this->currentStep = 1;
+        }else{
+            // $this->validate($this->rules[$this->currentStep] ?? []);
+            if (!$this->formSaved) {
+                $this->save();
+            }
+            $this->currentStep++;
         }
-        $this->currentStep++;
     }
 
     public function prevStep()
@@ -113,9 +115,9 @@ class RegisterSociety extends Component
     public function save()
     {
         $this->validate([
-            'formData.society_id' => 'required',
-            'formData.building_id' => 'required',
-            'formData.apartment_number' => 'required',
+            'formData.society_id'=>'required',
+            'formData.building_id'=>'required',
+            'formData.apartment_detail_id' => 'required',
             'formData.owners.*.owner_name' => 'required|string|max:255',
             'formData.owners.*.email' => 'required|email',
             'formData.owners.*.phone' => 'required|numeric|digits:10'
@@ -128,9 +130,7 @@ class RegisterSociety extends Component
             // If the form is saved, update the existing owner data instead of creating new
             foreach ($this->formData['owners'] as $index => $ownerData) {
                 $ownerData['user_id']=Auth::user()->id;
-                $ownerData['society_id']=$this->formData['society_id'];
-                $ownerData['building_id']=$this->formData['building_id'];
-                $ownerData['apartment_number']=$this->formData['apartment_number'];
+                $ownerData['apartment_detail_id']=$this->formData['apartment_detail_id'];
                 if (isset($this->ownerIds[$index]) && $this->ownerIds[$index]) {
                     log::info('owner id -'.$this->ownerIds[$index]);
                     Owner::where('id', $this->ownerIds[$index])->update($ownerData);
@@ -155,9 +155,7 @@ class RegisterSociety extends Component
             $this->ownerIds = [];
             foreach ($this->formData['owners'] as $owner) {
                 $owner['user_id']=Auth::user()->id;
-                $owner['society_id']=$this->formData['society_id'];
-                $owner['building_id']=$this->formData['building_id'];
-                $owner['apartment_number']=$this->formData['apartment_number'];
+                $owner['apartment_detail_id']=$this->formData['apartment_detail_id'];
                 $newOwner = Owner::create($owner);
                 $this->ownerIds[] = $newOwner->id;          
                 $c++;

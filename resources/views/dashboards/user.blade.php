@@ -8,14 +8,14 @@
 
         
         <div class="grid gap-4 md:grid-cols-3 mt-2">
-            @foreach($owners as $societyId => $ownerGroup)
+            @foreach($owners as $apartmentDetailId => $ownerGroup)
             @php
                 $firstOwner = $ownerGroup->first();
-                $society = $firstOwner->society;
                 $apartment = $firstOwner->apartment;
-                $countOwners = $societyOwnerCounts[$societyId] ?? 0;
+                $society = $apartment->society;
+                $countOwners = $societyOwnerCounts[$apartmentDetailId] ?? 0;
             @endphp
-            <a href="{{ route('menus.issue-certificate',$society->id) }}">
+            <a href="{{ route('menus.issue-certificate',$apartmentDetailId) }}">
             <div class="card">
                 <div class="card-header"><h2 class="text-center font-semibold text-2xl">{{ $society->society_name }}</h2></div>
                 <div class="card-body">
