@@ -7,6 +7,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Symfony\Component\CssSelector\Exception\InternalErrorException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Illuminate\Auth\AuthenticationException;
+use App\Http\Middleware\RoleMiddleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -17,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         //
+        $middleware->alias([
+            'role' => RoleMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         // Handle API authentication errors
