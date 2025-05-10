@@ -67,4 +67,9 @@ class User extends Authenticatable
             return $this->where('mobile', $username)->first();
         }
     }
+
+    public function role() {
+        return $this->belongsTo(Role::class);
+    }
+
 }

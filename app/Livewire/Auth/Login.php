@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use Illuminate\Support\Facades\Log;
 
 #[Layout('components.layouts.auth')]
 class Login extends Component
@@ -43,7 +44,15 @@ class Login extends Component
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
-        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        // Get the authenticated user
+        $user = Auth::user();
+        // Redirect based on user role
+        match ($user->role->role) {
+            'Super Admin' => $this->redirectIntended(route('superadmin.dashboard')),
+            'Admin' => $this->redirectIntended(route('admin.dashboard')),
+            'Society User' => $this->redirectIntended(route('user.dashboard')),
+        };
+        // $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
 
     /**

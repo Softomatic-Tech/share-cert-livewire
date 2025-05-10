@@ -4,20 +4,28 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
+        <!-- header -->
+            <div class="hidden md:block lg:block border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 text-center">
+                <p class="text-lg font-semibold">Welcome To Dear Society <br />Share Certificate Management</p>
+            </div>
+        <!-- header -->
+
         <flux:sidebar sticky stashable class="border-r border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-            <a href="{{ route('dashboard') }}" class="mr-5 flex items-center space-x-2" wire:navigate>
-                <x-app-logo />
+            <a href="{{ route(auth()->user()->role->role === 'Super Admin' ? 'superadmin.dashboard' : (auth()->user()->role->role === 'Admin' ? 'admin.dashboard' : 'user.dashboard')) }}" class="mr-5 flex items-center space-x-2" wire:navigate>
+                <x-app-logo /> 
             </a>
 
             <flux:navlist variant="outline">
-                <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Home') }}</flux:navlist.item>
+                <flux:navlist.item icon="home" :href="route(auth()->user()->role->role === 'Super Admin' ? 'superadmin.dashboard' : (auth()->user()->role->role === 'Admin' ? 'admin.dashboard' : 'user.dashboard'))" :current="request()->routeIs('superadmin.dashboard') || request()->routeIs('admin.dashboard') || request()->routeIs('user.dashboard')"  wire:navigate>{{ __('Home') }}</flux:navlist.item>
 
+                @if(auth()->user()->role->role === 'Test User')
                 <flux:navlist.group expandable heading="Society" >
                     <flux:navlist.item :href="route('menus.create_society')">Create</flux:navlist.item>
                     <flux:navlist.item :href="route('menus.society_list')">List</flux:navlist.item>
                 </flux:navlist.group>
+                @endif
             </flux:navlist>
 
             <flux:spacer />
@@ -37,7 +45,7 @@
                 <flux:profile
                     :name="auth()->user()->name"
                     :initials="auth()->user()->initials()"
-                    icon-trailing="chevrons-up-down"
+                    icon-trailing=""
                 />
 
                 <flux:menu class="w-[220px]">
@@ -82,6 +90,7 @@
         <flux:header class="lg:hidden">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
+            <!-- Centered Text -->
             <flux:spacer />
 
             <flux:dropdown position="top" align="end">
