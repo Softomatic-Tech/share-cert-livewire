@@ -98,7 +98,7 @@ class CreateSociety extends Component
                 $result=$society->apartments()->create($apartmentData);
             }
             session()->flash('success', 'Form submitted successfully!');
-            $this->reset(['formData', 'verification_document']); ;
+            $this->reset(['formData', 'verification_document']);
             $this->currentStep = 1; // Reset to first step
         }else{
             session()->flash('error', 'Form could not be submitted due to some error!');

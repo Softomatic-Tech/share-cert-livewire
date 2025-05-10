@@ -12,11 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('owners', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->id();
-            $table->integer('user_id');
-            $table->foreignId('society_id')->constrained('societies')->onDelete('cascade');
-            $table->foreignId('building_id')->constrained('apartment_details')->onDelete('cascade');
-            $table->foreignId('apartment_number')->constrained('apartment_details')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        
+            // Foreign key to apartment_details table
+            $table->unsignedBigInteger('apartment_detail_id');
+            $table->foreign('apartment_detail_id')->references('id')->on('apartment_details')->onDelete('cascade');
+            
             $table->string('owner_name');
             $table->string('email');
             $table->string('phone');

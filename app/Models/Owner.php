@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Owner extends Model
 {
     use HasFactory;
-    protected $fillable = ['society_id','building_id','apartment_number','user_id','owner_name', 'email', 'phone'];
+    protected $fillable = ['apartment_detail_id','user_id','owner_name', 'email', 'phone'];
 
     public function society()
     {
@@ -16,7 +16,7 @@ class Owner extends Model
 
     public function apartment()
     {
-        return $this->belongsTo(ApartmentDetail::class, 'building_id');
+        return $this->belongsTo(ApartmentDetail::class, 'apartment_detail_id');
     }
 
     public function documents()

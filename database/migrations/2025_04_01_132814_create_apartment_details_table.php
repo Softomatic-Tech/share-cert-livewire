@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreign('society_id')->references('id')->on('societies')->onDelete('cascade');
             $table->string('building_name');
             $table->string('apartment_number');
-            $table->string('verification_document')->nullable();
             $table->timestamps();
         });
     }

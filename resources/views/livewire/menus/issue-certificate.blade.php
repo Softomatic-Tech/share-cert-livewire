@@ -1,13 +1,13 @@
 <section class="w-full">
     <!-- Society Card -->
     <div class="mt-8 bg-white border border-gray-300 rounded-xl shadow p-6">
-        <h2 class="text-2xl text-center font-semibold">{{ $society->society_name }}</h2>
-        @foreach($society->apartments as $apartment)
+        <h2 class="text-2xl text-center font-semibold">{{ $apartments->society->society_name }}</h2>
+
         <div class="flex justify-between items-center mb-4">
             <div>
-                <h2 class="text-lg font-semibold">{{ $apartment->building_name }}-{{ $apartment->apartment_number }}</h2>
+                <h2 class="text-lg font-semibold">{{ $apartments->building_name }}-{{ $apartments->apartment_number }}</h2>
                 <p class="font-semibold">Owner</p>
-                @foreach($apartment->owners as $owner)
+                @foreach($apartments->owners as $owner)
                 <ul class="text-sm mt-1 space-y-1">
                     <li>– {{ $owner->owner_name }}</li>
                 </ul>
@@ -15,14 +15,14 @@
             </div>
             <div class="text-right">
                 <p class="font-semibold">Contact</p>
-                @foreach($apartment->owners as $owner)
+                @foreach($apartments->owners as $owner)
                 <ul class="text-sm mt-1 space-y-1">
                     <li>– {{ $owner->phone }}</li>
                 </ul>
                 @endforeach
             </div>
         </div>
-        @endforeach
+        
         <!-- Status Line -->
         <div class="mb-4">
             <p class="font-semibold">Share Certificate - <span class="text-green-600">Verification</span></p>

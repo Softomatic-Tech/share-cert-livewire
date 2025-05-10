@@ -51,7 +51,7 @@
                                         <flux:select.option value="{{ $row->id }}">{{ $row->society_name }}</flux:select.option>
                                     @endforeach
                                 </flux:select>
-                                @error("formData.society_id") <span class="text-red-500">{{ str_replace('form data.', '', $message) }}</span> @enderror
+                                @error("formData.society_id") <span class="text-red-500">The society name field is required.</span> @enderror
 
                                 <label for="building_id">Building Name</label>
                                 <flux:select wire:model.change="formData.building_id" id="building_id" placeholder="Choose Building...">
@@ -60,16 +60,17 @@
                                         <flux:select.option value="{{ $building->id }}">{{ $building->building_name }}</flux:select.option>
                                     @endforeach
                                 </flux:select>
-                                @error("formData.building_id") <span class="text-red-500">{{ str_replace('form data.', '', $message) }}</span> @enderror
+                                @error("formData.building_id") <span class="text-red-500">The building name field is required.</span> @enderror
 
-                                <label for="apartment_number">Apartment No</label>
-                                <flux:select id="apartment_number" wire:model="formData.apartment_number" placeholder="Choose Apartment...">
+                                <label for="apartment_detail_id">Apartment No</label>
+                                <flux:select id="apartment_detail_id" wire:model="formData.apartment_detail_id" placeholder="Choose Apartment...">
                                     <flux:select.option value="">Choose Apartment...</flux:select.option>
                                     @foreach($flatOptions as $flat)
                                         <flux:select.option value="{{ $flat->id }}">{{ $flat->apartment_number }}</flux:select.option>
                                     @endforeach
                                 </flux:select>
-                                
+                                @error("formData.apartment_detail_id") <span class="text-red-500">The apartment number field is required.</span> @enderror
+
                                 @foreach ($formData['owners'] as $index => $owner)
                                 <div class="owner-fields">
                                     <!-- Owner Name -->
@@ -135,7 +136,6 @@
                             <p>Name: {{ $owner['owner_name'] }}</p>
                             <p>Email: {{ $owner['email'] }}</p>
                             <p>Phone: {{ $owner['phone'] }}</p>
-                            <p>Flat: {{ $owner['flat_number'] }}</p>
                             <hr>
                         @endforeach
                         <button class="btn btn-secondary" type="button" wire:click="prevStep">Back</button>

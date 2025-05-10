@@ -20,7 +20,7 @@
             <flux:navlist variant="outline">
                 <flux:navlist.item icon="home" :href="route(auth()->user()->role->role === 'Super Admin' ? 'superadmin.dashboard' : (auth()->user()->role->role === 'Admin' ? 'admin.dashboard' : 'user.dashboard'))" :current="request()->routeIs('superadmin.dashboard') || request()->routeIs('admin.dashboard') || request()->routeIs('user.dashboard')"  wire:navigate>{{ __('Home') }}</flux:navlist.item>
 
-                @if(auth()->user()->role->role === 'Test User')
+                @if(auth()->user()->role->role === 'Super Admin')
                 <flux:navlist.group expandable heading="Society" >
                     <flux:navlist.item :href="route('menus.create_society')">Create</flux:navlist.item>
                     <flux:navlist.item :href="route('menus.society_list')">List</flux:navlist.item>
