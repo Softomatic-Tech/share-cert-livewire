@@ -22,8 +22,10 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'mobile',
+        'username',
+        'phone',
         'password',
+        'role_id'
     ];
 
     /**
@@ -64,7 +66,7 @@ class User extends Authenticatable
         if (filter_var($username, FILTER_VALIDATE_EMAIL)) {
             return $this->where('email', $username)->first();
         } else {
-            return $this->where('mobile', $username)->first();
+            return $this->where('phone', $username)->first();
         }
     }
 

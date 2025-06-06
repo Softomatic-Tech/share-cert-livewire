@@ -15,7 +15,7 @@ class AuthController extends Controller
         Log::info('Request Api Data:', $request->all());
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'mobile' => 'nullable|unique:users,mobile|min:10|max:15',
+            'phone' => 'nullable|unique:users,phone|min:10|max:15',
             'email' => 'nullable|email|unique:users,email',
             'password' => 'required|string|min:6',
         ]);
@@ -24,8 +24,8 @@ class AuthController extends Controller
             return response()->json(['message' =>$validator->errors()],400);
         }
 
-        if (!$request->email && !$request->mobile) {
-            return response()->json(['message' => 'Either email or mobile is required'], 400);
+        if (!$request->email && !$request->phone) {
+            return response()->json(['message' => 'Either email or phone is required'], 400);
         }
 
         $existingUser = User::where('email', $request->email)->first();
@@ -36,7 +36,7 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'mobile' => $request->mobile,
+            'phone' => $request->phone,
             'password' => Hash::make($request->password),
         ]);
 
@@ -55,7 +55,7 @@ class AuthController extends Controller
         }
 
         $validator = Validator::make($request->all(),[
-            'identifier' => 'required', // Can be either email or mobile
+            'identifier' => 'required', // Can be either email or phone
             'password' => 'required'
         ]);
 
@@ -64,7 +64,7 @@ class AuthController extends Controller
             return response()->json(['message' =>$validator->errors()],400);
         }
 
-        $field = filter_var($request->identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'mobile';
+        $field = filter_var($request->identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
         
         $user = User::where($field, $request->identifier)->first();
         if (!$user || !Hash::check($request->password, $user->password)) {
