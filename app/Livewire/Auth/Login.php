@@ -16,8 +16,10 @@ use Illuminate\Support\Facades\Log;
 #[Layout('components.layouts.auth')]
 class Login extends Component
 {
-    #[Validate('required|string|email')]
-    public string $email = '';
+    // #[Validate('required|string|email')]
+    // public string $email = '';
+    #[Validate('required|string')]
+    public string $authIdentifier = '';
 
     #[Validate('required|string')]
     public string $password = '';
@@ -33,11 +35,18 @@ class Login extends Component
 
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+        //Determine login type (email,username or phone)
+        $login_type='username';
+        if(filter_var($this->authIdentifier,FILTER_VALIDATE_EMAIL)){
+            $login_type='email';
+        }elseif(preg_match('/^\d{10}$/',$this->authIdentifier)){
+            $login_type='phone';
+        }
+        if (! Auth::attempt([$login_type => $this->authIdentifier, 'password' => $this->password], $this->remember)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
+                'authIdentifier' => __('auth.failed'),
             ]);
         }
 
@@ -69,7 +78,7 @@ class Login extends Component
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => __('auth.throttle', [
+            'authIdentifier' => __('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -81,6 +90,6 @@ class Login extends Component
      */
     protected function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->email).'|'.request()->ip());
+        return Str::transliterate(Str::lower($this->authIdentifier).'|'.request()->ip());
     }
 }
