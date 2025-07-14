@@ -25,8 +25,7 @@ Route::middleware(['auth', 'role:Super Admin'])->group(function () {
 // Admin Routes
 Route::middleware(['auth', 'role:Admin'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
-    Route::post('/users/{id}/mark-role', [DashboardController::class, 'markRole'])->name('users.markRole');
-
+    Route::post('/admin/{id}/mark-role', [DashboardController::class, 'markRole'])->name('admin.markRole');
 });
 
 // User Routes

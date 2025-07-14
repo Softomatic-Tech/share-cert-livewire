@@ -8,11 +8,11 @@
         <!-- Email Address -->
         <flux:input
             wire:model="authIdentifier"
-            :label="__('Email,Username or Phone')"
+            :label="__('Email or Phone')"
             type="text"
             required
             autofocus
-            placeholder="email@example.com/johndoe/xxxxxxxxxx"
+            placeholder="email@example.com/xxxxxxxxxx"
         />
 
         <!-- Password -->

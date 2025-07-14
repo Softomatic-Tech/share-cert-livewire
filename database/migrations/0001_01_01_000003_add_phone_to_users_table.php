@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('documents', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('owner_id')->constrained()->onDelete('cascade'); // Associating document with owner
-            $table->string('file_path');
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->string('phone',10)->unique()->after('email');
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('documents');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn(['phone']);
+        });
     }
 };

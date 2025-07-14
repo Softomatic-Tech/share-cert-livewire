@@ -10,6 +10,7 @@ class Society extends Model
 
     protected $fillable = [
         'society_name',
+        'total_flats',
         'address_1',
         'address_2',
         'pincode',
@@ -17,13 +18,8 @@ class Society extends Model
         'city'
     ];
 
-    public function apartments()
+    public function details()
     {
-        return $this->hasMany(ApartmentDetail::class);
-    }
-
-    public function owners()
-    {
-        return $this->hasMany(Owner::class);
+        return $this->hasMany(SocietyDetail::class);
     }
 }

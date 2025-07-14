@@ -8,22 +8,16 @@
 
         
         <div class="grid gap-4 md:grid-cols-3 mt-2">
-            @foreach($owners as $apartmentDetailId => $ownerGroup)
-            @php
-                $firstOwner = $ownerGroup->first();
-                $apartment = $firstOwner->apartment;
-                $society = $apartment->society;
-                $countOwners = $societyOwnerCounts[$apartmentDetailId] ?? 0;
-            @endphp
-            <a href="{{ route('menus.issue-certificate',$apartmentDetailId) }}">
+            @foreach($details as $detail)
+            <a href="{{ route('menus.issue-certificate',$detail->id) }}">
             <div class="card">
-                <div class="card-header"><h2 class="text-center font-semibold text-2xl">{{ $society->society_name }}</h2></div>
+                <div class="card-header"><h2 class="text-center font-semibold text-2xl">{{ $detail->society->society_name }}</h2></div>
                 <div class="card-body">
-                    <p class="font-semibold text-lg">{{ $apartment->building_name }}-{{ $apartment->apartment_number }}</p>
+                    <p class="font-semibold text-lg">{{$detail->building_name}} - {{$detail->apartment_number}}</p>
                     <div class="text-sm mt-2">
-                        <p><span class="font-semibold">Owner</span> – {{ $firstOwner->owner_name }}</p>
-                        <p><span class="font-semibold">Contact</span> {{ $firstOwner->phone }}</p>
-                        <p class="mt-2"><span class="font-semibold">Number of Owners:</span> {{ $countOwners }}</p>
+                        <p><span class="font-semibold">Owner</span> – {{$detail->owner1_name}}</p>
+                        <p><span class="font-semibold">Contact</span> – {{$detail->owner1_mobile}}</p>
+                        <p class="mt-2"><span class="font-semibold">Number of Owners:</span> – {{ $detail->owner_count }}</p>
                         <p class="mt-2"><span class="font-semibold">Share Certificate</span> - <span class="text-green-600 font-semibold">InProcess</span></p>
                     </div>
                 </div>

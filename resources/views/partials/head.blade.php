@@ -10,4 +10,6 @@
 <link rel="stylesheet" href="{{ asset('css/wizard.css') }}">
 <link rel="stylesheet" href="{{ asset('build/assets/app-COJtCUSU.css') }}">
 <script src="{{ asset('build/assets/app-l0sNRNKZ.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/gh/creativetimofficial/david-ai@1.0.6/packages/dist/david-ai.min.js" defer></script>
+
 @fluxAppearance
