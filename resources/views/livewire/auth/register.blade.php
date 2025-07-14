@@ -21,18 +21,8 @@
             wire:model="email"
             :label="__('Email address')"
             type="email"
-            required
             autocomplete="email"
             placeholder="email@example.com"
-        />
-        <!-- Username -->
-        <flux:input
-            wire:model="username"
-            :label="__('Username')"
-            type="text"
-            required
-            autocomplete="username"
-            placeholder="Choose a username"
         />
         <!-- Phone Number -->
         <flux:input

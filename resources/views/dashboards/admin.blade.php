@@ -5,6 +5,32 @@
         </div>
     </div>
     <div class="w-full">
+        <div class="grid gap-4 md:grid-cols-3 mt-2">
+            <div class="card">
+                {{-- <div class="card-header"><h2 class="text-center font-semibold text-2xl">Society</h2></div> --}}
+                <div class="card-body">
+                    <h2 class="text-center font-semibold text-2xl">Society</h2>
+                    <p class="font-semibold text-xl">{{ $societyCount }}</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                {{-- <div class="card-header"><h2 class="text-center font-semibold text-2xl">Apartments</h2></div> --}}
+                <div class="card-body">
+                    <h2 class="text-center font-semibold text-2xl">Apartments</h2>
+                    <p class="font-semibold text-xl">{{ $societyDetailsCount }}</p>
+                </div>
+            </div>
+
+            <div class="card">
+                {{-- <div class="card-header"><h2 class="text-center font-semibold text-2xl">Certificate Issue</h2></div> --}}
+                <div class="card-body">
+                    <h2 class="text-center font-semibold text-2xl">Certificate Issue</h2>
+                    <p class="font-semibold text-xl">{{ $issueCertificateCount }}</p>
+                </div>
+            </div>
+        </div>
+
         <div class="w-full mb-4 mt-2">
             @if(session()->has('success'))
             <div class="px-3 py-3 mb-4 rounded-lg bg-green-500">
@@ -35,16 +61,16 @@
                             <td class="px-3 py-3">{{ $user->email }}</td>
                             <td>
                                 @if($user->role_id==3)
-                                <form action="{{ route('users.markRole', $user->id) }}" method="POST">
+                                <form action="{{ route('admin.markRole', $user->id) }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="role_id" value="2"> <!-- for Admin -->
-                                    <button type="submit" class="bg-green-500 text-white font-bold py-2 px-4 border border-blue-700 rounded">Mark As Admin</button>
+                                    <button type="submit" class="bg-green-500 text-white font-bold py-2 px-4 border border-green-700 rounded">Mark As Admin</button>
                                 </form>
                                 @elseif($user->role_id==2)
-                                <form action="{{ route('users.markRole', $user->id) }}" method="POST">
+                                <form action="{{ route('admin.markRole', $user->id) }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="role_id" value="3"> <!-- for User -->
-                                    <button type="submit" class="bg-amber-500 text-white font-bold py-2 px-4 border border-blue-700 rounded">Mark As User</button>
+                                    <button type="submit" class="bg-amber-500 text-white font-bold py-2 px-4 border border-amber-700 rounded">Mark As User</button>
                                 </form>
                                 @endif
                             </td>

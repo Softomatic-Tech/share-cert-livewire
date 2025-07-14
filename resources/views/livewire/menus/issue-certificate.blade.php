@@ -1,31 +1,29 @@
 <section class="w-full">
     <!-- Society Card -->
     <div class="mt-8 bg-white border border-gray-300 rounded-xl shadow p-6">
-        <h2 class="text-2xl text-center font-semibold">{{ $apartments->society->society_name }}</h2>
-
+        <h2 class="text-2xl text-center font-semibold">{{ $societyDetails->society->society_name }}</h2>
         <div class="flex justify-between items-center mb-4">
             <div>
-                <h2 class="text-lg font-semibold">{{ $apartments->building_name }}-{{ $apartments->apartment_number }}</h2>
-                <p class="font-semibold">Owner</p>
-                @foreach($apartments->owners as $owner)
+                <h2 class="text-lg font-semibold">{{ $societyDetails->building_name }} {{ $societyDetails->apartment_number }}</h2>
+                <p class="font-semibold">Owners</p>
                 <ul class="text-sm mt-1 space-y-1">
-                    <li>– {{ $owner->owner_name }}</li>
+                    <li>@if($societyDetails->owner1_name)– {{ $societyDetails->owner1_name }}@else<span></span>@endif</li>
+                    <li>@if($societyDetails->owner2_name)– {{ $societyDetails->owner2_name }}@else<span></span>@endif</li>
+                    <li>@if($societyDetails->owner3_name)– {{ $societyDetails->owner3_name }}@else<span></span>@endif</li>
                 </ul>
-                @endforeach
             </div>
-            <div class="text-right">
-                <p class="font-semibold">Contact</p>
-                @foreach($apartments->owners as $owner)
+            <div>
+                <p class="font-semibold">Contacts</p>
                 <ul class="text-sm mt-1 space-y-1">
-                    <li>– {{ $owner->phone }}</li>
+                    <li>@if($societyDetails->owner1_mobile)– {{ $societyDetails->owner1_mobile }}@else<span></span>@endif</li>
+                    <li>@if($societyDetails->owner2_mobile)– {{ $societyDetails->owner2_mobile }}@else<span></span>@endif</li>
+                    <li>@if($societyDetails->owner3_mobile)– {{ $societyDetails->owner3_mobile }}@else<span></span>@endif</li>
                 </ul>
-                @endforeach
             </div>
         </div>
-        
         <!-- Status Line -->
         <div class="mb-4">
-            <p class="font-semibold">Share Certificate - <span class="text-green-600">Verification</span></p>
+            <p class="font-semibold">Share Certificate - <span class="text-green-600">{{ ucwords($societyDetails->status) }}</span></p>
         </div>
 
         <!-- Step Tracker -->

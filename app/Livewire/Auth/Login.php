@@ -36,7 +36,7 @@ class Login extends Component
         $this->ensureIsNotRateLimited();
 
         //Determine login type (email,username or phone)
-        $login_type='username';
+        $login_type='phone';
         if(filter_var($this->authIdentifier,FILTER_VALIDATE_EMAIL)){
             $login_type='email';
         }elseif(preg_match('/^\d{10}$/',$this->authIdentifier)){

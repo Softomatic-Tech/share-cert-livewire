@@ -45,64 +45,48 @@
                         <div class="card-body">
                             <div>
                                 <label for="society_id">Society Name</label>
-                                <flux:select id="society_id" wire:model.change="formData.society_id" placeholder="Choose Society...">
+                                <flux:select id="society_id" wire:model.change="selectedSociety" placeholder="Choose Society...">
                                     <flux:select.option value="">Choose Society...</flux:select.option>
-                                    @foreach($society as $row)
+                                    @foreach($society  as $row)
                                         <flux:select.option value="{{ $row->id }}">{{ $row->society_name }}</flux:select.option>
                                     @endforeach
                                 </flux:select>
-                                @error("formData.society_id") <span class="text-red-500">The society name field is required.</span> @enderror
-
+                                @error("society_id") <span class="text-red-500">The society name field is required.</span> @enderror
                                 <label for="building_id">Building Name</label>
-                                <flux:select wire:model.change="formData.building_id" id="building_id" placeholder="Choose Building...">
+                                <flux:select wire:model.change="selectedBuilding" id="building_id" placeholder="Choose Building...">
                                     <flux:select.option value="">Choose Building...</flux:select.option>
-                                    @foreach($buildingOptions as $building)
-                                        <flux:select.option value="{{ $building->id }}">{{ $building->building_name }}</flux:select.option>
+                                    @foreach($buildings as $building)
+                                        <flux:select.option value="{{ $building->building_name }}">{{ $building->building_name }}</flux:select.option>
                                     @endforeach
                                 </flux:select>
-                                @error("formData.building_id") <span class="text-red-500">The building name field is required.</span> @enderror
+                                @error("building_id") <span class="text-red-500">The building name field is required.</span> @enderror
 
-                                <label for="apartment_detail_id">Apartment No</label>
-                                <flux:select id="apartment_detail_id" wire:model="formData.apartment_detail_id" placeholder="Choose Apartment...">
+                                <label for="apartment">Apartment No</label>
+                                <flux:select id="apartment" wire:model="selectedApartment" placeholder="Choose Apartment...">
                                     <flux:select.option value="">Choose Apartment...</flux:select.option>
-                                    @foreach($flatOptions as $flat)
-                                        <flux:select.option value="{{ $flat->id }}">{{ $flat->apartment_number }}</flux:select.option>
+                                    @foreach($apartments as $apartment)
+                                        <flux:select.option value="{{ $apartment->apartment_number }}">{{ $apartment->apartment_number }}</flux:select.option>
                                     @endforeach
                                 </flux:select>
-                                @error("formData.apartment_detail_id") <span class="text-red-500">The apartment number field is required.</span> @enderror
-
-                                @foreach ($formData['owners'] as $index => $owner)
+                                @error("apartment") <span class="text-red-500">The apartment number field is required.</span> @enderror
                                 <div class="owner-fields">
-                                    <!-- Owner Name -->
-                                    <label for="owner_name_{{ $index }}">Owner Name</label>
-                                    <flux:input wire:model="formData.owners.{{ $index }}.owner_name" type="text" id="owner_name_{{ $index }}"/>
-                                    @error("formData.owners.{$index}.owner_name") <span class="text-red-500">{{ str_replace('formData.owners.'.$index.'.', '', str_replace('_', ' ', $message)) }}</span> @enderror
+                                    <label for="owner_name">Owner Name</label>
+                                    <flux:input wire:model="formData.owner_name" type="text" id="owner_name"/>
+                                    @error("formData.owner_name") <span class="text-red-500">{{ str_replace('formData.', '', $message) }}</span> @enderror
 
                                     <!-- Email -->
-                                    <label for="email_{{ $index }}">Email</label>
-                                    <flux:input type="email" wire:model="formData.owners.{{ $index }}.email" id="email_{{ $index }}"/>
-                                    @error("formData.owners.{$index}.email") <span class="text-red-500">{{ str_replace('formData.owners.'.$index.'.', '', $message) }}</span> @enderror
+                                    <label for="email">Email</label>
+                                    <flux:input type="email" wire:model="formData.email" id="email"/>
+                                    @error("formData.email") <span class="text-red-500">{{ str_replace('formData.', '', $message) }}</span> @enderror
 
                                     <!-- Phone -->
-                                    <label for="phone_{{ $index }}">Phone</label>
-                                    <flux:input type="text" wire:model="formData.owners.{{ $index }}.phone" id="phone_{{ $index }}"/>
-                                    @error("formData.owners.{$index}.phone") <span class="text-red-500">{{ str_replace('formData.owners.'.$index.'.', '', $message) }}</span> @enderror
-
-                                    <!-- Remove button for owners -->
-                                    <div class="flex justify-end mt-4">
-                                        @if(count($formData['owners']) > 1)
-                                        <flux:button variant="danger" type="button" wire:click="removeOwner({{ $index }})">{{ __('Remove') }}</flux:button>
-                                        @endif
-                                    </div>
-                                </div>
-                                @endforeach
-
-                                <!-- Add New Owner button (only if there are less than 4 owners) -->
-                                <div class="flex justify-end mt-4">
-                                    <button class="bg-green-500 rounded-sm p-2 text-white font-bold" type="button" wire:click="addOwner" @if(count($formData['owners']) >= 4) disabled @endif>Add</button>
-                                </div>
+                                    <label for="phone">Phone</label>
+                                    <flux:input type="text" wire:model="formData.phone" id="phone"/>
+                                    @error("formData.phone") <span class="text-red-500">{{ str_replace('formData.', '', $message) }}</span> @enderror
                             </div>
-                            <flux:button variant="primary" type="submit">{{ __('Next') }}</flux:button>
+                            <div class="flex justify-end mt-4">
+                                <flux:button variant="primary" type="submit">{{ __('Next') }}</flux:button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -132,12 +116,7 @@
                 <div class="card">
                     <div class="card-header">Step 3: Need Clarification</div>
                     <div class="card-body">
-                        @foreach ($formData['owners'] as $owner)
-                            <p>Name: {{ $owner['owner_name'] }}</p>
-                            <p>Email: {{ $owner['email'] }}</p>
-                            <p>Phone: {{ $owner['phone'] }}</p>
-                            <hr>
-                        @endforeach
+                      
                         <button class="btn btn-secondary" type="button" wire:click="prevStep">Back</button>
                         <button class="btn btn-primary" type="button" wire:click="nextStep">Next</button>
                     </div>

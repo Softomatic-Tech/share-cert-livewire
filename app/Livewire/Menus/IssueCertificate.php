@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Livewire\Menus;
-use App\Models\ApartmentDetail;
+use App\Models\Society;
+use App\Models\SocietyDetail;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -9,17 +10,12 @@ use Livewire\WithFileUploads;
 
 class IssueCertificate extends Component
 {
-    public $apartments;
+    public $societyDetails = [];
 
     public function mount($id)
     {
-        $user_id=Auth::user()->id;
-        $this->apartments = ApartmentDetail::with([
-            'society:id,society_name',
-            'owners' => function ($query) use ($user_id) {
-                $query->where('user_id', $user_id);
-            }
-            ])->where('id', $id)->first();
+
+        $this->societyDetails = SocietyDetail::with('society')->where('id', $id)->first();
     }
 
     public function render()
