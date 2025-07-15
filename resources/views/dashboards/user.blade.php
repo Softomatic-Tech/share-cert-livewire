@@ -1,13 +1,22 @@
 <x-layouts.app :title="__('User Dashboard')">
     <div class="relative">
-        <div class="mt-6 mx-auto w-fit max-w-xl px-4">
-            <div class="text-center text-2xl font-semibold text-zinc-800 dark:text-white">You Don't have any apartment registered.</div>
+        <div class="mx-auto w-fit max-w-xl px-4">
+            <div class="text-center text-2xl font-semibold text-zinc-800 dark:text-white">Select society to view Apartment Details</div>
 
-            <div class="text-base text-lg mt-4 text-center text-zinc-500 dark:text-zinc-300">Please <a href="{{ route('menus.register_society') }}" class="underline text-cyan-600">Click Here</a> to register!</div>
+            {{-- <div class="text-base text-lg mt-4 text-center text-zinc-500 dark:text-zinc-300">Please <a href="{{ route('menus.register_society') }}" class="underline text-cyan-600">Click Here</a> to register!</div> --}}
         </div>
+        <div class="w-full mt-3">
+            <label for="society_id">Society Name</label>
+            <flux:select id="society_id" wire:model.change="selectedSociety" placeholder="Choose Society...">
+                <flux:select.option value="">Choose Society...</flux:select.option>
+                @foreach($societies  as $row)
+                    <flux:select.option value="{{ $row->id }}">{{ $row->society_name }}</flux:select.option>
+                @endforeach
+            </flux:select>
 
+        </div>
         
-        <div class="grid gap-4 md:grid-cols-3 mt-2">
+        {{-- <div class="grid gap-4 md:grid-cols-3 mt-2">
             @foreach($details as $detail)
             <a href="{{ route('menus.issue-certificate',$detail->id) }}">
             <div class="card">
@@ -24,7 +33,7 @@
             </div>
             </a>
             @endforeach
-        </div>
+        </div> --}}
         
     </div>
     

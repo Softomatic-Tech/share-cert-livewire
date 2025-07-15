@@ -7,30 +7,33 @@ use App\Livewire\Menus\CreateSociety;
 use App\Livewire\Menus\SocietyList;
 use App\Livewire\Menus\RegisterSociety;
 use App\Livewire\Menus\IssueCertificate;
+use App\Livewire\Menus\SuperAdminDashboard;
+use App\Livewire\Menus\AdminDashboard;
+use App\Livewire\Menus\UserDashboard;
+use App\Livewire\Menus\ViewAllSocieties;
+use App\Livewire\Menus\ViewAllApartments;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return redirect()->route('login');
 })->name('home');
 
-// Route::view('dashboard', 'dashboard')
-//     ->middleware(['auth', 'verified'])
-//     ->name('dashboard');
+
 // Super Admin Routes
 Route::middleware(['auth', 'role:Super Admin'])->group(function () {
-    Route::get('/superadmin/dashboard', [DashboardController::class, 'superAdmin'])->name('superadmin.dashboard');
+    Route::get('/superadmin/dashboard', SuperAdminDashboard::class)->name('superadmin.dashboard');
 });
 
 // Admin Routes
 Route::middleware(['auth', 'role:Admin'])->group(function () {
-    Route::get('/admin/dashboard', [DashboardController::class, 'admin'])->name('admin.dashboard');
-    Route::post('/admin/{id}/mark-role', [DashboardController::class, 'markRole'])->name('admin.markRole');
+    Route::get('/admin/dashboard', AdminDashboard::class)->name('admin.dashboard');
+    Route::get('/admin/view-societies', ViewAllSocieties::class)->name('admin.view-societies');
+    Route::get('/admin/view-apartments', ViewAllApartments::class)->name('admin.view-apartments');
 });
 
 // User Routes
 Route::middleware(['auth', 'role:Society User'])->group(function () {
-    Route::get('/user/dashboard', [DashboardController::class, 'user'])->name('user.dashboard');
+    Route::get('/user/dashboard', UserDashboard::class)->name('user.dashboard');
 });
 
 Route::middleware(['auth'])->group(function () {
