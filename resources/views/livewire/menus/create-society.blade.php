@@ -222,15 +222,9 @@
                                                         <th scope="col" class="px-6 py-4">#</th>
                                                         <th scope="col" class="px-6 py-4">Building Name</th>
                                                         <th scope="col" class="px-6 py-4">Apartment Number</th>
-                                                        <th scope="col" class="px-6 py-4">Owner 1 Name</th>
-                                                        <th scope="col" class="px-6 py-4">Owner 1 Mobile</th>
-                                                        <th scope="col" class="px-6 py-4">Owner 1 Email</th>
-                                                        <th scope="col" class="px-6 py-4">Owner 2 Name</th>
-                                                        <th scope="col" class="px-6 py-4">Owner 2 Mobile</th>
-                                                        <th scope="col" class="px-6 py-4">Owner 2 Email</th>
-                                                        <th scope="col" class="px-6 py-4">Owner 3 Name</th>
-                                                        <th scope="col" class="px-6 py-4">Owner 3 Mobile</th>
-                                                        <th scope="col" class="px-6 py-4">Owner 3 Email</th>
+                                                        <th scope="col" class="px-6 py-4">Owner 1 Details</th>
+                                                        <th scope="col" class="px-6 py-4">Owner 2 Details</th>
+                                                        <th scope="col" class="px-6 py-4">Owner 3 Details</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -239,15 +233,21 @@
                                                         <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $index + 1 }}</td>
                                                         <td class="whitespace-nowrap px-6 py-4">{{ $detail->building_name }}</td>
                                                         <td class="whitespace-nowrap px-6 py-4">{{ $detail->apartment_number }}</td>
-                                                        <td class="whitespace-nowrap px-6 py-4">{{ $detail->owner1_name }}</td>
-                                                        <td class="whitespace-nowrap px-6 py-4">{{ $detail->owner1_mobile }}</td>
-                                                        <td class="whitespace-nowrap px-6 py-4">{{ $detail->owner1_email }}</td>
-                                                        <td class="whitespace-nowrap px-6 py-4">{{ $detail->owner2_name }}</td>
-                                                        <td class="whitespace-nowrap px-6 py-4">{{ $detail->owner2_mobile }}</td>
-                                                        <td class="whitespace-nowrap px-6 py-4">{{ $detail->owner2_email }}</td>
-                                                        <td class="whitespace-nowrap px-6 py-4">{{ $detail->owner3_name }}</td>
-                                                        <td class="whitespace-nowrap px-6 py-4">{{ $detail->owner3_mobile }}</td>
-                                                        <td class="whitespace-nowrap px-6 py-4">{{ $detail->owner3_email }}</td>
+                                                        <td class="whitespace-nowrap px-6 py-4">
+                                                            {{ $detail->owner1_name }} 
+                                                            <br />@if($detail->owner1_mobile)<i class="fa-solid fa-phone"></i> {{ $detail->owner1_mobile }} @endif
+                                                            <br /> @if($detail->owner1_email)<i class="fas fa-envelope"></i> {{ $detail->owner1_email }}@endif
+                                                        </td>
+                                                        <td class="whitespace-nowrap px-6 py-4">
+                                                            {{ $detail->owner2_name }} 
+                                                            <br />@if($detail->owner2_mobile)<i class="fa-solid fa-phone"></i> {{ $detail->owner2_mobile }} @endif
+                                                            <br />@if($detail->owner2_email)<i class="fas fa-envelope"></i> {{ $detail->owner2_email }}@endif
+                                                        </td>
+                                                        <td class="whitespace-nowrap px-6 py-4">
+                                                            {{ $detail->owner3_name }} 
+                                                            <br />@if($detail->owner3_mobile)<i class="fa-solid fa-phone"></i> {{ $detail->owner3_mobile }} @endif
+                                                            <br />@if($detail->owner3_email)<i class="fas fa-envelope"></i> {{ $detail->owner3_email }}@endif
+                                                        </td>
                                                     </tr>
                                                     @endforeach
                                                 </tbody>

@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('society_id'); 
             $table->foreign('society_id')->references('id')->on('societies')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('building_name');
             $table->string('apartment_number');
@@ -27,11 +28,11 @@ return new class extends Migration
             $table->string('owner3_name')->nullable();
             $table->string('owner3_email')->nullable();
             $table->string('owner3_mobile')->nullable();
-            $table->text('status')->nullable();
-            $table->string('docs1')->nullable();
-            $table->string('docs2')->nullable();
-            $table->string('docs3')->nullable();
-            $table->string('docs4')->nullable();
+            $table->json('status')->nullable();
+            $table->string('agreementCopy')->nullable();
+            $table->string('memberShipForm')->nullable();
+            $table->string('allotmentLetter')->nullable();
+            $table->string('possessionLetter')->nullable();
             $table->timestamps();
         });
     }

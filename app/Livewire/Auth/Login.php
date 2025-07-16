@@ -26,22 +26,34 @@ class Login extends Component
 
     public bool $remember = false;
 
+    public string $email = '';
     /**
      * Handle an incoming authentication request.
      */
+    public function updatedEmail($value)
+    {
+        $this->authIdentifier = $value;
+    }
+
+    public function updatedAuthIdentifier($value)
+    {
+        $this->email = $value;
+    }
+
     public function login(): void
     {
         $this->validate();
 
         $this->ensureIsNotRateLimited();
 
-        //Determine login type (email,username or phone)
-        $login_type='phone';
-        if(filter_var($this->authIdentifier,FILTER_VALIDATE_EMAIL)){
-            $login_type='email';
-        }elseif(preg_match('/^\d{10}$/',$this->authIdentifier)){
-            $login_type='phone';
-        }
+        //Determine login type (email or phone)
+        // $login_type='phone';
+        // if(filter_var($this->authIdentifier,FILTER_VALIDATE_EMAIL)){
+        //     $login_type='email';
+        // }elseif(preg_match('/^\d{10}$/',$this->authIdentifier)){
+        //     $login_type='phone';
+        // 
+        $login_type = filter_var($this->authIdentifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
         if (! Auth::attempt([$login_type => $this->authIdentifier, 'password' => $this->password], $this->remember)) {
             RateLimiter::hit($this->throttleKey());
 
@@ -54,14 +66,15 @@ class Login extends Component
         Session::regenerate();
 
         // Get the authenticated user
-        $user = Auth::user();
-        // Redirect based on user role
-        match ($user->role->role) {
-            'Super Admin' => $this->redirectIntended(route('superadmin.dashboard')),
-            'Admin' => $this->redirectIntended(route('admin.dashboard')),
-            'Society User' => $this->redirectIntended(route('user.dashboard')),
-        };
-        // $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
+        // $user = Auth::user();
+        // // Redirect based on user role
+        // match ($user->role->role) {
+        //     'Super Admin' => $this->redirectIntended(route('superadmin.dashboard')),
+        //     'Admin' => $this->redirectIntended(route('admin.dashboard')),
+        //     'Society User' => $this->redirectIntended(route('user.dashboard')),
+        //     default => $this->redirectIntended('/'), 
+        // };
+        $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
 
     /**

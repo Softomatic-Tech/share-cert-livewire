@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -24,6 +25,8 @@ class Register extends Component
 
     public string $password_confirmation = '';
 
+    public string $role_id = '';
+
     /**
      * Handle an incoming registration request.
      */
@@ -38,12 +41,12 @@ class Register extends Component
 
         $validated['email'] = $validated['email'] ?: null;
         $validated['password'] = Hash::make($validated['password']);
-        $validated['role_id'] = 3;
+        $validated['role_id'] = Role::firstWhere('role', 'Society User')->id;
 
         event(new Registered(($user = User::create($validated))));
 
-        // Auth::login($user);
+        Auth::login($user);
 
-        $this->redirect(route('login'));
+        $this->redirect(route('dashboard', absolute: false));
     }
 }

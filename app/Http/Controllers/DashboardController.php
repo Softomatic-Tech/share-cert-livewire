@@ -9,8 +9,24 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
+
 class DashboardController extends Controller
 {
+
+    public function index()
+    {
+        $user = Auth::user();
+        $dashboardComponent = match ($user->role->role) {
+            'Super Admin' => 'menus.superadmin-dashboard',
+            'Admin' => 'menus.admin-dashboard',
+            'Society User' => 'menus.user-dashboard',
+            default => abort(403, 'Unauthorized'),
+        };
+
+        log::info('User component: ' . $dashboardComponent);
+        return view('dashboard', compact('dashboardComponent'));
+    }
+
     public function superAdmin() {
         return view('dashboards.superadmin');
     }
@@ -27,45 +43,6 @@ class DashboardController extends Controller
 
     public function user() {
         $user_id=Auth::user()->id;
-        // $societies = Society::whereHas('details', function ($query) use ($user_id) {
-        //     $query->where('user_id', $user_id);
-        // })
-        // ->with(['details' => function ($query) use ($user_id) {
-        //     $query->where('user_id', $user_id);
-        // }])
-        // ->get()
-        // ->map(function ($society) {
-        //     $firstDetail = $society->details->first();
-        
-        //     $totalOwners = $society->details->map(function ($detail) {
-        //         $count = 0;
-        //         if (!empty($detail->owner1_name) && !empty($detail->owner1_mobile)) $count++;
-        //         if (!empty($detail->owner2_name) && !empty($detail->owner2_mobile)) $count++;
-        //         if (!empty($detail->owner3_name) && !empty($detail->owner3_mobile)) $count++;
-        //         return $count;
-        //     })->sum();
-    
-        //     return [
-        //         'society_id'=>$society->id,
-        //         'society_name'   => $society->society_name,
-        //         'building_name'  => $firstDetail->building_name ?? '',
-        //         'apartment_number'   => $firstDetail->apartment_number ?? '',
-        //         'owner_name' => $firstDetail->owner1_name,
-        //         'owner_mobile' => $firstDetail->owner1_mobile,
-        //         'total_owners'   => $totalOwners,
-        //     ];
-
-        //     $society->details = $society->details->map(function($detail) {
-        //         $ownerCount = 0;
-        //         if (!empty($detail->owner1_name)) $ownerCount++;
-        //         if (!empty($detail->owner2_name)) $ownerCount++;
-        //         if (!empty($detail->owner3_name)) $ownerCount++;
-        //         $detail->total_owners = $ownerCount;
-        
-        //         return $detail;
-        //     });
-        //     return $society;
-        //});
         $details = SocietyDetail::with('society')
         ->where('user_id', Auth::id())
         ->select('id', 'society_id', 'building_name', 'apartment_number', 'owner1_name', 'owner1_mobile', 'owner2_name', 'owner2_mobile','owner3_name', 'owner3_mobile','status')
@@ -78,7 +55,8 @@ class DashboardController extends Controller
             $item->owner_count = $ownerCount;
             return $item;
         });
-        return view('dashboards.user',compact('details'));
+        $societies= Society::all();
+        return view('dashboards.user',compact('societies','details'));
     }
 
     public function markRole(Request $request, $id){
