@@ -13,11 +13,12 @@ use App\Livewire\Menus\UserDashboard;
 use App\Livewire\Menus\ViewAllSocieties;
 use App\Livewire\Menus\ViewAllApartments;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\DashboardController;
 Route::get('/', function () {
     return redirect()->route('login');
 })->name('home');
 
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
 
 // Super Admin Routes
 Route::middleware(['auth', 'role:Super Admin'])->group(function () {

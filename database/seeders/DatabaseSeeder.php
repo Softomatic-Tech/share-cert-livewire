@@ -4,6 +4,7 @@ namespace Database\Seeders;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Role;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -14,18 +15,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $superAdminId = Role::factory()->create(['role' => 'Super Admin']);
+        $adminId = Role::factory()->create(['role' => 'Admin']);
+        $societyUserId = Role::factory()->create(['role' => 'Society User'])->id;
 
+        // Now create a user and assign the "Society User" role
         User::factory()->create([
-            'name' => 'Test User',
+            'name' => 'Test Society User',
             'email' => 'test@example.com',
             'phone' => '1234567890',
-        ]);
-
-        DB::table('roles')->insert([
-            ['role' => 'Super Admin', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
-            ['role' => 'Admin', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
-            ['role' => 'Society User', 'created_at' => Carbon::now(), 'updated_at' => Carbon::now()],
+            'role_id' => $societyUserId,
+            'password' => bcrypt('password'), // if password is required for login
         ]);
     }
 }
