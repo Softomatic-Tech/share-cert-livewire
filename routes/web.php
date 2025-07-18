@@ -3,7 +3,9 @@
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
+use App\Livewire\Menus\SocietyMultistepForm;
 use App\Livewire\Menus\CreateSociety;
+use App\Livewire\Menus\CreateApartment;
 use App\Livewire\Menus\SocietyList;
 use App\Livewire\Menus\RegisterSociety;
 use App\Livewire\Menus\IssueCertificate;
@@ -23,6 +25,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['au
 // Super Admin Routes
 Route::middleware(['auth', 'role:Super Admin'])->group(function () {
     Route::get('/superadmin/dashboard', SuperAdminDashboard::class)->name('superadmin.dashboard');
+    Route::get('/superadmin/society-multistep-form', SocietyMultistepForm::class)->name('menus.society_multistep_form');
+    Route::get('/superadmin/society-list', SocietyList::class)->name('menus.society_list');
 });
 
 // Admin Routes
@@ -30,6 +34,8 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
     Route::get('/admin/dashboard', AdminDashboard::class)->name('admin.dashboard');
     Route::get('/admin/view-societies', ViewAllSocieties::class)->name('admin.view-societies');
     Route::get('/admin/view-apartments', ViewAllApartments::class)->name('admin.view-apartments');
+    Route::get('/admin/create-society', CreateSociety::class)->name('menus.create_society');
+    Route::get('/admin/create-apartment', CreateApartment::class)->name('menus.create_apartment');
 });
 
 // User Routes
@@ -42,8 +48,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
-    Route::get('/create-society', CreateSociety::class)->name('menus.create_society');
-    Route::get('/society-list', SocietyList::class)->name('menus.society_list');
     Route::get('/register-society', RegisterSociety::class)->name('menus.register_society');
     Route::get('/issue-certificate/{id}', IssueCertificate::class)->name('menus.issue-certificate');
 });

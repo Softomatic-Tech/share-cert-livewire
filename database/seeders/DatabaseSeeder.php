@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $superAdminId = Role::factory()->create(['role' => 'Super Admin']);
+        $superAdminId = Role::factory()->create(['role' => 'Super Admin'])->id;
         $adminId = Role::factory()->create(['role' => 'Admin']);
         $societyUserId = Role::factory()->create(['role' => 'Society User'])->id;
 
@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test Society User',
             'email' => 'test@example.com',
             'phone' => '1234567890',
-            'role_id' => $societyUserId,
+            'role_id' => $superAdminId,
             'password' => bcrypt('password'), // if password is required for login
         ]);
     }
