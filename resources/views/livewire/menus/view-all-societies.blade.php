@@ -7,7 +7,7 @@
     <div class="grid gap-4 md:grid-cols-3 mt-2">
         @foreach($societies as $society)
         <div class="card">
-            <div class="card-body" wire:click="redirectToSocietyPage">
+            <div class="card-body">
                 <h2 class="text-center font-semibold text-xl">{{ $society->society_name }}</h2>
             </div>
         </div>

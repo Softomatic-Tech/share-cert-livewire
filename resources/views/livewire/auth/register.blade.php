@@ -53,6 +53,19 @@
             autocomplete="new-password"
             :placeholder="__('Confirm password')"
         />
+        <flux:select id="security_question_id" :label="__('Security Question')" wire:model="security_question_id" placeholder="Select Security Question...">
+            <flux:select.option value="">Choose Security Question</flux:select.option>
+            @foreach ($securityQues as $question)
+                <flux:select.option value="{{ $question->id }}">{{ $question->question }}</flux:select.option>
+            @endforeach
+        </flux:select>
+        <flux:input
+            wire:model="security_answer"
+            :label="__('Security Answer')"
+            type="text"
+            required
+            :placeholder="__('Security Answer')"
+        />
 
         <div class="flex items-center justify-end">
             <flux:button type="submit" variant="primary" class="w-full">

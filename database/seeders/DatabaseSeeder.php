@@ -15,16 +15,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $superAdminId = Role::factory()->create(['role' => 'Super Admin']);
+        $superAdminId = Role::factory()->create(['role' => 'Super Admin'])->id;
         $adminId = Role::factory()->create(['role' => 'Admin']);
-        $societyUserId = Role::factory()->create(['role' => 'Society User'])->id;
+        $societyUserId = Role::factory()->create(['role' => 'Society User']);
 
         // Now create a user and assign the "Society User" role
         User::factory()->create([
             'name' => 'Test Society User',
             'email' => 'test@example.com',
             'phone' => '1234567890',
-            'role_id' => $societyUserId,
+            'role_id' => $superAdminId,
             'password' => bcrypt('password'), // if password is required for login
         ]);
     }

@@ -47,13 +47,22 @@ class Login extends Component
         $this->ensureIsNotRateLimited();
 
         //Determine login type (email or phone)
-        // $login_type='phone';
-        // if(filter_var($this->authIdentifier,FILTER_VALIDATE_EMAIL)){
-        //     $login_type='email';
-        // }elseif(preg_match('/^\d{10}$/',$this->authIdentifier)){
-        //     $login_type='phone';
-        // 
         $login_type = filter_var($this->authIdentifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+
+        if ($login_type === 'phone') {
+            $mobile = $this->authIdentifier;
+
+            $existsInSociety = \App\Models\SocietyDetail::where('owner1_mobile', $mobile)
+                ->orWhere('owner2_mobile', $mobile)
+                ->orWhere('owner3_mobile', $mobile)
+                ->exists();
+
+            if (! $existsInSociety) {
+                throw ValidationException::withMessages([
+                    'authIdentifier' => 'This mobile number is not registered as an owner in any society.',
+                ]);
+            }
+        }
         if (! Auth::attempt([$login_type => $this->authIdentifier, 'password' => $this->password], $this->remember)) {
             RateLimiter::hit($this->throttleKey());
 
@@ -66,14 +75,6 @@ class Login extends Component
         Session::regenerate();
 
         // Get the authenticated user
-        // $user = Auth::user();
-        // // Redirect based on user role
-        // match ($user->role->role) {
-        //     'Super Admin' => $this->redirectIntended(route('superadmin.dashboard')),
-        //     'Admin' => $this->redirectIntended(route('admin.dashboard')),
-        //     'Society User' => $this->redirectIntended(route('user.dashboard')),
-        //     default => $this->redirectIntended('/'), 
-        // };
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
 
