@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
     {
         $superAdminId = Role::factory()->create(['role' => 'Super Admin'])->id;
         $adminId = Role::factory()->create(['role' => 'Admin']);
-        $societyUserId = Role::factory()->create(['role' => 'Society User']);
+        $societyUserId = Role::factory()->create(['role' => 'Society User'])->id;
 
         // Now create a user and assign the "Society User" role
         User::factory()->create([

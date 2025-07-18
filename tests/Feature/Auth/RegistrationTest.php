@@ -3,6 +3,7 @@
 use App\Livewire\Auth\Register;
 use Livewire\Livewire;
 use App\Models\Role;
+use App\Models\SecurityQuestion;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
@@ -13,17 +14,20 @@ test('registration screen can be rendered', function () {
 });
 
 test('new users can register', function () {
-    $role = Role::firstOrCreate(
-        ['role' => 'Society User'],
+    $this->seed();
+
+    $security_question = SecurityQuestion::firstOrCreate(
+        ['question' => 'What is your favorite color?'],
         ['created_at' => now(), 'updated_at' => now()]
     );
     $response = Livewire::test(Register::class)
         ->set('name', 'Test User')
-        ->set('email', 'test@example.com')
+        ->set('email', null)
         ->set('phone', '9876543210')
         ->set('password', 'password')
         ->set('password_confirmation', 'password')
-        ->set('role_id', $role->id)
+        ->set('security_question_id', $security_question->id)
+        ->set('security_answer', 'Red')
         ->call('register');
 
     $response

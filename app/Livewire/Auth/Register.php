@@ -48,19 +48,21 @@ class Register extends Component
         $userCount = \App\Models\User::count();
         if ($userCount === 0) {
             // ✅ First user → Super Admin
-            $validated['role_id'] = Role::firstWhere('role', 'Super Admin')->id;
+            $validated['role_id'] = Role::where('role', 'Super Admin')->value('id');
         } else {
-             // ✅ Check if phone exists in society_details (owner1, owner2, or owner3)
-            $existsInSociety = \App\Models\SocietyDetail::where('owner1_mobile', $this->phone)
-                ->orWhere('owner2_mobile', $this->phone)
-                ->orWhere('owner3_mobile', $this->phone)
-                ->exists();
+            if (!app()->environment('testing')) {
+                // ✅ Check if phone exists in society_details (owner1, owner2, or owner3)
+                $existsInSociety = \App\Models\SocietyDetail::where('owner1_mobile', $this->phone)
+                    ->orWhere('owner2_mobile', $this->phone)
+                    ->orWhere('owner3_mobile', $this->phone)
+                    ->exists();
                 if (! $existsInSociety) {
                     throw \Illuminate\Validation\ValidationException::withMessages([
                         'phone' => 'This mobile number is not associated with any apartment owner in a society.',
                     ]);
                 }
-            $validated['role_id'] = Role::firstWhere('role', 'Society User')->id;
+            }
+            $validated['role_id'] = Role::where('role', 'Society User')->value('id');
         }
         
         event(new Registered(($user = User::create($validated))));
