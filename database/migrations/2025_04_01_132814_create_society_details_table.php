@@ -33,6 +33,7 @@ return new class extends Migration
             $table->string('memberShipForm')->nullable();
             $table->string('allotmentLetter')->nullable();
             $table->string('possessionLetter')->nullable();
+            $table->text('comment')->nullable();
             $table->timestamps();
         });
     }

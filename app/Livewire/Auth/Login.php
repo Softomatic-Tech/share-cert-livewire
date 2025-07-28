@@ -51,16 +51,18 @@ class Login extends Component
 
         if ($login_type === 'phone') {
             $mobile = $this->authIdentifier;
-
+            $userRole = \App\Models\User::where('phone',$mobile)->value('role_id');
+            if($userRole==3){
             $existsInSociety = \App\Models\SocietyDetail::where('owner1_mobile', $mobile)
                 ->orWhere('owner2_mobile', $mobile)
                 ->orWhere('owner3_mobile', $mobile)
                 ->exists();
 
-            if (! $existsInSociety) {
-                throw ValidationException::withMessages([
-                    'authIdentifier' => 'This mobile number is not registered as an owner in any society.',
-                ]);
+                if (! $existsInSociety) {
+                    throw ValidationException::withMessages([
+                        'authIdentifier' => 'This mobile number is not registered as an owner in any society.',
+                    ]);
+                }
             }
         }
         if (! Auth::attempt([$login_type => $this->authIdentifier, 'password' => $this->password], $this->remember)) {

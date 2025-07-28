@@ -8,16 +8,13 @@ use App\Models\Society;
 use App\Models\SocietyDetail;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Facades\Auth;
 
 class SocietyMultistepForm extends Component
 {
     use WithFileUploads;
     public $currentStep = 1;
     public $csv_file;
-    public $agreement_copy;
-    public $membership_form;
-    public $allotment_letter;
-    public $possesion_letter;
     public $societyId = null;
     public $csvUploaded = false;
 
@@ -51,7 +48,6 @@ class SocietyMultistepForm extends Component
     {
         return view('livewire.menus.society-multistep-form');
     }
-
     public function getUploadedDetailsProperty()
     {
         if ($this->societyId) {
@@ -71,7 +67,6 @@ class SocietyMultistepForm extends Component
     public function nextStep()
     {
         if ($this->currentStep == 1) {
-            $this->validate($this->rules[$this->currentStep] ?? []);
             $this->save(); // Save Step 1 before moving
             if (!$this->societyId) {
                 return; // Do not move if society not saved
@@ -187,6 +182,57 @@ class SocietyMultistepForm extends Component
             $owner1_name = trim($data[$indexes['owner1_first_name']] . ' ' . ($data[$indexes['owner1_middle_name']] ?? '') . ' ' . ($data[$indexes['owner1_last_name']] ?? ''));
             $owner2_name = trim(($data[$indexes['owner2_first_name']] ?? '') . ' ' . ($data[$indexes['owner2_middle_name']] ?? '') . ' ' . ($data[$indexes['owner2_last_name']] ?? ''));
             $owner3_name = trim(($data[$indexes['owner3_first_name']] ?? '') . ' ' . ($data[$indexes['owner3_middle_name']] ?? '') . ' ' . ($data[$indexes['owner3_last_name']] ?? ''));
+            $user = Auth::user();
+            $status=[
+                "tasks" => [
+                    [
+                        "name" => "Verify Details",
+                        "responsibilityOf"=> "ApartmentOwner",
+                        "Status" => "Pending",
+                        "createdBy" => "System",
+                        "createDateTime" => now(),
+                        "updatedBy" => null,
+                        "updateDateTime" => null
+                    ],
+                    [
+                        "name" => "Application",
+                        "responsibilityOf"=> "ApartmentOwner",
+                        "Status" => "Pending",
+                        "createdBy" => null,
+                        "createDateTime" => now(),
+                        "updatedBy" => null,
+                        "updateDateTime" => null,
+                    ],
+                    [
+                        "name" => "Verification",
+                        "responsibilityOf"=> "DearSociety",
+                        "Status" => "Pending",
+                        "createdBy" => "System",
+                        "createDateTime" => null,
+                        "updatedBy" => null,
+                        "updateDateTime" => null
+                    ],
+                    [
+                        "name" => "Certificate Generated",
+                        "responsibilityOf"=> "DearSociety",
+                        "Status" => "Pending",
+                        "createdBy" => null,
+                        "createDateTime" => null,
+                        "updatedBy" => null,
+                        "updateDateTime" => null
+                    ],
+                    [
+                        "name" => "Certificate Delivered",
+                        "responsibilityOf"=> "DearSociety",
+                        "Status" => "Pending",
+                        "createdBy" => null,
+                        "createDateTime" => null,
+                        "updatedBy" => null,
+                        "updateDateTime" => null
+                    ]
+                ]
+            ];
+
             SocietyDetail::create([
                 'society_id' => $this->societyId,
                 'building_name' => $data[$indexes['building_name']],
@@ -200,22 +246,12 @@ class SocietyMultistepForm extends Component
                 'owner3_name' => $owner3_name ?: null,
                 'owner3_mobile' => $data[$indexes['owner3_mobile']] ?? null,
                 'owner3_email' => $data[$indexes['owner3_email']] ?? null,
+                'status' => json_encode($status),
             ]);
             $insertedCount++;
         }
 
         session()->flash('success', "{$csvFlats} entries inserted successfully.");
-    }
-
-    public function updateStatus($id){
-        $detail = SocietyDetail::find($id);
-        if ($detail) {
-            $detail->status = 'verified';
-            $detail->save();
-            session()->flash('success','Status has been verified');
-        }else{
-            session()->flash('error','Society details not exist');
-        }
     }
 
     public function done()
@@ -245,64 +281,4 @@ class SocietyMultistepForm extends Component
         session()->flash('success', 'Society and its details have been saved successfully!');
     }
 
-    public function agreementCopy()
-    {
-        $this->validate([
-            'agreement_copy' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
-        ]);
-
-        $fileName = time().'.'.$this->agreement_copy->getClientOriginalExtension();
-        $path = $this->agreement_copy->storeAs('society_docs', $fileName, 'public');
-
-        // $society = Society::find($this->societyId);
-
-        // if ($society) {
-        //     $society->agreement_copy = $fileName;
-        //     $society->save();
-
-            session()->flash('success', 'File uploaded and saved successfully!');
-        // } else {
-        //     session()->flash('error', 'Society not found.');
-        // }
-        $this->reset('agreement_copy');
-    }
-
-    public function memberShipForm()
-    {
-        $this->validate([
-            'membership_form' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
-        ]);
-
-        $fileName = time().'.'.$this->membership_form->getClientOriginalExtension();
-        $path = $this->membership_form->storeAs('society_docs', $fileName, 'public');
-
-        session()->flash('success', 'File uploaded and saved successfully!');
-        $this->reset('membership_form');
-    }
-
-    public function allotmentLetter()
-    {
-        $this->validate([
-            'allotment_letter' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
-        ]);
-
-        $fileName = time().'.'.$this->allotment_letter->getClientOriginalExtension();
-        $path = $this->allotment_letter->storeAs('society_docs', $fileName, 'public');
-
-        session()->flash('success', 'File uploaded and saved successfully!');
-        $this->reset('allotment_letter');
-    }
-
-    public function possessionLetter()
-    {
-        $this->validate([
-            'possesion_letter' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
-        ]);
-
-        $fileName = time().'.'.$this->possesion_letter->getClientOriginalExtension();
-        $path = $this->possesion_letter->storeAs('society_docs', $fileName, 'public');
-
-        session()->flash('success', 'File uploaded and saved successfully!');
-        $this->reset('possesion_letter');
-    }
 }
