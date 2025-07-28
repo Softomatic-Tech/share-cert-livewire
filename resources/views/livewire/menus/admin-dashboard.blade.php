@@ -5,23 +5,30 @@
     
         <div class="grid gap-6 md:grid-cols-3 mt-2">
             <div class="card">
-                <div class="card-body cursor-pointer" wire:click="redirectToSocietyPage">
-                    <h2 class="text-center font-semibold text-xl">Society</h2>
-                    <p class="font-semibold text-2xl">{{ $societyCount }}</p>
+                <div class="card-body cursor-pointer" wire:click="redirectToSociety(1)">
+                    <h2 class="text-center font-semibold text-xl">Pending Society</h2>
+                    <p class="font-semibold text-2xl">{{ $pendingSocietyCount }}</p>
                 </div>
             </div>
             
             <div class="card">
+                <div class="card-body cursor-pointer" wire:click="redirectToSociety(2)">
+                    <h2 class="text-center font-semibold text-xl">Rejected Society</h2>
+                    <p class="font-semibold text-2xl">{{ $rejectedSocietyCount }}</p>
+                </div>
+            </div>
+            
+            {{-- <div class="card">
                 <div class="card-body cursor-pointer" wire:click="redirectToApartmentPage">
                     <h2 class="text-center font-semibold text-xl">Apartments</h2>
                     <p class="font-semibold text-2xl">{{ $societyDetailsCount }}</p>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="card">
                 <div class="card-body">
                     <h2 class="text-center font-semibold text-xl">Certificate Issue</h2>
-                    <p class="font-semibold text-2xl">{{ $issueCertificateCount }}</p>
+                    <p class="font-semibold text-2xl">10</p>
                 </div>
             </div>
         </div>

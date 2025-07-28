@@ -16,6 +16,8 @@ use App\Livewire\Menus\ViewAllSocieties;
 use App\Livewire\Menus\ViewAllApartments;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
+use App\Livewire\Menus\UpdateSocietyStatus;
+
 Route::get('/', function () {
     return redirect()->route('login');
 })->name('home');
@@ -32,15 +34,17 @@ Route::middleware(['auth', 'role:Super Admin'])->group(function () {
 // Admin Routes
 Route::middleware(['auth', 'role:Admin'])->group(function () {
     Route::get('/admin/dashboard', AdminDashboard::class)->name('admin.dashboard');
-    Route::get('/admin/view-societies', ViewAllSocieties::class)->name('admin.view-societies');
-    Route::get('/admin/view-apartments', ViewAllApartments::class)->name('admin.view-apartments');
+    Route::get('/admin/view-societies/{societyStatus}', ViewAllSocieties::class)->name('admin.view-societies');
+    Route::get('/admin/view-apartments/{id}/{societyStatus}', ViewAllApartments::class)->name('admin.view-apartments');
     Route::get('/admin/create-society', CreateSociety::class)->name('menus.create_society');
     Route::get('/admin/create-apartment', CreateApartment::class)->name('menus.create_apartment');
+    
 });
 
 // User Routes
 Route::middleware(['auth', 'role:Society User'])->group(function () {
     Route::get('/user/dashboard', UserDashboard::class)->name('user.dashboard');
+    Route::get('/user/update-society-status/{apartmentId}', UpdateSocietyStatus::class)->name('menus.update_society_status');
 });
 
 Route::middleware(['auth'])->group(function () {

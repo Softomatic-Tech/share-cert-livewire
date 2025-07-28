@@ -24,9 +24,9 @@
                   <th scope="col" class="px-6 py-4">#</th>
                   <th scope="col" class="px-6 py-4">Building Name</th>
                   <th scope="col" class="px-6 py-4">Apartment No</th>
-                  <th scope="col" class="px-6 py-4">Owner 1 Details</th>
-                  <th scope="col" class="px-6 py-4">Owner 2 Details</th>
-                  <th scope="col" class="px-6 py-4">Owner 3 Details</th>
+                  <th scope="col" class="px-6 py-4">Owner1 Details</th>
+                  <th scope="col" class="px-6 py-4">Owner2 Details</th>
+                  <th scope="col" class="px-6 py-4">Owner3 Details</th>
                   <th scope="col" class="px-6 py-4">Agreement Copy</th>
                   <th scope="col" class="px-6 py-4">MemberShip Form</th>
                   <th scope="col" class="px-6 py-4">Allotment Letter</th>
@@ -58,41 +58,41 @@
                       <td class="whitespace-nowrap px-6 py-4">
                         @if($detail->agreementCopy)
                           <a href="{{ asset('storage/' . $detail->agreementCopy) }}" target="_blank" class="text-blue-500 hover:underline">View</a>
-                          <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full">Verify</button>
+                          {{-- <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full">Verify</button>
 
                           <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">Reject</button>
                         @else
-                          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" wire:click="openUploadModal({{ $detail->id }}, 'agreementCopy')">Upload</button>
+                          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" wire:click="openUploadModal({{ $detail->id }}, 'agreementCopy')">Upload</button> --}}
                         @endif
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
                         @if($detail->memberShipForm)
                           <a href="{{ asset('storage/' . $detail->memberShipForm) }}" target="_blank" class="text-blue-500 hover:underline">View</a>
-                          <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full">Verify</button>
+                          {{-- <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full">Verify</button>
 
                           <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">Reject</button>
                         @else
-                          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" wire:click="openUploadModal({{ $detail->id }}, 'memberShipForm')">Upload</button>
+                          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" wire:click="openUploadModal({{ $detail->id }}, 'memberShipForm')">Upload</button> --}}
                         @endif
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
                         @if($detail->allotmentLetter)
                           <a href="{{ asset('storage/' . $detail->allotmentLetter) }}" target="_blank" class="text-blue-500 hover:underline">View</a>
-                          <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full">Verify</button>
+                          {{-- <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full">Verify</button>
 
                           <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">Reject</button>
                         @else
-                          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" wire:click="openUploadModal({{ $detail->id }}, 'allotmentLetter')">Upload</button>
+                          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" wire:click="openUploadModal({{ $detail->id }}, 'allotmentLetter')">Upload</button> --}}
                         @endif
                       </td>
                       <td class="whitespace-nowrap px-6 py-4">
                         @if($detail->possessionLetter)
                           <a href="{{ asset('storage/' . $detail->possessionLetter) }}" target="_blank" class="text-blue-500 hover:underline">View</a>
-                          <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full">Verify</button>
+                          {{-- <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-full">Verify</button>
 
                           <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">Reject</button>
                         @else
-                          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" wire:click="openUploadModal({{ $detail->id }}, 'possessionLetter')">Upload</button>
+                          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full" wire:click="openUploadModal({{ $detail->id }}, 'possessionLetter')">Upload</button> --}}
                         @endif
                       </td>
                       <td></td>

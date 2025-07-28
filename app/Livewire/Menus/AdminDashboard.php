@@ -15,7 +15,7 @@ class AdminDashboard extends Component
     public $adminRole;
     public $userRole;
     public $societyCount;
-    public $societyDetailsCount;
+    public $societyDetailsCount,$pendingSociety,$pendingSocietyCount,$rejectedSociety,$rejectedSocietyCount;
     public $issueCertificateCount;
 
     public function render()
@@ -27,9 +27,38 @@ class AdminDashboard extends Component
         $this->users=User::orderBy('id','desc')->get();
         $this->adminRole=Role::where('role','Admin')->value('id');
         $this->userRole=Role::where('role','Society User')->value('id');
-        $this->societyCount = Society::count();
-        $this->societyDetailsCount = SocietyDetail::count();
-        $this->issueCertificateCount=100;
+
+        $this->pendingSociety = SocietyDetail::get()
+            ->filter(function ($item) {
+            $json = json_decode($item->status, true);
+            if (isset($json['tasks'])) {
+                foreach ($json['tasks'] as $task) {
+                    if ($task['name'] === 'Verify Details' && $task['Status'] === 'Applied') {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        })
+        ->unique('society_id');
+        $this->pendingSocietyCount=$this->pendingSociety->count();
+
+    $this->rejectedSociety = SocietyDetail::get()
+        ->filter(function ($item) {
+        $json = json_decode($item->status, true);
+        if (isset($json['tasks'])) {
+            foreach ($json['tasks'] as $task) {
+                if ($task['name'] === 'Verify Details' && $task['Status'] === 'Pending') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    })
+    ->unique('society_id');
+    $this->rejectedSocietyCount=$this->rejectedSociety->count();
+
+    $this->issueCertificateCount=100;
     }
     
     public function markRole($userID,$roleID){
@@ -42,9 +71,9 @@ class AdminDashboard extends Component
             session()->flash('error', 'Role not updated!');
     }
 
-    public function redirectToSocietyPage()
+    public function redirectToSociety($status)
     {
-        return redirect()->route('admin.view-societies');
+        return redirect()->route('admin.view-societies',['societyStatus'=>$status]);
     }
 
     public function redirectToApartmentPage()
