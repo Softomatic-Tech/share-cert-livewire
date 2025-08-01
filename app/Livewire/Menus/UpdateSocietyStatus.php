@@ -129,11 +129,11 @@ class UpdateSocietyStatus extends Component
         ]);
 
         if($society || $apartment){
-        session()->flash('success', 'Society and details updated successfully!');
-        $this->mount($this->apartment_id);
-        $this->currentStep = 1; // Reset to first step
+            $this->dispatch('showSuccess', message:  "Society and details updated successfully!");
+            $this->mount($this->apartment_id);
+            $this->currentStep = 1; // Reset to first step
         }else{
-            session()->flash('error', 'Society information could not be saved due to some error!');
+            $this->dispatch('showError', message:  "Society information could not be saved due to some error!");
         }
     }
 
@@ -149,10 +149,9 @@ class UpdateSocietyStatus extends Component
         if ($details) {
             $details->agreementCopy = $fileName;
             $details->save();
-
-            session()->flash('success', 'Agreement Copy uploaded successfully!');
+            $this->dispatch('showSuccess', message:  "Agreement Copy uploaded successfully!");
         } else {
-            session()->flash('error', 'Society not found.');
+            $this->dispatch('showError', message:  "Society not found!");
         }
         $this->reset('agreementCopy');
         $this->loadSocietyData($this->apartment_id);
@@ -171,9 +170,9 @@ class UpdateSocietyStatus extends Component
             $details->memberShipForm = $fileName;
             $details->save();
 
-            session()->flash('success', 'Membership Form uploaded successfully!');
+            $this->dispatch('showSuccess', message:  "Membership Form uploaded successfully!");
         } else {
-            session()->flash('error', 'Society not found.');
+            $this->dispatch('showError', message:  "Society not found!");
         }
         $this->reset('memberShipForm');
         $this->loadSocietyData($this->apartment_id);
@@ -192,9 +191,9 @@ class UpdateSocietyStatus extends Component
             $details->allotmentLetter = $fileName;
             $details->save();
 
-            session()->flash('success', 'Allotment Letter uploaded successfully!');
+            $this->dispatch('showSuccess', message:  "Allotment Letter uploaded successfully!");
         } else {
-            session()->flash('error', 'Society not found.');
+            $this->dispatch('showError', message:  "Society not found!");
         }
         $this->reset('allotmentLetter');
         $this->loadSocietyData($this->apartment_id);
@@ -213,9 +212,9 @@ class UpdateSocietyStatus extends Component
             $details->possessionLetter = $fileName;
             $details->save();
 
-            session()->flash('success', 'Possession Letter uploaded successfully!');
+            $this->dispatch('showSuccess', message:  "Possession Letter uploaded successfully!");
         } else {
-            session()->flash('error', 'Society not found.');
+            $this->dispatch('showError', message:  "Society not found!");
         }
         $this->reset('possessionLetter');
         $this->loadSocietyData($this->apartment_id);
@@ -261,6 +260,6 @@ class UpdateSocietyStatus extends Component
         $this->updateStatus($this->apartment_id); 
 
         $this->currentStep = 1;
-        session()->flash('success', 'Society details and its documents have been verified and submitted successfully!');
+        $this->dispatch('showSuccess', message:  "Society details and its documents have been verified and submitted successfully!");
     }
 }

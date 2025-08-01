@@ -18,19 +18,9 @@
                     <p>Verification</p>
                 </div>
             </div>
-            @if(session()->has('success'))
-            <div id="alert-box" class="p-4 mb-4 text-sm text-white rounded-lg bg-green-500 flex justify-between items-center" role="alert">
-                <div>{{ session('success') }}</div>
-                <button onclick="dismissAlert()" class="ml-4 text-white font-medium">X</button>
+            <div class="py-4">
+                <livewire:menus.alerts />
             </div>
-            @endif
-
-            @if(session()->has('error'))
-            <div id="alert-box" class="p-4 mb-4 text-sm text-white rounded-lg bg-red-500 flex justify-between items-center" role="alert">
-                <div>{{ session('error') }}</div>
-                <button onclick="dismissAlert()" class="ml-4 text-white font-medium">X</button>
-            </div>
-            @endif
             <!-- Form Section -->
             @if($currentStep == 1)
                 <form wire:submit.prevent="nextStep">
@@ -98,7 +88,7 @@
                                         @error('csv_file') <span class="text-red-500">{{ $message }}</span> @enderror
                                         </div>
                                         <flux:button variant="filled" type="button" wire:click="csvExport">{{ __('CSV EXPORT') }}</flux:button>
-                                        <flux:button variant="primary" type="submit">{{ __('CSV IMPORT') }}</flux:button>
+                                        <flux:button variant="primary" type="submit" wire:loading.attr="disabled" wire:target="csv_file, csvImport">{{ __('CSV IMPORT') }}</flux:button>
                                         @else
                                             <flux:button variant="filled" type="button" wire:click="csvExport">{{ __('CSV EXPORT') }}</flux:button>
                                             <div class="text-green-600 font-semibold">CSV already uploaded successfully. No re-upload allowed.</div>
@@ -107,91 +97,6 @@
                                 </div>
                             </div>
 
-                            {{-- <div class="card mt-2 mb-2">
-                                <div class="card-body">
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <form wire:submit.prevent="agreementCopy">
-                                                <div class="form-group">
-                                                    <label for="agreement_copy">Xerox Copy Of Agreement:</label>
-                                                    <flux:input type="file" id="agreement_copy" wire:model="agreement_copy" />
-                                                    @error('agreement_copy') <span class="text-red-500">{{ $message }}</span> @enderror
-                                                </div>
-                                                <div class="flex justify-end mr-4">
-                                                    <button class="flex items-center rounded-md bg-gradient-to-tr from-slate-800 to-slate-700 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="submit">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 mr-1.5">
-                                                          <path fill-rule="evenodd" d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.03 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v4.94a.75.75 0 0 0 1.5 0v-4.94l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clip-rule="evenodd" />
-                                                        </svg>
-                                                       
-                                                        Upload Files
-                                                      </button>
-                                                </div>
-                                            </form>
-                                        </div>
-
-                                        <div>
-                                            <form wire:submit.prevent="memberShipForm">
-                                                <div class="form-group">
-                                                    <label for="membership_form">MemberShip Form:</label>
-                                                    <flux:input type="file" id="membership_form" wire:model="membership_form" />
-                                                    @error('membership_form') <span class="text-red-500">{{ $message }}</span> @enderror
-                                                </div>
-                                                <div class="flex justify-end">
-                                                    <button class="flex items-center rounded-md bg-gradient-to-tr from-slate-800 to-slate-700 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="submit">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 mr-1.5">
-                                                          <path fill-rule="evenodd" d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.03 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v4.94a.75.75 0 0 0 1.5 0v-4.94l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clip-rule="evenodd" />
-                                                        </svg>
-                                                        Upload Files
-                                                      </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <form wire:submit.prevent="allotmentLetter">
-                                                <div class="form-group">
-                                                    <label for="allotment_letter">Parking Allotment Letter:</label>
-                                                    <flux:input type="file" id="allotment_letter" wire:model="allotment_letter" />
-                                                    @error('allotment_letter') <span class="text-red-500">{{ $message }}</span> @enderror
-                                                </div>
-                                                <div class="flex justify-end">
-                                                    <button class="flex items-center rounded-md bg-gradient-to-tr from-slate-800 to-slate-700 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="submit">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 mr-1.5">
-                                                          <path fill-rule="evenodd" d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.03 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v4.94a.75.75 0 0 0 1.5 0v-4.94l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clip-rule="evenodd" />
-                                                        </svg>
-                                                        Upload Files
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-
-                                        <div>
-                                            <form wire:submit.prevent="possesionLetter">
-                                                <div class="form-group">
-                                                    <label for="possesion_letter">Possesion Letter:</label>
-                                                    <flux:input type="file" id="possesion_letter" wire:model="possesion_letter" />
-                                                    @error('possesion_letter') <span class="text-red-500">{{ $message }}</span> @enderror
-                                                </div>
-                                                <div class="flex justify-end">
-                                                    <button class="flex items-center rounded-md bg-gradient-to-tr from-slate-800 to-slate-700 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none" type="submit">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 mr-1.5">
-                                                          <path fill-rule="evenodd" d="M10.5 3.75a6 6 0 0 0-5.98 6.496A5.25 5.25 0 0 0 6.75 20.25H18a4.5 4.5 0 0 0 2.206-8.423 3.75 3.75 0 0 0-4.133-4.303A6.001 6.001 0 0 0 10.5 3.75Zm2.03 5.47a.75.75 0 0 0-1.06 0l-3 3a.75.75 0 1 0 1.06 1.06l1.72-1.72v4.94a.75.75 0 0 0 1.5 0v-4.94l1.72 1.72a.75.75 0 1 0 1.06-1.06l-3-3Z" clip-rule="evenodd" />
-                                                        </svg>
-                                                       
-                                                        Upload Files
-                                                      </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> --}}
                             <div class="flex justify-end mt-4">
                                 <flux:button variant="filled" class="mr-2" type="button" wire:click="prevStep">{{ __('Back') }}</flux:button>
                                 <flux:button variant="primary" type="button" wire:click="nextStep">{{ __('Next') }}</flux:button>
@@ -271,8 +176,3 @@
         </div>
     </div>
 </section>
-<script>
-    function dismissAlert() {
-        document.getElementById("alert-box").style.display = "none";
-    }
-</script>

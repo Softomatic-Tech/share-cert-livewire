@@ -7,7 +7,6 @@ use App\Livewire\Menus\SocietyMultistepForm;
 use App\Livewire\Menus\CreateSociety;
 use App\Livewire\Menus\CreateApartment;
 use App\Livewire\Menus\SocietyList;
-use App\Livewire\Menus\RegisterSociety;
 use App\Livewire\Menus\IssueCertificate;
 use App\Livewire\Menus\SuperAdminDashboard;
 use App\Livewire\Menus\AdminDashboard;
@@ -52,7 +51,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
-    Route::get('/register-society', RegisterSociety::class)->name('menus.register_society');
     Route::get('/issue-certificate/{id}', IssueCertificate::class)->name('menus.issue-certificate');
 });
 

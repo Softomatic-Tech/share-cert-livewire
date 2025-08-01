@@ -75,7 +75,7 @@ class SocietyMultistepForm extends Component
 
         if ($this->currentStep == 2) {
             if (SocietyDetail::where('society_id', $this->societyId)->count() === 0) {
-                session()->flash('error', 'Please upload society details CSV before proceeding.');
+                $this->dispatch('showError', message:  "Please upload society details CSV before proceeding!");
                 return;
             }
         }
@@ -98,10 +98,10 @@ class SocietyMultistepForm extends Component
             $this->societyId = $society->id;
         }
         if($society){
-            session()->flash('success', 'Society information saved successfully!');
+            $this->dispatch('showSuccess', message:  "Society information saved successfully!");
             $this->currentStep = 1; // Reset to first step
         }else{
-            session()->flash('error', 'Society information could not be saved due to some error!');
+            $this->dispatch('showError', message:  "Society information could not be saved due to some error!");
         }
     }
 
@@ -145,7 +145,7 @@ class SocietyMultistepForm extends Component
         $headerMap = array_map('trim', $header);
         foreach ($requiredHeaders as $required) {
             if (!in_array($required, $headerMap)) {
-                session()->flash('error', "CSV is missing required column: {$required}");
+                $this->dispatch('showSuccess', message:  "CSV is missing required column: {$required}");
                 fclose($file);
                 return;
             }
@@ -175,7 +175,7 @@ class SocietyMultistepForm extends Component
 
         $csvFlats = count($validRows);
         if ($csvFlats !== $expectedFlats) {
-            session()->flash('error', "CSV must contain exactly {$expectedFlats} valid flat entries. Found {$csvFlats}. Row(s) skipped: " . implode(', ', $invalidRows));
+            $this->dispatch('showError', message:  "CSV must contain exactly {$expectedFlats} valid flat entries. Found {$csvFlats}. Row(s) skipped: " . implode(', ', $invalidRows));
             return;
         }
         foreach ($validRows as $data) {
@@ -251,7 +251,7 @@ class SocietyMultistepForm extends Component
             $insertedCount++;
         }
 
-        session()->flash('success', "{$csvFlats} entries inserted successfully.");
+        $this->dispatch('showSuccess', message:  "{$csvFlats} entries inserted successfully!");
     }
 
     public function done()
@@ -278,7 +278,7 @@ class SocietyMultistepForm extends Component
 
         $this->currentStep = 1;
 
-        session()->flash('success', 'Society and its details have been saved successfully!');
+        $this->dispatch('showSuccess', message:  "Society and its details have been saved successfully!");
     }
 
 }

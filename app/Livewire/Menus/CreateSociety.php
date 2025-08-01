@@ -30,10 +30,10 @@ class CreateSociety extends Component
         ]);
         $society=Society::create($validated);
         if($society){
-            session()->flash('success', 'Society information saved successfully!');
+            $this->dispatch('showSuccess', message: 'Society information saved successfully!');
             $this->reset(['society_name', 'address_1', 'address_2', 'pincode', 'state', 'city', 'total_flats']);
         }else{
-            session()->flash('error', 'Society information could not be saved due to some error!');
+            $this->dispatch('showError', message: 'Society information could not be saved due to some error!');
         }
         
     }
