@@ -66,9 +66,9 @@ class AdminDashboard extends Component
         $user->role_id = $roleID;
         $user->save();
         if($user)
-            session()->flash('success', 'Role updated successfully!');
+            $this->dispatch('showSuccess', message: 'Role updated successfully!');
         else
-            session()->flash('error', 'Role not updated!');
+            $this->dispatch('showError', message: 'Role not updated!');
     }
 
     public function redirectToSociety($status)

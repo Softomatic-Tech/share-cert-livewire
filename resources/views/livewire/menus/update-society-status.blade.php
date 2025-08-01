@@ -19,18 +19,9 @@
                 </div>
             </div>
             @if(session()->has('success'))
-            <div id="alert-box" class="p-4 mb-4 text-sm text-white rounded-lg bg-green-500 flex justify-between items-center" role="alert">
-                <div>{{ session('success') }}</div>
-                <button onclick="dismissAlert()" class="ml-4 text-white font-medium">X</button>
+            <div class="py-4">
+                <livewire:menus.alerts />
             </div>
-            @endif
-
-            @if(session()->has('error'))
-            <div id="alert-box" class="p-4 mb-4 text-sm text-white rounded-lg bg-red-500 flex justify-between items-center" role="alert">
-                <div>{{ session('error') }}</div>
-                <button onclick="dismissAlert()" class="ml-4 text-white font-medium">X</button>
-            </div>
-            @endif
             <!-- Verify Details -->
             @if($currentStep == 1)
                 <div class="step-one">
@@ -304,8 +295,3 @@
         </div>
     </div>
 </section>
-<script>
-    function dismissAlert() {
-        document.getElementById("alert-box").style.display = "none";
-    }
-</script>

@@ -67,15 +67,16 @@ class SocietyList extends Component
 
         $filename = time() . '_' . $this->document->getClientOriginalName();
         $path = $this->document->storeAs('society_docs', $filename, 'public');
-        log::info('Document stored at', ['path' => $path]);
-        exit;
         $detail = SocietyDetail::find($this->uploadDocId);
         if ($detail) {
             $detail->{$this->docType} = $filename;
             log::info('docType ', $detail->{$this->docType});
             $detail->{$this->docType . '_status'} = null; // reset status
             $detail->save();
-            session()->flash('success', 'Document uploaded successfully!');
+            if($detail)
+                $this->dispatch('showSuccess', message:  "Document has been uploaded successfully!");
+            else
+                $this->dispatch('showError', message:  "Document has not been not uploaded!");
         }
 
         $this->reset(['document', 'uploadDocId', 'docType']);

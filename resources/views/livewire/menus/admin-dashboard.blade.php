@@ -34,16 +34,9 @@
         </div>
 
         <div class="w-full mb-4 mt-2">
-            @if(session()->has('success'))
-            <div class="px-3 py-3 mb-4 rounded-lg bg-green-500">
-                <div>{{ session('success') }}</div>
+            <div class="py-4">
+                <livewire:menus.alerts />
             </div>
-            @endif
-            @if(session()->has('error'))
-            <div class="px-3 py-3 mb-4 rounded-lg bg-red-500">
-                <div>{{ session('error') }}</div>
-            </div>
-            @endif
             
             <div class="sm:-mx-6 lg:-mx-8">
                 <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8">

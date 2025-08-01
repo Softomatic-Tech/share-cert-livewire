@@ -1,17 +1,8 @@
 <div class="w-full">
-    @if(session()->has('success'))
-        <div id="alert-box" class="p-4 mb-4 text-sm text-white rounded-lg bg-green-500 flex justify-between items-center" role="alert">
-            <div>{{ session('success') }}</div>
-            <button onclick="dismissAlert()" class="ml-4 text-white font-medium">X</button>
-        </div>
-    @endif
-    @if(session()->has('error'))
-        <div id="alert-box" class="p-4 mb-4 text-sm text-white rounded-lg bg-red-500 flex justify-between items-center" role="alert">
-            <div>{{ session('error') }}</div>
-            <button onclick="dismissAlert()" class="ml-4 text-white font-medium">X</button>
-        </div>
-        @endif
-    <div class="flex justify-between">
+    <div class="py-4">
+        <livewire:menus.alerts />
+    </div>
+    <div class="flex justify-between mt-2">
         <h1 class="text-xl font-bold">View Apartments</h1>
         <button type="button" class="bg-amber-500 text-white font-bold py-2 px-4 rounded" wire:click="redirectToCreateApartment">Add Apartment</button>
     </div>
@@ -80,33 +71,53 @@
                         <!-- Documents -->
                         <div class="mt-4 flex flex-nowrap gap-4">
                             @if($details->agreementCopy)
-                            <div>
-                                <flux:modal.trigger name="documentModal">
+                            <div class="border-1 border-amber-500 rounded p-1">
+                                <flux:tooltip content="Copy of Agreement">
+                                    <a href="{{ asset('storage/' . $details->agreementCopy) }}" target="_blank"><img src="{{ asset('images/document.svg') }}" alt="Copy of Agreement" class="w-6 h-6"></a>
+                                </flux:tooltip>
+                                {{-- <flux:modal.trigger name="documentModal">
                                     <flux:button x-on:click="$wire.setDocument('Copy of Agreement','{{ $details->agreementCopy }}','{{ $details->id }}')">Copy of Agreement <img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></flux:button>
-                                </flux:modal.trigger>
+                                </flux:modal.trigger>--}}
                             </div> 
                             @endif
                             @if($details->membershipForm)
-                            <div>
-                                <flux:modal.trigger name="documentModal">
+                            <div class="border-1 border-amber-500 rounded p-1">
+                                <flux:tooltip content="Membership Form">
+                                    <a href="{{ asset('storage/' . $details->membershipForm) }}" target="_blank"><img src="{{ asset('images/document.svg') }}" alt="Membership Form" class="w-6 h-6"></a>
+                                </flux:tooltip>
+                                {{-- <flux:modal.trigger name="documentModal">
                                     <flux:button x-on:click="$wire.setDocument('Membership Form','{{ $details->membershipForm }}','{{ $details->id }}')">Membership Form <img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></flux:button>
-                                </flux:modal.trigger>                                
+                                </flux:modal.trigger>--}}
                             </div>       
                             @endif
                             @if($details->allotmentLetter)
-                            <div>
-                                <flux:modal.trigger name="documentModal">
+                            <div class="border-1 border-amber-500 rounded p-1">
+                                <flux:tooltip content="Allotment Letter">
+                                    <a href="{{ asset('storage/' . $details->allotmentLetter) }}" target="_blank"><img src="{{ asset('images/document.svg') }}" alt="Allotment Letter" class="w-6 h-6"></a>
+                                </flux:tooltip>
+                                {{-- <flux:modal.trigger name="documentModal">
                                     <flux:button x-on:click="$wire.setDocument('Allotment Letter','{{ $details->allotmentLetter }}','{{ $details->id }}')">Allotment Letter <img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></flux:button>
-                                </flux:modal.trigger>                                
+                                </flux:modal.trigger>--}}
                             </div>       
                             @endif
                             @if($details->possessionLetter)
-                            <div>
-                                <flux:modal.trigger name="documentModal">
+                            <div class="border-1 border-amber-500 rounded p-1">
+                                <flux:tooltip content="Possession Letter">
+                                    <a href="{{ asset('storage/' . $details->possessionLetter) }}" target="_blank"><img src="{{ asset('images/document.svg') }}" alt=" Possession Letter" class="w-6 h-6"></a>
+                                </flux:tooltip>
+                                {{-- <flux:modal.trigger name="documentModal">
                                     <flux:button x-on:click="$wire.setDocument('Possession Letter','{{ $details->possessionLetter }}','{{ $details->id }}')">Possession Letter <img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></flux:button>
-                                </flux:modal.trigger>                                
+                                </flux:modal.trigger>--}}
                             </div>
-                            @endif       
+                            @endif 
+                            
+                            <div>
+                                @if($details->agreementCopy && $details->membershipForm && $details->allotmentLetter && $details->possessionLetter)
+                                <flux:modal.trigger name="documentModal">
+                                    <flux:button x-on:click="$wire.setDocument('{{ $details->id }}')">Need Info</flux:button>
+                                </flux:modal.trigger>
+                                @endif
+                            </div> 
                         </div>
                     </div>
                 </div>
@@ -157,13 +168,13 @@
 
                 {{-- Comment Field (only when rejecting) --}}
                 @if($isRejecting)
-                    <flux:input type="text" wire:model="comment" placeholder="Enter reason for rejection..." />
+                    <flux:textarea  type="text" wire:model="comment" placeholder="Enter reason for rejection..." />
                     @error('comment') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 @endif
 
                 <div class="flex justify-between">
                     <flux:modal.close>
-                        <flux:button x-on:click="$wire.approveDocument('{{ $detailId }}')">Approve</flux:button>
+                        <flux:button variant="primary" x-on:click="$wire.approveDocument('{{ $detailId }}')">Approve</flux:button>
                     </flux:modal.close>
                     <flux:button wire:click="setRejecting" variant="filled">Reject</flux:button>
                 </div>

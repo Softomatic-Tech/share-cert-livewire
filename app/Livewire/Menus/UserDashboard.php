@@ -78,7 +78,7 @@ class UserDashboard extends Component
                 'city' => $this->city,
             ]);
 
-            session()->flash('success', 'Society details updated successfully!');
+            $this->dispatch('showSuccess', message: 'Society details updated successfully!');
         }
     }
 
@@ -105,7 +105,7 @@ class UserDashboard extends Component
 
         $apartment = SocietyDetail::find($this->selectedBuilding);
             if (!$apartment) {
-                session()->flash('success', 'Apartment details not found!');
+                $this->dispatch('showSuccess', message: 'Apartment details not found!');
                 return;
             }
             $updateData = [
@@ -139,7 +139,7 @@ class UserDashboard extends Component
             }
             
             $apartment->update($updateData);
-            session()->flash('success', 'Apartment details updated successfully!');
+            $this->dispatch('showSuccess', message: 'Apartment details updated successfully!');
     }
     
     public function verifyDetails($apartmentId)

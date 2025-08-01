@@ -45,12 +45,12 @@ class ViewAllApartments extends Component
         return redirect()->route('menus.create_apartment');
     }
 
-    public function setDocument($title,$docName,$id)
+    public function setDocument($id)
     {
         $this->reset(['documentName', 'title']); 
         $this->detailId = $id;
-        $this->documentName = $docName;
-        $this->title=$title;
+        // $this->documentName = $docName;
+        // $this->title=$title;
         $this->dispatch('open-modal', name: 'documentModal');
     }
 
@@ -71,7 +71,10 @@ class ViewAllApartments extends Component
         }
         $society->status = json_encode($data);
         $society->save();
-        session()->flash('success', 'Document approved successfully!');
+        if($society)
+            $this->dispatch('showSuccess', message: 'Document approved successfully!');
+        else
+            $this->dispatch('showError', message: 'Something went wrong to approve document!');
     }
 
     public function rejectDocument($detailId)
@@ -91,7 +94,10 @@ class ViewAllApartments extends Component
         $society->status = json_encode($data);
         $society->comment = $this->comment;
         $society->save();
-        session()->flash('success', 'Document rejected successfully!');
+        if($society)
+            $this->dispatch('showSuccess', message: 'Document rejected successfully!');
+        else
+            $this->dispatch('showError', message: 'Something went wrong to reject document!');
     }
 
 }

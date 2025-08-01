@@ -68,7 +68,7 @@ class CreateApartment extends Component
         $fullPath = Storage::path($path);
         $file = fopen($fullPath, 'r');  
         if (!$file) {
-            session()->flash('error', 'Unable to open the uploaded CSV file.');
+            $this->dispatch('showError', message: 'Unable to open the uploaded CSV file.');
             return;
         }
         $header = fgetcsv($file); 
@@ -76,7 +76,7 @@ class CreateApartment extends Component
         $headerMap = array_map('trim', $header);
         foreach ($requiredHeaders as $required) {
             if (!in_array($required, $headerMap)) {
-                session()->flash('error', "CSV is missing required column: {$required}");
+                $this->dispatch('showError', message: 'CSV is missing required column: {$required}');
                 fclose($file);
                 return;
             }
@@ -105,7 +105,7 @@ class CreateApartment extends Component
 
         $csvFlats = count($validRows);
         if ($csvFlats !== $expectedFlats) {
-            session()->flash('error', "CSV must contain exactly {$expectedFlats} valid flat entries. Found {$csvFlats}. Row(s) skipped: " . implode(', ', $invalidRows));
+            $this->dispatch('showError', message:  "CSV must contain exactly {$expectedFlats} valid flat entries. Found {$csvFlats}. Row(s) skipped: " . implode(', ', $invalidRows));
             return;
         }
         foreach ($validRows as $data) {
@@ -129,6 +129,6 @@ class CreateApartment extends Component
             $insertedCount++;
         }
 
-        session()->flash('success', "{$csvFlats} entries inserted successfully.");
+        $this->dispatch('showSuccess', message:  "{$csvFlats} entries inserted successfully.");
     }
 }
