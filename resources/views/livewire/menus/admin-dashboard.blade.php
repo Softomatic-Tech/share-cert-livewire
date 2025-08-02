@@ -1,34 +1,45 @@
     <div class="w-full">
         <div class="flex justify-between">
-            <h1 class="text-xl font-bold">Admin Dashboard</h1>
+            <h1 class="text-2xl font-bold">Admin Dashboard</h1>
         </div>
     
         <div class="grid gap-6 md:grid-cols-3 mt-2">
             <div class="card">
-                <div class="card-body cursor-pointer" wire:click="redirectToSociety(1)">
-                    <h2 class="text-center font-semibold text-xl">Pending Society</h2>
-                    <p class="font-semibold text-2xl">{{ $pendingSocietyCount }}</p>
+                @if($pendingApplicationCount>0)
+                <div class="card-body bg-amber-200 cursor-pointer" wire:click="redirectToSociety(1)">
+                @else
+                <div class="card-body bg-amber-200">
+                @endif
+                    <h2 class="text-center font-bold text-xl text-amber-900">PENDING APPLICATION</h2>
+                    <p class="font-bold text-2xl text-amber-900">{{ $pendingApplicationCount }}</p>
+                </div>
+            </div>
+            <div class="card">
+                @if($pendingVerificationCount>0)
+                <div class="card-body bg-red-200 cursor-pointer" wire:click="redirectToSociety(2)">
+                @else
+                <div class="card-body bg-red-200">
+                @endif
+                    <h2 class="text-center font-bold text-xl text-red-900">PENDING VERIFICATION</h2>
+                    <p class="font-bold text-2xl text-red-900">{{ $pendingVerificationCount }}</p>
                 </div>
             </div>
             
             <div class="card">
-                <div class="card-body cursor-pointer" wire:click="redirectToSociety(2)">
-                    <h2 class="text-center font-semibold text-xl">Rejected Society</h2>
-                    <p class="font-semibold text-2xl">{{ $rejectedSocietyCount }}</p>
+                @if($rejectedVerificationCount>0)
+                <div class="card-body bg-emerald-200 cursor-pointer" wire:click="redirectToSociety(3)">
+                @else
+                <div class="card-body bg-emerald-200">
+                @endif
+                    <h2 class="text-center font-bold text-xl text-emerald-900">REJECTED VERIFICATION</h2>
+                    <p class="font-bold text-2xl text-emerald-900">{{ $rejectedVerificationCount }}</p>
                 </div>
             </div>
             
-            {{-- <div class="card">
-                <div class="card-body cursor-pointer" wire:click="redirectToApartmentPage">
-                    <h2 class="text-center font-semibold text-xl">Apartments</h2>
-                    <p class="font-semibold text-2xl">{{ $societyDetailsCount }}</p>
-                </div>
-            </div> --}}
-
             <div class="card">
-                <div class="card-body">
-                    <h2 class="text-center font-semibold text-xl">Certificate Issue</h2>
-                    <p class="font-semibold text-2xl">10</p>
+                <div class="card-body bg-blue-200">
+                    <h2 class="text-center font-bold text-xl text-blue-900">CERTIFICATE ISSUE</h2>
+                    <p class="font-bold text-2xl text-blue-900">10</p>
                 </div>
             </div>
         </div>

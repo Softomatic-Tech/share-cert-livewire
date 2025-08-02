@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Role; 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -16,8 +18,10 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'phone' => 'nullable|unique:users,phone|min:10|max:15',
-            'email' => 'nullable|email|unique:users,email',
+            'email' => 'nullable', 'email','max:255',Rule::unique(User::class)->whereNotNull('email'),
             'password' => 'required|string|min:6',
+            'security_question_id'=>'required', 'integer','exists:security_questions,id',
+            'security_answer'=>'required|string|max:255'
         ]);
 
         if ($validator->fails()) {
@@ -32,12 +36,15 @@ class AuthController extends Controller
         if ($existingUser) {
             return response()->json(['message' => 'The email already registered'], 409); // 409 Conflict
         }
-
+        $role_id = Role::where('role', 'Society User')->value('id');
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
+            'security_question_id'=> $request->security_question_id,
+            'security_answer'=> Hash::make($request->security_answer),
+            'role_id'=> $role_id
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;

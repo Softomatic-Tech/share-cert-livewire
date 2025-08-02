@@ -14,8 +14,7 @@ class AdminDashboard extends Component
     public $users;
     public $adminRole;
     public $userRole;
-    public $societyCount;
-    public $societyDetailsCount,$pendingSociety,$pendingSocietyCount,$rejectedSociety,$rejectedSocietyCount;
+    public $pendingApplication,$pendingApplicationCount,$pendingVerification,$pendingVerificationCount,$rejectedVerification,$rejectedVerificationCount;
     public $issueCertificateCount;
 
     public function render()
@@ -28,36 +27,60 @@ class AdminDashboard extends Component
         $this->adminRole=Role::where('role','Admin')->value('id');
         $this->userRole=Role::where('role','Society User')->value('id');
 
-        $this->pendingSociety = SocietyDetail::get()
+        $this->pendingApplication = SocietyDetail::get()
             ->filter(function ($item) {
             $json = json_decode($item->status, true);
-            if (isset($json['tasks'])) {
-                foreach ($json['tasks'] as $task) {
-                    if ($task['name'] === 'Verify Details' && $task['Status'] === 'Applied') {
-                        return true;
-                    }
-                }
-            }
+            if (!isset($json['tasks'])) return false;
+            $tasks = collect($json['tasks']);
+            $verify = $tasks->firstWhere('name', 'Verify Details');
+            $application = $tasks->firstWhere('name', 'Application');
+            $verification = $tasks->firstWhere('name', 'Verification');
+            return (
+                ($verify && $verify['Status'] === 'Pending') &&
+                ($application && $application['Status'] === 'Pending') &&
+                ($verification && $verification['Status'] === 'Pending')
+            );
+            
             return false;
         })
         ->unique('society_id');
-        $this->pendingSocietyCount=$this->pendingSociety->count();
+    $this->pendingApplicationCount=$this->pendingApplication->count();
 
-    $this->rejectedSociety = SocietyDetail::get()
+    $this->pendingVerification = SocietyDetail::get()
         ->filter(function ($item) {
         $json = json_decode($item->status, true);
-        if (isset($json['tasks'])) {
-            foreach ($json['tasks'] as $task) {
-                if ($task['name'] === 'Verify Details' && $task['Status'] === 'Pending') {
-                    return true;
-                }
-            }
-        }
-        return false;
+        if (!isset($json['tasks'])) return false;
+        $tasks = collect($json['tasks']);
+        $verify = $tasks->firstWhere('name', 'Verify Details');
+        $application = $tasks->firstWhere('name', 'Application');
+        $verification = $tasks->firstWhere('name', 'Verification');
+        return (
+            $verify && $verify['Status'] === 'Applied' &&
+            $application && $application['Status'] === 'Applied' &&
+            $verification && $verification['Status'] === 'Pending'
+        );
+        
     })
     ->unique('society_id');
-    $this->rejectedSocietyCount=$this->rejectedSociety->count();
+    $this->pendingVerificationCount=$this->pendingVerification->count();
 
+    $this->rejectedVerification = SocietyDetail::get()
+        ->filter(function ($item) {
+        $json = json_decode($item->status, true);
+        if (!isset($json['tasks'])) return false;
+        $tasks = collect($json['tasks']);
+        $verify = $tasks->firstWhere('name', 'Verify Details');
+        $application = $tasks->firstWhere('name', 'Application');
+        $verification = $tasks->firstWhere('name', 'Verification');
+        return (
+            $verify && $verify['Status'] === 'Pending' &&
+            $application && $application['Status'] === 'Pending' &&
+            $verification && $verification['Status'] === 'Rejected'
+        );
+        
+    })
+    ->unique('society_id');
+    $this->rejectedVerificationCount=$this->rejectedVerification->count();
     $this->issueCertificateCount=100;
     }
     

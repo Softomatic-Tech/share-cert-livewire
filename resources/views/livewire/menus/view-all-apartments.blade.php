@@ -2,9 +2,12 @@
     <div class="py-4">
         <livewire:menus.alerts />
     </div>
-    <div class="flex justify-between mt-2">
+    <div class="flex justify-between items-center mt-2">
         <h1 class="text-xl font-bold">View Apartments</h1>
+        <div class="flex gap-4">
         <button type="button" class="bg-amber-500 text-white font-bold py-2 px-4 rounded" wire:click="redirectToCreateApartment">Add Apartment</button>
+        <button type="button" class="bg-stone-500 text-white font-bold py-2 px-4 rounded" x-on:click="window.history.back()">Back</button>
+        </div>
     </div>
 
    
@@ -110,12 +113,24 @@
                                 </flux:modal.trigger>--}}
                             </div>
                             @endif 
-                            
                             <div>
-                                @if($details->agreementCopy && $details->membershipForm && $details->allotmentLetter && $details->possessionLetter)
-                                <flux:modal.trigger name="documentModal">
-                                    <flux:button x-on:click="$wire.setDocument('{{ $details->id }}')">Need Info</flux:button>
-                                </flux:modal.trigger>
+                                @php
+                                    $statusData = json_decode($details->status, true);
+                                    $tasks = collect($statusData['tasks']);
+                                    $verifyDetails = $tasks->firstWhere('name', 'Verify Details');
+                                    $application = $tasks->firstWhere('name', 'Application');
+                                    $verification = $tasks->firstWhere('name', 'Verification');
+                                @endphp
+                                @if (
+                                    $verifyDetails && $verifyDetails['Status'] === 'Applied' &&
+                                    $application && $application['Status'] === 'Applied' &&
+                                    $verification && $verification['Status'] === 'Pending'
+                                )
+                                @if($details->agreementCopy)
+                                    <flux:modal.trigger name="documentModal">
+                                        <flux:button variant="primary" x-on:click="$wire.setDocument('{{ $details->id }}')">Need Info</flux:button>
+                                    </flux:modal.trigger>
+                                @endif
                                 @endif
                             </div> 
                         </div>
@@ -127,25 +142,26 @@
                 @endphp
                 @if(isset($statusData['tasks']))
                 <div data-dui-stepper-container data-dui-initial-step="1" class="w-full">
-                    <div class="flex w-full items-center justify-between">
+                    <div class="flex 
+                    w-full items-center justify-between">
                         @foreach(collect($statusData['tasks'])->skip(1) as $task)
                         <div aria-disabled="false" data-dui-step class="group w-full flex items-center">
                             <div class="relative">
-                                <span class="relative grid h-10 w-10 place-items-center rounded-full {{ $task['Status'] == 'Pending' ? 'bg-stone-400' : ' bg-amber-400' }}">
+                                <span class="relative grid h-10 w-10 place-items-center rounded-full {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'bg-stone-400' : 'bg-amber-400'}}">
                                 <i class="fa-solid fa-check text-white"></i>
                                 </span>
                                 @if($task['name']=='Application')
-                                <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ $task['Status'] != 'Pending' ? 'text-stone-800 font-extrabold' : 'text-stone-500 font-normal' }}">Applied</span>
+                                <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}}">Applied</span>
                                 @elseif($task['name']=='Verification')
-                                <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ $task['Status'] != 'Pending' ? 'text-stone-800 font-extrabold' : 'text-stone-500 font-normal' }}">Verification</span>
+                                <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}}">Verification</span>
                                 @elseif($task['name']=='Certificate Generated')
-                                <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ $task['Status'] != 'Pending' ? 'text-stone-800 font-extrabold' : 'text-stone-500 font-normal' }}">Waiting</span>
+                                <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}}">Waiting</span>
                                 @elseif($task['name']=='Certificate Delivered')
-                                <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ $task['Status'] != 'Pending' ? 'text-stone-800 font-extrabold' : 'text-stone-500 font-normal' }}">Delivered</span>
+                                <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}}">Delivered</span>
                                 @endif
                             </div>
                             @if(!$loop->last)
-                            <div class="flex-1 h-1 {{ $task['Status'] == 'Pending' ? 'bg-stone-400' : ' bg-amber-400' }}"></div>
+                            <div class="flex-1 h-1 {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'bg-stone-400' : 'bg-amber-400'}}"></div>
                             @endif
                         </div>
                         @endforeach
@@ -168,7 +184,7 @@
 
                 {{-- Comment Field (only when rejecting) --}}
                 @if($isRejecting)
-                    <flux:textarea  type="text" wire:model="comment" placeholder="Enter reason for rejection..." />
+                    <flux:textarea type="text" wire:model="comment" placeholder="Enter reason for rejection..." value="{{ $comment }}"/>
                     @error('comment') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
                 @endif
 

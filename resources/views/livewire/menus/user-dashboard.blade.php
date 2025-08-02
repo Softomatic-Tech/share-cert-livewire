@@ -28,14 +28,24 @@
     <div class="max-h-[500px] overflow-y-auto pr-2">
     @if($selectedSociety || $selectedBuilding)
     @foreach($buildings as $building)
-    @if($building->comment)
-    <div class="px-4 py-2 my-2 rounded-lg bg-amber-100 border-amber-400 border-2">
-        <p class="text-md font-bold">Your Application for {{ $building->building_name }} {{ $building->apartment_number }} at {{ $building->society->society_name }} need attention.</p>
-        <p class="text-md font-bold">Please Correct Following-</p>
-        <p class="text-sm"> {{ $building->comment }}</p>
-    </div>
-    @endif
-    <div class="w-full mt-4 p-4 rounded-lg shadow-lg border border-gray-200 bg-white dark:bg-gray-800 cursor-pointer" wire:click="verifyDetails({{ $building->id }})">
+        @php
+            $statusData = json_decode($building->status, true);
+            $tasks = collect($statusData['tasks']);
+            $verification = $tasks->firstWhere('name', 'Verification');
+        @endphp
+        @if ($verification && $verification['Status'] === 'Approved')
+        <div class="w-full mt-4 p-4 rounded-lg shadow-lg border border-gray-200 bg-white dark:bg-gray-800">
+        @else
+        @if($building->comment)
+        <div class="px-4 py-2 my-2 rounded-lg bg-amber-100 border-amber-400 border-2">
+            <p class="text-md font-bold">Your Application for {{ $building->building_name }} {{ $building->apartment_number }} at {{ $building->society->society_name }} need attention.</p>
+            <p class="text-md font-bold">Please Correct Following-</p>
+            <p class="text-sm"> {{ $building->comment }}</p>
+        </div>
+        @endif
+        
+        <div class="w-full mt-4 p-4 rounded-lg shadow-lg border border-gray-200 bg-white dark:bg-gray-800 cursor-pointer" wire:click="verifyDetails({{ $building->id }})">
+        @endif
         <!-- Top Row: Society name (left) and Progress bar (right) -->
         <div class="flex justify-between items-center">
             <!-- Society Name -->
