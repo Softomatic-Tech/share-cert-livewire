@@ -1,7 +1,10 @@
 <div class="w-full">
-    <div class="flex justify-between">
+    <div class="flex justify-between items-center">
         <h1 class="text-xl font-bold">View Societies</h1>
-        <button type="button" class="bg-amber-500 text-white font-bold py-2 px-4 rounded" wire:click="redirectToCreateSociety">Add Society</button>
+        <div class="flex gap-4">
+            <button type="button" class="bg-amber-500 text-white font-bold py-2 px-4 rounded" wire:click="redirectToCreateSociety">Add Society</button>
+            <button type="button" class="bg-stone-500 text-white font-bold py-2 px-4 rounded" x-on:click="window.history.back()">Back</button>
+        </div>
     </div>
 
     @foreach($societyDetail as $detail)

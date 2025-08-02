@@ -18,7 +18,6 @@
                     <p>Verify And Submit</p>
                 </div>
             </div>
-            @if(session()->has('success'))
             <div class="py-4">
                 <livewire:menus.alerts />
             </div>
@@ -28,88 +27,87 @@
                     <div class="card">
                         <div class="card-header">Step 1: Verify Details</div>
                         <div class="card-body">
-                        <form wire:submit.prevent="nextStep">
-                                <div class="flex space-x-4 my-2">
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('Society Name')" wire:model="society_name" />
+                            <form wire:submit.prevent="nextStep">
+                                    <div class="flex space-x-4 my-2">
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('Society Name')" wire:model="society_name" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('Total Flats')" wire:model="total_flats" />
+                                    </div>
+                                    </div>
+                                    <div class="flex space-x-4 my-2">
+                                    <div class="flex-1">
+                                        <flux:input type="text"  :label="__('Address Line 1')" wire:model="address_1" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <flux:input type="text"  :label="__('Address Line 2')" wire:model="address_2" />
+                                    </div>
+                                    </div>
+                                    <div class="flex space-x-4 my-2">
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('Pincode')" wire:model="pincode" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('City')" wire:model="city" />
+                                    </div>
+                                    </div>
+                                    <div class="flex space-x-4 my-2">
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('State')" wire:model="state" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('Building Name')" wire:model="building_name" />
+                                    </div>
+                                    </div>
+                                    <div class="flex space-x-4 my-2">
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('Apartment Number')" wire:model="apartment_number" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('Owner 1 Name')" wire:model="owner1_name" />
+                                    </div>
+                                    </div>
+                                    <div class="flex space-x-4 my-2">
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('Owner 1 Email')" wire:model="owner1_email" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('Owner 1 Mobile')" wire:model="owner1_mobile" />
+                                    </div>
+                                    </div>
+                                    <div class="flex space-x-4 my-2">
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('Owner 2 Name')" wire:model="owner2_name" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('Owner 2 Email')" wire:model="owner1_email" />
+                                    </div>
+                                    </div>
+                                    <div class="flex space-x-4 my-2">
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('Owner 2 Mobile')" class="form-control" wire:model="owner1_mobile" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('Owner 3 Name')" class="form-control" wire:model="owner3_name" />
+                                    </div>
+                                    </div>
+                                    <div class="flex space-x-4 my-2">
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('Owner 3 Email')" wire:model="owner3_email" />
+                                    </div>
+                                    <div class="flex-1">
+                                        <flux:input type="text" :label="__('Owner 3 Mobile')" wire:model="owner3_mobile" />
+                                    </div>
+                                    </div>
+                                    {{-- <div class="my-2">
+                                        <flux:button variant="primary" type="submit">{{ __('Update') }}</flux:button>
+                                    </div> --}}
+                                    <div class="flex justify-end mt-4">
+                                    <flux:button variant="filled" class="mr-2" type="button" wire:click="prevStep">{{ __('Back') }}</flux:button>
+                                    <flux:button variant="primary" type="button" wire:click="nextStep">{{ __('Next') }}</flux:button>
                                 </div>
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('Total Flats')" wire:model="total_flats" />
-                                </div>
-                                </div>
-                                <div class="flex space-x-4 my-2">
-                                <div class="flex-1">
-                                    <flux:input type="text"  :label="__('Address Line 1')" wire:model="address_1" />
-                                </div>
-                                <div class="flex-1">
-                                    <flux:input type="text"  :label="__('Address Line 2')" wire:model="address_2" />
-                                </div>
-                                </div>
-                                <div class="flex space-x-4 my-2">
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('Pincode')" wire:model="pincode" />
-                                </div>
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('City')" wire:model="city" />
-                                </div>
-                                </div>
-                                <div class="flex space-x-4 my-2">
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('State')" wire:model="state" />
-                                </div>
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('Building Name')" wire:model="building_name" />
-                                </div>
-                                </div>
-                                <div class="flex space-x-4 my-2">
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('Apartment Number')" wire:model="apartment_number" />
-                                </div>
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('Owner 1 Name')" wire:model="owner1_name" />
-                                </div>
-                                </div>
-                                <div class="flex space-x-4 my-2">
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('Owner 1 Email')" wire:model="owner1_email" />
-                                </div>
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('Owner 1 Mobile')" wire:model="owner1_mobile" />
-                                </div>
-                                </div>
-                                <div class="flex space-x-4 my-2">
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('Owner 2 Name')" wire:model="owner2_name" />
-                                </div>
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('Owner 2 Email')" wire:model="owner1_email" />
-                                </div>
-                                </div>
-                                <div class="flex space-x-4 my-2">
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('Owner 2 Mobile')" class="form-control" wire:model="owner1_mobile" />
-                                </div>
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('Owner 3 Name')" class="form-control" wire:model="owner3_name" />
-                                </div>
-                                </div>
-                                <div class="flex space-x-4 my-2">
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('Owner 3 Email')" wire:model="owner3_email" />
-                                </div>
-                                <div class="flex-1">
-                                    <flux:input type="text" :label="__('Owner 3 Mobile')" wire:model="owner3_mobile" />
-                                </div>
-                                </div>
-                                {{-- <div class="my-2">
-                                    <flux:button variant="primary" type="submit">{{ __('Update') }}</flux:button>
-                                </div> --}}
-                                <div class="flex justify-end mt-4">
-                                <flux:button variant="filled" class="mr-2" type="button" wire:click="prevStep">{{ __('Back') }}</flux:button>
-                                <flux:button variant="primary" type="button" wire:click="nextStep">{{ __('Next') }}</flux:button>
-                            </div>
-                        </form>
-                            
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -222,64 +220,64 @@
                                 <div class="sm:-mx-6 lg:-mx-8">
                                     <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8">
                                         <table class="min-w-full text-start text-sm font-light text-surface dark:text-white">
-                                                <thead class="border-b border-neutral-200 font-medium dark:border-white/10">
-                                                    <tr>
-                                                        <th scope="col" class="px-6 py-4">Building</th>
-                                                        @if($owner1_name)<th scope="col" class="px-6 py-4">Owner 1 Details</th>@endif
-                                                        @if($owner2_name)<th scope="col" class="px-6 py-4">Owner 2 Details</th>@endif
-                                                        @if($owner3_name)<th scope="col" class="px-6 py-4">Owner 3 Details</th>@endif
-                                                        @if($agreementCopy)<th scope="col" class="px-6 py-4">Xerox Copy Of Agreement</th>@endif
-                                                        @if($memberShipForm)<th scope="col" class="px-6 py-4">MemberShip Form</th>@endif
-                                                        @if($allotmentLetter)<th scope="col" class="px-6 py-4">Parking Allotment Letter</th>@endif
-                                                        @if($possessionLetter)<th scope="col" class="px-6 py-4">Possession Letter</th>@endif
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr class="border-b border-neutral-200 dark:border-white/10">
-                                                        <td class="whitespace-nowrap px-6 py-4">{{ $building_name }} -{{ $apartment_number }}</td>
-                                                        @if($owner1_name)
-                                                        <td class="whitespace-nowrap px-6 py-4">
-                                                            {{ $owner1_name }}
-                                                            <br />
-                                                            @if($owner1_mobile)<i class="fa-solid fa-phone"></i> {{ $owner1_mobile }}@endif
-                                                            <br /> 
-                                                            @if($owner1_email)<i class="fas fa-envelope"></i> {{ $owner1_email }}@endif
-                                                        </td>
-                                                        @endif
-                                                        @if($owner2_name)
-                                                        <td class="whitespace-nowrap px-6 py-4">
-                                                            {{ $owner2_name }}
-                                                            <br />
-                                                            @if($owner2_mobile)<i class="fa-solid fa-phone"></i> {{ $owner2_mobile }}@endif
-                                                            <br /> 
-                                                            @if($owner2_email)<i class="fas fa-envelope"></i> {{ $owner2_email }}@endif
-                                                        </td>
-                                                        @endif
-                                                        @if($owner3_name)
-                                                        <td class="whitespace-nowrap px-6 py-4">
-                                                            {{ $owner3_name }}
-                                                            <br />
-                                                            @if($owner3_mobile)<i class="fa-solid fa-phone"></i> {{ $owner3_mobile }}@endif
-                                                            <br /> 
-                                                            @if($owner3_email)<i class="fas fa-envelope"></i> {{ $owner3_email }}@endif
-                                                        </td>
-                                                        @endif
-                                                        @if($agreementCopy)
-                                                        <td class="whitespace-nowrap px-6 py-4">
-                                                            <a href="{{ asset('storage/society_docs/'.$agreementCopy) }}" target="_blank" class="text-blue-600 underline"><img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></a></td>
-                                                        @endif
-                                                        @if($memberShipForm)
-                                                        <td class="whitespace-nowrap px-6 py-4"><a href="{{ asset('storage/society_docs/'.$memberShipForm) }}" target="_blank" class="text-blue-600 underline"><img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></a></td>
-                                                        @endif
-                                                        @if($memberShipForm)
-                                                        <td class="whitespace-nowrap px-6 py-4"><a href="{{ asset('storage/society_docs/'.$allotmentLetter) }}" target="_blank" class="text-blue-600 underline"><img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></a></td>
-                                                        @endif
-                                                        @if($possessionLetter)
-                                                        <td class="whitespace-nowrap px-6 py-4"><a href="{{ asset('storage/society_docs/'.$possessionLetter) }}" target="_blank" class="text-blue-600 underline"><img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></a></td>
-                                                        @endif
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+                                            <thead class="border-b border-neutral-200 font-medium dark:border-white/10">
+                                                <tr>
+                                                    <th scope="col" class="px-6 py-4">Building</th>
+                                                    @if($owner1_name)<th scope="col" class="px-6 py-4">Owner 1 Details</th>@endif
+                                                    @if($owner2_name)<th scope="col" class="px-6 py-4">Owner 2 Details</th>@endif
+                                                    @if($owner3_name)<th scope="col" class="px-6 py-4">Owner 3 Details</th>@endif
+                                                    @if($agreementCopy)<th scope="col" class="px-6 py-4">Xerox Copy Of Agreement</th>@endif
+                                                    @if($memberShipForm)<th scope="col" class="px-6 py-4">MemberShip Form</th>@endif
+                                                    @if($allotmentLetter)<th scope="col" class="px-6 py-4">Parking Allotment Letter</th>@endif
+                                                    @if($possessionLetter)<th scope="col" class="px-6 py-4">Possession Letter</th>@endif
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr class="border-b border-neutral-200 dark:border-white/10">
+                                                    <td class="whitespace-nowrap px-6 py-4">{{ $building_name }} -{{ $apartment_number }}</td>
+                                                    @if($owner1_name)
+                                                    <td class="whitespace-nowrap px-6 py-4">
+                                                        {{ $owner1_name }}
+                                                        <br />
+                                                        @if($owner1_mobile)<i class="fa-solid fa-phone"></i> {{ $owner1_mobile }}@endif
+                                                        <br /> 
+                                                        @if($owner1_email)<i class="fas fa-envelope"></i> {{ $owner1_email }}@endif
+                                                    </td>
+                                                    @endif
+                                                    @if($owner2_name)
+                                                    <td class="whitespace-nowrap px-6 py-4">
+                                                        {{ $owner2_name }}
+                                                        <br />
+                                                        @if($owner2_mobile)<i class="fa-solid fa-phone"></i> {{ $owner2_mobile }}@endif
+                                                        <br /> 
+                                                        @if($owner2_email)<i class="fas fa-envelope"></i> {{ $owner2_email }}@endif
+                                                    </td>
+                                                    @endif
+                                                    @if($owner3_name)
+                                                    <td class="whitespace-nowrap px-6 py-4">
+                                                        {{ $owner3_name }}
+                                                        <br />
+                                                        @if($owner3_mobile)<i class="fa-solid fa-phone"></i> {{ $owner3_mobile }}@endif
+                                                        <br /> 
+                                                        @if($owner3_email)<i class="fas fa-envelope"></i> {{ $owner3_email }}@endif
+                                                    </td>
+                                                    @endif
+                                                    @if($agreementCopy)
+                                                    <td class="whitespace-nowrap px-6 py-4">
+                                                        <a href="{{ asset('storage/society_docs/'.$agreementCopy) }}" target="_blank" class="text-blue-600 underline"><img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></a></td>
+                                                    @endif
+                                                    @if($memberShipForm)
+                                                    <td class="whitespace-nowrap px-6 py-4"><a href="{{ asset('storage/society_docs/'.$memberShipForm) }}" target="_blank" class="text-blue-600 underline"><img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></a></td>
+                                                    @endif
+                                                    @if($memberShipForm)
+                                                    <td class="whitespace-nowrap px-6 py-4"><a href="{{ asset('storage/society_docs/'.$allotmentLetter) }}" target="_blank" class="text-blue-600 underline"><img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></a></td>
+                                                    @endif
+                                                    @if($possessionLetter)
+                                                    <td class="whitespace-nowrap px-6 py-4"><a href="{{ asset('storage/society_docs/'.$possessionLetter) }}" target="_blank" class="text-blue-600 underline"><img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></a></td>
+                                                    @endif
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>

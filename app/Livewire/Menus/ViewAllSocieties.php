@@ -8,7 +8,7 @@ use Livewire\Component;
 class ViewAllSocieties extends Component
 {
     public $societies=[];
-    public $societyStatus,$status;
+    public $societyStatus;
     public $societyDetail;
     public function render()
     {
@@ -17,22 +17,35 @@ class ViewAllSocieties extends Component
 
     public function mount($societyStatus)
     {
-        $this->$societyStatus=$societyStatus;
-        if($societyStatus==1){
-            $this->status='Applied';
-        }else{
-            $this->status='Pending';
-        }
-        
+        $this->societyStatus=$societyStatus;
         $this->societyDetail = SocietyDetail::get()
             ->filter(function ($item) {
             $json = json_decode($item->status, true);
-            if (isset($json['tasks'])) {
-                foreach ($json['tasks'] as $task) {
-                    if ($task['name'] === 'Verify Details' && $task['Status'] === $this->status) {
-                        return true;
-                    }
-                }
+            if (!isset($json['tasks'])) return false;
+            $tasks = collect($json['tasks']);
+            $verify = $tasks->firstWhere('name', 'Verify Details');
+            $application = $tasks->firstWhere('name', 'Application');
+            $verification = $tasks->firstWhere('name', 'Verification');
+            if ($this->societyStatus == 1) {
+                return (
+                    ($verify && $verify['Status'] === 'Pending') &&
+                    ($application && $application['Status'] === 'Pending') &&
+                    ($verification && $verification['Status'] === 'Pending')
+                );
+            }
+            if ($this->societyStatus == 2) {
+                return (
+                    $verify && $verify['Status'] === 'Applied' &&
+                    $application && $application['Status'] === 'Applied' &&
+                    $verification && $verification['Status'] === 'Pending'
+                );
+            }
+            if ($this->societyStatus == 3) {
+                return (
+                    $verify && $verify['Status'] === 'Pending' &&
+                    $application && $application['Status'] === 'Pending' &&
+                    $verification && $verification['Status'] === 'Rejected'
+                );
             }
             return false;
         })

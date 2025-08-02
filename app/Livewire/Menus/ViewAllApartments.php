@@ -7,10 +7,10 @@ use Illuminate\Support\Facades\Log;
 
 class ViewAllApartments extends Component
 {
-    public $societyDetails = [];
+    public $societyDetails;
     public $documentName,$title,$detailId;
     public $isRejecting = false;
-    public $comment,$status;
+    public $comment,$societyStatus;
     public $societyDetail;
     
     protected $listeners = ['setDocument' => 'setDocument'];
@@ -21,20 +21,34 @@ class ViewAllApartments extends Component
 
     public function mount($id,$societyStatus)
     {
-        if($societyStatus==1){
-            $this->status='Applied';
-        }else{
-            $this->status='Pending';
-        }
+        $this->societyStatus=$societyStatus;
         $this->societyDetails = SocietyDetail::where('society_id',$id)->get()
             ->filter(function ($item) {
             $json = json_decode($item->status, true);
-            if (isset($json['tasks'])) {
-                foreach ($json['tasks'] as $task) {
-                    if ($task['name'] === 'Verify Details' && $task['Status'] === $this->status) {
-                        return true;
-                    }
-                }
+            $tasks = collect($json['tasks']);
+            $verify = $tasks->firstWhere('name', 'Verify Details');
+            $application = $tasks->firstWhere('name', 'Application');
+            $verification = $tasks->firstWhere('name', 'Verification');
+            if ($this->societyStatus == 1) {
+                return (
+                    ($verify && $verify['Status'] === 'Pending') &&
+                    ($application && $application['Status'] === 'Pending') &&
+                    ($verification && $verification['Status'] === 'Pending')
+                );
+            }
+            if ($this->societyStatus == 2) {
+                return (
+                    $verify && $verify['Status'] === 'Applied' &&
+                    $application && $application['Status'] === 'Applied' &&
+                    $verification && $verification['Status'] === 'Pending'
+                );
+            }
+            if ($this->societyStatus == 3) {
+                return (
+                    $verify && $verify['Status'] === 'Pending' &&
+                    $application && $application['Status'] === 'Pending' &&
+                    $verification && $verification['Status'] === 'Rejected'
+                );
             }
             return false;
         });
@@ -47,10 +61,10 @@ class ViewAllApartments extends Component
 
     public function setDocument($id)
     {
-        $this->reset(['documentName', 'title']); 
+        // $this->reset(['id']); 
         $this->detailId = $id;
-        // $this->documentName = $docName;
-        // $this->title=$title;
+        $society = SocietyDetail::find($this->detailId);
+        $this->comment=$society->comment;
         $this->dispatch('open-modal', name: 'documentModal');
     }
 
@@ -62,24 +76,28 @@ class ViewAllApartments extends Component
     public function approveDocument($detailId)
     {
         $this->detailId=$detailId;
-        $society = \App\Models\SocietyDetail::find($this->detailId); 
+        $society = SocietyDetail::find($this->detailId); 
         $data = json_decode($society->status, true);
         foreach ($data['tasks'] as &$task) {
-            if (in_array($task['name'], ['Verify Details', 'Application'])) {
+            if ($task['name']=='Verification') {
                 $task['Status'] = 'Approved';
             }
         }
         $society->status = json_encode($data);
         $society->save();
-        if($society)
+        if($society){
             $this->dispatch('showSuccess', message: 'Document approved successfully!');
-        else
+        }else{
             $this->dispatch('showError', message: 'Something went wrong to approve document!');
+        }
+        $this->mount($society->society_id,$this->societyStatus);
+        if ($this->societyDetails->isEmpty()) {
+            return redirect()->route('admin.dashboard'); 
+        }
     }
 
     public function rejectDocument($detailId)
     {
-        log::info('reject docs');
         $this->validate([
             'comment' => 'required|string|min:3',
         ]);
@@ -87,17 +105,26 @@ class ViewAllApartments extends Component
         $society = SocietyDetail::find($this->detailId); 
         $data = json_decode($society->status, true);
         foreach ($data['tasks'] as &$task) {
-            if (in_array($task['name'], ['Verify Details', 'Application'])) {
+            if ($task['name']=='Verification') {
                 $task['Status'] = 'Rejected';
+            }
+
+            if ($task['name']=='Verify Details' || $task['name']=='Application') {
+                $task['Status'] = 'Pending';
             }
         }
         $society->status = json_encode($data);
         $society->comment = $this->comment;
         $society->save();
-        if($society)
+        if($society){
             $this->dispatch('showSuccess', message: 'Document rejected successfully!');
-        else
+        }else{
             $this->dispatch('showError', message: 'Something went wrong to reject document!');
+        }
+        $this->mount($society->society_id,$this->societyStatus);
+        if ($this->societyDetails->isEmpty()) {
+            return redirect()->route('admin.dashboard'); 
+        }
     }
 
 }
