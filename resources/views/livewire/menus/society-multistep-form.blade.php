@@ -7,15 +7,15 @@
             <div class="stepwizard">
                 <div class="stepwizard-step">
                     <button type="button" @if ($currentStep == 1) disabled @endif>1</button>
-                    <p>Basic</p>
+                    <p @if ($currentStep == 1) disabled @endif>Basic</p>
                 </div>
                 <div class="stepwizard-step">
                     <button type="button" @if ($currentStep == 2) disabled @endif>2</button>
-                    <p>Flat Details</p>
+                    <p @if ($currentStep == 2) disabled @endif>Flat Details</p>
                 </div>
                 <div class="stepwizard-step">
                     <button type="button" @if ($currentStep == 3) disabled @endif>3</button>
-                    <p>Verification</p>
+                    <p @if ($currentStep == 3) disabled @endif>Verification</p>
                 </div>
             </div>
             <div class="py-4">

@@ -7,6 +7,7 @@ use Livewire\WithFileUploads;
 use App\Models\Society;
 use App\Models\SocietyDetail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,7 +18,6 @@ class SocietyMultistepForm extends Component
     public $csv_file;
     public $societyId = null;
     public $csvUploaded = false;
-
     public $formData = [
         'society_name' => '',
         'total_flats'=>'',
@@ -28,7 +28,6 @@ class SocietyMultistepForm extends Component
         'city' => '',
     ];
 
-    public $verification_document;
     // Validation rules for each step
     protected $rules = [
         1 => [
@@ -48,6 +47,7 @@ class SocietyMultistepForm extends Component
     {
         return view('livewire.menus.society-multistep-form');
     }
+
     public function getUploadedDetailsProperty()
     {
         if ($this->societyId) {
@@ -75,7 +75,7 @@ class SocietyMultistepForm extends Component
 
         if ($this->currentStep == 2) {
             if (SocietyDetail::where('society_id', $this->societyId)->count() === 0) {
-                $this->dispatch('showError', message:  "Please upload society details CSV before proceeding!");
+                $this->dispatch('show-error', message:  "Please upload society details CSV before proceeding!");
                 return;
             }
         }
@@ -98,10 +98,10 @@ class SocietyMultistepForm extends Component
             $this->societyId = $society->id;
         }
         if($society){
-            $this->dispatch('showSuccess', message:  "Society information saved successfully!");
+            $this->dispatch('show-success', message:  "Society information saved successfully!");
             $this->currentStep = 1; // Reset to first step
         }else{
-            $this->dispatch('showError', message:  "Society information could not be saved due to some error!");
+            $this->dispatch('show-error', message:  "Society information could not be saved due to some error!");
         }
     }
 
@@ -145,7 +145,7 @@ class SocietyMultistepForm extends Component
         $headerMap = array_map('trim', $header);
         foreach ($requiredHeaders as $required) {
             if (!in_array($required, $headerMap)) {
-                $this->dispatch('showSuccess', message:  "CSV is missing required column: {$required}");
+                $this->dispatch('show-success', message:  "CSV is missing required column: {$required}");
                 fclose($file);
                 return;
             }
@@ -175,14 +175,13 @@ class SocietyMultistepForm extends Component
 
         $csvFlats = count($validRows);
         if ($csvFlats !== $expectedFlats) {
-            $this->dispatch('showError', message:  "CSV must contain exactly {$expectedFlats} valid flat entries. Found {$csvFlats}. Row(s) skipped: " . implode(', ', $invalidRows));
+            $this->dispatch('show-error', message:  "CSV must contain exactly {$expectedFlats} valid flat entries. Found {$csvFlats}. Row(s) skipped: " . implode(', ', $invalidRows));
             return;
         }
         foreach ($validRows as $data) {
             $owner1_name = trim($data[$indexes['owner1_first_name']] . ' ' . ($data[$indexes['owner1_middle_name']] ?? '') . ' ' . ($data[$indexes['owner1_last_name']] ?? ''));
             $owner2_name = trim(($data[$indexes['owner2_first_name']] ?? '') . ' ' . ($data[$indexes['owner2_middle_name']] ?? '') . ' ' . ($data[$indexes['owner2_last_name']] ?? ''));
             $owner3_name = trim(($data[$indexes['owner3_first_name']] ?? '') . ' ' . ($data[$indexes['owner3_middle_name']] ?? '') . ' ' . ($data[$indexes['owner3_last_name']] ?? ''));
-            $user = Auth::user();
             $status=[
                 "tasks" => [
                     [
@@ -251,16 +250,19 @@ class SocietyMultistepForm extends Component
             $insertedCount++;
         }
 
-        $this->dispatch('showSuccess', message:  "{$csvFlats} entries inserted successfully!");
+        if($insertedCount==$csvFlats){
+            $this->dispatch('show-success', message:  "{$csvFlats} entries inserted successfully!");
+        }else{
+            $this->dispatch('show-error', message:  "Society information could not be saved due to some error!");
+        }
     }
 
     public function done()
     {
-        // Optional: Clear previous form state
+        // // Optional: Clear previous form state
         $this->reset([
             'formData',
             'csv_file',
-            'verification_document',
             'societyId',
             'currentStep',
         ]);
@@ -277,8 +279,7 @@ class SocietyMultistepForm extends Component
         ];
 
         $this->currentStep = 1;
-
-        $this->dispatch('showSuccess', message:  "Society and its details have been saved successfully!");
+        $this->dispatch('show-success', message:  "Society and its details have been saved successfully!");
     }
 
 }

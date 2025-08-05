@@ -22,10 +22,6 @@
             @foreach($societyDetails as $details)
             <div class="grid grid-cols-2 gap-4 py-4 border-b border-gray-300">
                 <div class="flex gap-4 items-start">
-                    <!-- Icon Box -->
-                    {{-- <div class="bg-blue-200 p-3 rounded">
-                        <i class="fa-solid fa-code"></i>
-                    </div> --}}
                     <!-- Apartment + Owners -->
                     <div class="flex-1">
                         <h3 class="font-bold text-xl">{{ $details->society->society_name }}</h3>
