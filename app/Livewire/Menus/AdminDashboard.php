@@ -42,8 +42,7 @@ class AdminDashboard extends Component
             );
             
             return false;
-        })
-        ->unique('society_id');
+        });
     $this->pendingApplicationCount=$this->pendingApplication->count();
 
     $this->pendingVerification = SocietyDetail::get()
@@ -60,8 +59,7 @@ class AdminDashboard extends Component
             $verification && $verification['Status'] === 'Pending'
         );
         
-    })
-    ->unique('society_id');
+    });
     $this->pendingVerificationCount=$this->pendingVerification->count();
 
     $this->rejectedVerification = SocietyDetail::get()
@@ -78,8 +76,7 @@ class AdminDashboard extends Component
             $verification && $verification['Status'] === 'Rejected'
         );
         
-    })
-    ->unique('society_id');
+    });
     $this->rejectedVerificationCount=$this->rejectedVerification->count();
     $this->issueCertificateCount=100;
     }
@@ -94,13 +91,18 @@ class AdminDashboard extends Component
             $this->dispatch('showError', message: 'Role not updated!');
     }
 
-    public function redirectToSociety($status)
+    public function redirectToSocietyDetail($status)
     {
         return redirect()->route('admin.view-societies',['societyStatus'=>$status]);
     }
 
-    public function redirectToApartmentPage()
+    public function redirectToCreateSociety()
     {
-        return redirect()->route('admin.view-apartments');
+        return redirect()->route('menus.create_society');
+    }
+
+    public function redirectToCreateApartment()
+    {
+        return redirect()->route('menus.create_apartment');
     }
 }

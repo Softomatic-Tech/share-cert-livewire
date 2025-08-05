@@ -12,8 +12,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class CreateApartment extends Component
 {
     use WithFileUploads;
-    public $csv_file;
-    public $societyId = null;
+    public $csv_file,$society_id;
     public $society = [];
 
     public function render()
@@ -68,7 +67,7 @@ class CreateApartment extends Component
         $fullPath = Storage::path($path);
         $file = fopen($fullPath, 'r');  
         if (!$file) {
-            $this->dispatch('showError', message: 'Unable to open the uploaded CSV file.');
+            $this->dispatch('show-error', message: 'Unable to open the uploaded CSV file.');
             return;
         }
         $header = fgetcsv($file); 
@@ -76,7 +75,7 @@ class CreateApartment extends Component
         $headerMap = array_map('trim', $header);
         foreach ($requiredHeaders as $required) {
             if (!in_array($required, $headerMap)) {
-                $this->dispatch('showError', message: 'CSV is missing required column: {$required}');
+                $this->dispatch('show-error', message: 'CSV is missing required column: {$required}');
                 fclose($file);
                 return;
             }
@@ -105,7 +104,7 @@ class CreateApartment extends Component
 
         $csvFlats = count($validRows);
         if ($csvFlats !== $expectedFlats) {
-            $this->dispatch('showError', message:  "CSV must contain exactly {$expectedFlats} valid flat entries. Found {$csvFlats}. Row(s) skipped: " . implode(', ', $invalidRows));
+            $this->dispatch('show-error', message:  "CSV must contain exactly {$expectedFlats} valid flat entries. Found {$csvFlats}. Row(s) skipped: " . implode(', ', $invalidRows));
             return;
         }
         foreach ($validRows as $data) {
@@ -129,6 +128,10 @@ class CreateApartment extends Component
             $insertedCount++;
         }
 
-        $this->dispatch('showSuccess', message:  "{$csvFlats} entries inserted successfully.");
+        if($insertedCount==$csvFlats){
+            $this->dispatch('show-success', message:  "{$csvFlats} entries inserted successfully!");
+        }else{
+            $this->dispatch('show-error', message:  "Society information could not be saved due to some error!");
+        }
     }
 }

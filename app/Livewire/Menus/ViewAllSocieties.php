@@ -7,9 +7,13 @@ use Livewire\Component;
 
 class ViewAllSocieties extends Component
 {
-    public $societies=[];
     public $societyStatus;
     public $societyDetail;
+    public $documentName,$title,$detailId;
+    public $isRejecting = false;
+    public $comment;
+    public $search = '';
+
     public function render()
     {
         return view('livewire.menus.view-all-societies');
@@ -18,7 +22,27 @@ class ViewAllSocieties extends Component
     public function mount($societyStatus)
     {
         $this->societyStatus=$societyStatus;
-        $this->societyDetail = SocietyDetail::get()
+        $this->getSocietyDetail();
+    }
+
+    public function updatedSearch()
+    {
+        if (strlen($this->search) >= 2 || $this->search === '') {
+            $this->getSocietyDetail();
+        }
+    }
+
+    public function getSocietyDetail()
+    {
+        $this->societyDetail = SocietyDetail::with('society')
+            ->when(strlen($this->search) >= 2, function ($query) {
+                $query->whereHas('society', function ($q) {
+                    $q->where('society_name', 'like', '%' . $this->search . '%');
+                })
+                ->orWhere('building_name', 'like', '%' . $this->search . '%')
+                ->orWhere('apartment_number', 'like', '%' . $this->search . '%');
+            })
+            ->get()
             ->filter(function ($item) {
             $json = json_decode($item->status, true);
             if (!isset($json['tasks'])) return false;
@@ -48,17 +72,74 @@ class ViewAllSocieties extends Component
                 );
             }
             return false;
-        })
-        ->unique('society_id');
+        });
     }
 
-    public function redirectToCreateSociety()
+    public function setDocument($id)
     {
-        return redirect()->route('menus.create_society');
+        // $this->reset(['id']); 
+        $this->detailId = $id;
+        $society = SocietyDetail::find($this->detailId);
+        $this->comment=$society->comment;
+        $this->dispatch('open-modal', name: 'documentModal');
     }
 
-    public function redirectToApartment($id,$societyStatus)
+    public function setRejecting()
     {
-        return redirect()->route('admin.view-apartments',['id'=>$id,'societyStatus'=>$societyStatus]);
+        $this->isRejecting = true;
+    }
+
+    public function approveDocument($detailId)
+    {
+        $this->detailId=$detailId;
+        $society = SocietyDetail::find($this->detailId); 
+        $data = json_decode($society->status, true);
+        foreach ($data['tasks'] as &$task) {
+            if ($task['name']=='Verification') {
+                $task['Status'] = 'Approved';
+            }
+        }
+        $society->status = json_encode($data);
+        $society->save();
+        if($society){
+            $this->dispatch('show-success', message: 'Document approved successfully!');
+        }else{
+            $this->dispatch('show-error', message: 'Something went wrong to approve document!');
+        }
+        $this->mount($this->societyStatus);
+        if ($this->societyDetail->isEmpty()) {
+            return redirect()->route('admin.dashboard'); 
+        }
+    }
+
+    public function rejectDocument($detailId)
+    {
+        $this->validate([
+            'comment' => 'required|string|min:3',
+        ]);
+        $this->detailId=$detailId;
+        $society = SocietyDetail::find($this->detailId); 
+        $data = json_decode($society->status, true);
+        foreach ($data['tasks'] as &$task) {
+            if ($task['name']=='Verification') {
+                $task['Status'] = 'Rejected';
+            }
+
+            if ($task['name']=='Verify Details' || $task['name']=='Application') {
+                $task['Status'] = 'Pending';
+            }
+        }
+        $society->status = json_encode($data);
+        $society->comment = $this->comment;
+        $society->save();
+        if($society){
+            $this->dispatch('show-success', message: 'Document rejected successfully!');
+        }else{
+            $this->dispatch('show-error', message: 'Something went wrong to reject document!');
+        }
+        $this->mount($this->societyStatus);
+        if ($this->societyDetail->isEmpty()) {
+            return redirect()->route('admin.dashboard'); 
+        }
     }
 }

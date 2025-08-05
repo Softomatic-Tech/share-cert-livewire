@@ -30,17 +30,11 @@ class CreateSociety extends Component
         ]);
         $society=Society::create($validated);
         if($society){
-            $this->dispatch('showSuccess', message: 'Society information saved successfully!');
+            $this->dispatch('show-success', message: 'Society information saved successfully!');
             $this->reset(['society_name', 'address_1', 'address_2', 'pincode', 'state', 'city', 'total_flats']);
         }else{
-            $this->dispatch('showError', message: 'Society information could not be saved due to some error!');
+            $this->dispatch('show-error', message: 'Society information could not be saved due to some error!');
         }
         
     }
-
-    public function redirectToSocietyPage()
-    {
-        return redirect()->route('admin.view-societies');
-    }
-
 }

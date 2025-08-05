@@ -35,6 +35,10 @@
     color: #fbbf24; /* Amber color */
 }
 
+.stepwizard-step p[disabled] {
+    color: #ccc;
+}
+
 /* Form styles */
 .card {
     border: 1px solid #ddd;

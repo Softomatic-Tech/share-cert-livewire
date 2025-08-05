@@ -1,12 +1,20 @@
     <div class="w-full">
-        <div class="flex justify-between">
+        <div class="flex justify-between items-center">
             <h1 class="text-2xl font-bold">Admin Dashboard</h1>
+            <div class="flex gap-4">
+            <flux:tooltip content="Add Society">
+            <button type="button" class="bg-amber-500 text-white font-bold py-2 px-4 rounded cursor-pointer" wire:click="redirectToCreateSociety"><i class="fa-solid fa-plus"></i></button>
+            </flux:tooltip>
+            <flux:tooltip content="Add Apartment To Society">
+            <button type="button" class="bg-stone-500 text-white font-bold py-2 px-4 rounded cursor-pointer" wire:click="redirectToCreateApartment"><i class="fa-solid fa-building"></i></button>
+            </flux:tooltip>
+        </div>
         </div>
     
         <div class="grid gap-6 md:grid-cols-3 mt-2">
             <div class="card">
                 @if($pendingApplicationCount>0)
-                <div class="card-body bg-amber-200 cursor-pointer" wire:click="redirectToSociety(1)">
+                <div class="card-body bg-amber-200 cursor-pointer" wire:click="redirectToSocietyDetail(1)">
                 @else
                 <div class="card-body bg-amber-200">
                 @endif
@@ -16,7 +24,7 @@
             </div>
             <div class="card">
                 @if($pendingVerificationCount>0)
-                <div class="card-body bg-red-200 cursor-pointer" wire:click="redirectToSociety(2)">
+                <div class="card-body bg-red-200 cursor-pointer" wire:click="redirectToSocietyDetail(2)">
                 @else
                 <div class="card-body bg-red-200">
                 @endif
@@ -27,7 +35,7 @@
             
             <div class="card">
                 @if($rejectedVerificationCount>0)
-                <div class="card-body bg-emerald-200 cursor-pointer" wire:click="redirectToSociety(3)">
+                <div class="card-body bg-emerald-200 cursor-pointer" wire:click="redirectToSocietyDetail(3)">
                 @else
                 <div class="card-body bg-emerald-200">
                 @endif
@@ -51,6 +59,7 @@
             
             <div class="sm:-mx-6 lg:-mx-8">
                 <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8">
+                    <h1 class="text-xl font-bold">User Administration :</h1>
                     <div class="overflow-x-auto">
                         @if($users->isNotEmpty())
                         <table
@@ -71,9 +80,9 @@
                                 <td class="whitespace-nowrap px-6 py-4">{{ $user->email }}</td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     @if($user->role_id==3)
-                                    <button type="button" class="bg-green-500 text-white font-bold py-2 px-4 border border-green-700 rounded" wire:click="markRole({{ $user->id }}, 2)">Mark As Admin</button>
+                                    <button type="button" class="bg-green-500 font-bold py-2 px-4 border  rounded" wire:click="markRole({{ $user->id }}, 2)">Mark As Admin</button>
                                     @elseif($user->role_id==2)
-                                    <button type="button" class="bg-amber-500 text-white font-bold py-2 px-4 border border-amber-700 rounded" wire:click="markRole({{ $user->id }}, 3)">Mark As User</button>
+                                    <button type="button" class="bg-amber-500 font-bold py-2 px-4 border rounded" wire:click="markRole({{ $user->id }}, 3)">Mark As User</button>
                                     @endif
                                 </td>
                             </tr>

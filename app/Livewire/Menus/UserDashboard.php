@@ -9,17 +9,12 @@ use Illuminate\Support\Facades\Auth;
 
 class UserDashboard extends Component
 {
-    public $selectedSociety  = null; 
-    public $selectedBuilding = null;
-    public $societies = [];
-    public $buildings = [];
-    public $taskStatus  = [];
+    public $societyDetail = [];
     public $society_name, $total_flats, $address_1, $address_2, $pincode, $city, $state='';
     public $building_name, $apartment_number, $owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email='';
     public $isSocietyAccordionOpen = false;
     public $isApartmentAccordionOpen = false;
-    public $apartments=null;
-    public $comment;    
+    public $comment,$search;    
     public function render()
     {
         return view('livewire.menus.user-dashboard');
@@ -27,32 +22,32 @@ class UserDashboard extends Component
 
     public function mount()
     {
-        $userPhone = Auth::user()->phone;
-        $this->societies = Society::whereHas('details', function($query) use ($userPhone) {
-            $query->where('owner1_mobile', $userPhone)
-                ->orWhere('owner2_mobile', $userPhone)
-                ->orWhere('owner3_mobile', $userPhone);
-        })->get();
+        $this->getSocietyDetail();
     }
 
-    public function updatedSelectedSociety($societyId)
+    public function updatedSearch()
     {
-        $userPhone = Auth::user()->phone;
-        $this->buildings = SocietyDetail::where('society_id', $societyId)->where(function ($query) use ($userPhone) {
-            $query->where('owner1_mobile', $userPhone)
-            ->orWhere('owner2_mobile', $userPhone)
-            ->orWhere('owner3_mobile', $userPhone);
-        })->get();
+        if (strlen($this->search) >= 2 || $this->search === '') {
+            $this->getSocietyDetail();
+        }
     }
 
-    public function updatedselectedBuilding($apartmentId)
-    {
-        $userPhone = Auth::user()->phone;
-        $this->buildings = SocietyDetail::where('id', $apartmentId)->where(function ($query) use ($userPhone) {
-            $query->where('owner1_mobile', $userPhone)
-            ->orWhere('owner2_mobile', $userPhone)
-            ->orWhere('owner3_mobile', $userPhone);
-        })->get();
+    public function getSocietyDetail(){
+        $this->societyDetail = SocietyDetail::with('society')
+            ->where(function ($query) {
+                $userMobile = Auth::user()->phone;
+                $query->where('owner1_mobile', $userMobile)
+                    ->orWhere('owner2_mobile', $userMobile)
+                    ->orWhere('owner3_mobile', $userMobile);
+            })
+            ->when(strlen($this->search) >= 2, function ($query) {
+                $query->whereHas('society', function ($q) {
+                    $q->where('society_name', 'like', '%' . $this->search . '%');
+                })
+                ->orWhere('building_name', 'like', '%' . $this->search . '%')
+                ->orWhere('apartment_number', 'like', '%' . $this->search . '%');
+            })
+            ->get();
     }
 
     public function updateSociety()
@@ -78,7 +73,7 @@ class UserDashboard extends Component
                 'city' => $this->city,
             ]);
 
-            $this->dispatch('showSuccess', message: 'Society details updated successfully!');
+            $this->dispatch('show-success', message: 'Society details updated successfully!');
         }
     }
 
@@ -139,7 +134,7 @@ class UserDashboard extends Component
             }
             
             $apartment->update($updateData);
-            $this->dispatch('showSuccess', message: 'Apartment details updated successfully!');
+            $this->dispatch('show-success', message: 'Apartment details updated successfully!');
     }
     
     public function verifyDetails($apartmentId)
