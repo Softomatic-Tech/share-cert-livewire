@@ -43,9 +43,9 @@ class UserDashboard extends Component
             ->when(strlen($this->search) >= 2, function ($query) {
                 $query->whereHas('society', function ($q) {
                     $q->where('society_name', 'like', '%' . $this->search . '%');
-                })
-                ->orWhere('building_name', 'like', '%' . $this->search . '%')
-                ->orWhere('apartment_number', 'like', '%' . $this->search . '%');
+                });
+                // ->orWhere('building_name', 'like', '%' . $this->search . '%')
+                // ->orWhere('apartment_number', 'like', '%' . $this->search . '%');
             })
             ->get();
     }

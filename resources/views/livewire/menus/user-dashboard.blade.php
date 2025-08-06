@@ -92,28 +92,28 @@
                             <!-- Documents -->
                             <div class="mt-4 flex overflow-x-auto gap-2 whitespace-nowrap">
                                 @if($details->agreementCopy)
-                                <div class="border-1 border-gray-300 px-2 py-2 rounded-md">
+                                <div class="border-2 border-gray-300 px-2 py-2 rounded-md">
                                         <a href="{{ asset('storage/society_docs/' . $details->agreementCopy) }}" target="_blank">
                                         <span class="font-bold text-sm">Copy of Agreement</span>
                                         </a>
                                 </div> 
                                 @endif
                                 @if($details->memberShipForm)
-                                <div class="border-1 border-gray-300 px-2 py-2 rounded-md">
+                                <div class="border-2 border-gray-300 px-2 py-2 rounded-md">
                                     <a href="{{ asset('storage/society_docs/' . $details->memberShipForm) }}" target="_blank">
                                         <span class="font-bold text-sm">Membership Form</span>
                                     </a>
                                 </div>       
                                 @endif
                                 @if($details->allotmentLetter)
-                                <div class="border-1 border-gray-300 px-2 py-2 rounded-md">
+                                <div class="border-2 border-gray-300 px-2 py-2 rounded-md">
                                     <a href="{{ asset('storage/society_docs/' . $details->allotmentLetter) }}" target="_blank">
                                         <span class="font-bold text-sm">Allotment Letter</span>
                                     </a>
                                 </div>        
                                 @endif
                                 @if($details->possessionLetter)
-                                <div class="border-1 border-gray-300 px-2 py-2 rounded-md">
+                                <div class="border-2 border-gray-300 px-2 py-2 rounded-md">
                                     <a href="{{ asset('storage/society_docs/' . $details->possessionLetter) }}" target="_blank">
                                         <span class="font-bold text-sm">Possession Letter</span>
                                     </a>
