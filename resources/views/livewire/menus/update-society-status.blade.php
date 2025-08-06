@@ -104,7 +104,6 @@
                                         <flux:button variant="primary" type="submit">{{ __('Update') }}</flux:button>
                                     </div> --}}
                                     <div class="flex justify-end mt-4">
-                                    <flux:button variant="filled" class="mr-2" type="button" wire:click="prevStep">{{ __('Back') }}</flux:button>
                                     <flux:button variant="primary" type="button" wire:click="nextStep">{{ __('Next') }}</flux:button>
                                 </div>
                             </form>

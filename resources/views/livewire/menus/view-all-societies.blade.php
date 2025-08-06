@@ -26,7 +26,7 @@
 
             <!-- Apartment Card -->
             @foreach($societyDetail as $details)
-            <div class="grid grid-cols-2 gap-4 py-4 border-b border-gray-300">
+            <div class="grid grid-cols-2 gap-x-24 py-4 border-b border-gray-300">
                 <div class="flex gap-4 items-start">
                     <!-- Apartment + Owners -->
                     <div class="flex-1">
@@ -76,28 +76,28 @@
                         <!-- Documents -->
                         <div class="mt-4 flex overflow-x-auto gap-2 whitespace-nowrap">
                             @if($details->agreementCopy)
-                            <div class="border-1 border-gray-300 px-2 py-2 rounded-md">
+                            <div class="border-2 border-gray-300 px-2 py-2 rounded-md">
                                     <a href="{{ asset('storage/society_docs/' . $details->agreementCopy) }}" target="_blank">
                                     <span class="font-bold text-sm">Copy of Agreement</span>
                                     </a>
                             </div> 
                             @endif
                             @if($details->memberShipForm)
-                            <div class="border-1 border-gray-300 px-2 py-2 rounded-md">
+                            <div class="border-2 border-gray-300 px-2 py-2 rounded-md">
                                 <a href="{{ asset('storage/society_docs/' . $details->memberShipForm) }}" target="_blank">
                                     <span class="font-bold text-sm">Membership Form</span>
                                 </a>
                             </div>       
                             @endif
                             @if($details->allotmentLetter)
-                            <div class="border-1 border-gray-300 px-2 py-2 rounded-md">
+                            <div class="border-2 border-gray-300 px-2 py-2 rounded-md">
                                 <a href="{{ asset('storage/society_docs/' . $details->allotmentLetter) }}" target="_blank">
                                     <span class="font-bold text-sm">Allotment Letter</span>
                                 </a>
                             </div>        
                             @endif
                             @if($details->possessionLetter)
-                            <div class="border-1 border-gray-300 px-2 py-2 rounded-md">
+                            <div class="border-2 border-gray-300 px-2 py-2 rounded-md">
                                 <a href="{{ asset('storage/society_docs/' . $details->possessionLetter) }}" target="_blank">
                                     <span class="font-bold text-sm">Possession Letter</span>
                                 </a>
@@ -131,30 +131,56 @@
                 $statusData = json_decode($details->status, true);
                 @endphp
                 @if(isset($statusData['tasks']))
-                <div data-dui-stepper-container data-dui-initial-step="1" class="w-full">
-                    <div class="flex w-full items-center justify-between">
-                        @foreach(collect($statusData['tasks'])->skip(1) as $task)
-                        <div aria-disabled="false" data-dui-step class="group w-full flex items-center">
-                            <div class="relative">
-                                <span class="relative grid h-10 w-10 place-items-center rounded-full {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'bg-stone-400' : 'bg-amber-400'}}">
-                                <i class="fa-solid fa-check text-white"></i>
-                                </span>
-                                @if($task['name']=='Application')
-                                <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}}">Application
-                                </span>
-                                @elseif($task['name']=='Verification')
-                                <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}}">Verification</span>
-                                @elseif($task['name']=='Certificate Generated')
-                                <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}}">Waiting</span>
-                                @elseif($task['name']=='Certificate Delivered')
-                                <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}}">Delivered</span>
+                @php
+                    $step1 = $statusData['tasks'][1];
+                    $step2 = $statusData['tasks'][2]; 
+                    $note = '';
+
+                    if ($step1['Status'] === 'Pending') {
+                        if ($step2 && $step2['Status'] === 'Pending') {
+                            $note = 'Step 1 is pending and needs to be applied.';
+                        }elseif ($step2 && $step2['Status'] === 'Rejected') {
+                            $note = 'Step 1 is pending and needs to be reviewed.';
+                        }
+                    } elseif ($step1['Status'] === 'Applied') {
+                        if ($step2 && $step2['Status'] === 'Pending') {
+                            $note = 'Step 2 needs to be verified and updated.';
+                        } elseif ($step2 && $step2['Status'] === 'Approved') {
+                            $note = 'All steps are done.';
+                        }
+                    }
+                @endphp
+                <div class="w-full flex flex-col gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold mb-4">
+                            {{ $note }}
+                        </h2>
+                    </div>
+                    <div data-dui-stepper-container data-dui-initial-step="1" class="w-full">
+                        <div class="flex items-center justify-between">
+                            @foreach(collect($statusData['tasks'])->skip(1) as $task)
+                            <div aria-disabled="false" data-dui-step class="group w-full flex items-center">
+                                <div class="relative">
+                                    <span class="relative grid h-10 w-10 place-items-center rounded-full {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'bg-stone-400' : 'bg-amber-400'}}">
+                                    <i class="fa-solid fa-check text-white"></i>
+                                    </span>
+                                    @if($task['name']=='Application')
+                                    <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}}">Application
+                                    </span>
+                                    @elseif($task['name']=='Verification')
+                                    <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}}">Verification</span>
+                                    @elseif($task['name']=='Certificate Generated')
+                                    <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}}">Waiting</span>
+                                    @elseif($task['name']=='Certificate Delivered')
+                                    <span class="absolute -bottom-6 start-0 whitespace-nowrap text-sm {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}}">Delivered</span>
+                                    @endif
+                                </div>
+                                @if(!$loop->last)
+                                <div class="flex-1 h-1 {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'bg-stone-400' : 'bg-amber-400'}}"></div>
                                 @endif
                             </div>
-                            @if(!$loop->last)
-                            <div class="flex-1 h-1 {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'bg-stone-400' : 'bg-amber-400'}}"></div>
-                            @endif
+                            @endforeach
                         </div>
-                        @endforeach
                     </div>
                 </div>
                 @endif
