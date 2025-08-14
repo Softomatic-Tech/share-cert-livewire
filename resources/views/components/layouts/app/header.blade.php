@@ -11,20 +11,18 @@
             </a>
 
             <flux:navbar class="-mb-px max-lg:hidden">
-                <flux:navbar.item icon="home" :href="route(auth()->user()->role->role === 'Super Admin' ? 'superadmin.dashboard' : (auth()->user()->role->role === 'Admin' ? 'admin.dashboard' : 'user.dashboard'))" 
+                {{-- <flux:navbar.item :href="route(auth()->user()->role->role === 'Super Admin' ? 'superadmin.dashboard' : (auth()->user()->role->role === 'Admin' ? 'admin.dashboard' : 'user.dashboard'))" 
                 :current="request()->routeIs('superadmin.dashboard') || request()->routeIs('admin.dashboard') || request()->routeIs('user.dashboard')" wire:navigate>
-                    {{ __('Home') }}
-                </flux:navbar.item>
-                @if(auth()->user()->role->role === 'Society User')
-                <flux:navbar.item icon="document-text" :href="route('menus.register_society')" :current="request()->routeIs('menus.register_society')">Register Society</flux:navbar.item>
-                @endif
-                @if(auth()->user()->role->role === 'Admin')
-                <flux:navbar.item icon="document-text" :href="route('menus.create_society')" :current="request()->routeIs('menus.create_society')">Create Society</flux:navbar.item>
+                <i class="fa-solid fa-house"></i> {{ __('Home') }}
+                </flux:navbar.item> --}}
+            </flux:navbar>
+            <flux:spacer />
+            <flux:navbar class="mr-1.5 space-x-0.5 py-0!">
+                @if(auth()->user()->role->role === 'Super Admin')
+                <flux:navbar.item  :href="route('menus.society_multistep_form')" :current="request()->routeIs('menus.society_multistep_form')"><i class="fa-solid fa-landmark dark:text-white"></i> <span class="font-bold dark:text-white">Create Society</span></flux:navbar.item>
+                <flux:navbar.item :href="route('menus.society_list')" :current="request()->routeIs('menus.society_list')"><i class="fa-solid fa-list" class="dark:text-white"></i><span class="font-bold dark:text-white"> List</span></flux:navbar.item>
                 @endif
             </flux:navbar>
-
-            <flux:spacer />
-
             {{-- <flux:navbar class="mr-1.5 space-x-0.5 py-0!">
                 <flux:tooltip :content="__('Search')" position="bottom">
                     <flux:navbar.item class="!h-10 [&>div>svg]:size-5" icon="magnifying-glass" href="#" :label="__('Search')" />
@@ -41,7 +39,7 @@
                 <flux:tooltip :content="__('Documentation')" position="bottom">
                     <flux:navbar.item
                         class="h-10 max-lg:hidden [&>div>svg]:size-5"
-                        icon="book-open-text"
+                        
                         href="https://laravel.com/docs/starter-kits"
                         target="_blank"
                         label="Documentation"
@@ -109,9 +107,6 @@
                     {{ __('Home') }}
                     </flux:navlist.item>
 
-                    @if(auth()->user()->role->role === 'Society User')
-                    <flux:navbar.item icon="document-text" :href="route('menus.register_society')" :current="request()->routeIs('menus.register_society')">Register Society</flux:navbar.item>
-                    @endif
                     @if(auth()->user()->role->role === 'Admin')
                     <flux:navbar.item icon="document-text" :href="route('menus.create_society')" :current="request()->routeIs('menus.create_society')">Create Society</flux:navbar.item>
                     @endif

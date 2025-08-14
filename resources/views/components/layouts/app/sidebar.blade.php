@@ -6,7 +6,7 @@
     <body class="min-h-screen bg-white dark:bg-zinc-800">
         <!-- header -->
             <div class="hidden md:block lg:block border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 text-center">
-                <p class="text-lg font-semibold">Welcome To Dear Society <br />Share Certificate Management</p>
+                <p class="text-lg font-bold">Welcome To Dear Society <br /><span class="text-ms font-stretch-normal">Share Certificate Management</span></p>
             </div>
         <!-- header -->
 

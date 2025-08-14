@@ -3,6 +3,7 @@
 namespace App\Livewire\Settings;
 
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
@@ -10,17 +11,22 @@ use Livewire\Component;
 
 class Profile extends Component
 {
-    public string $name = '';
+    public $name = '';
 
-    public string $email = '';
+    public $email = '';
+
+    public $phone = '';
+    public $user;
 
     /**
      * Mount the component.
      */
-    public function mount(): void
+    public function mount(UserService $userService)
     {
-        $this->name = Auth::user()->name;
-        $this->email = Auth::user()->email;
+        $this->user = $userService->getAuthenticatedUser();
+        $this->name = $this->user->name;
+        $this->email = $this->user->email;
+        $this->phone = $this->user->phone;
     }
 
     /**
@@ -28,21 +34,25 @@ class Profile extends Component
      */
     public function updateProfileInformation(): void
     {
-        $user = Auth::user();
-
+        $user = $this->user->find(Auth::id());
+        // $user = Auth::user();
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
 
             'email' => [
-                'required',
+                'nullable',
                 'string',
                 'lowercase',
                 'email',
                 'max:255',
-                Rule::unique(User::class)->ignore($user->id),
+                Rule::unique(User::class)->whereNotNull('email')->ignore($user->id),
             ],
+            'phone' => ['required', 'digits:10', Rule::unique('users', 'phone')->ignore($user->id)],
         ]);
 
+        if (empty($validated['email']) && empty($validated['phone'])) {
+            $this->dispatch('show-error', message:  "Either email or phone is required!");
+        }
         $user->fill($validated);
 
         if ($user->isDirty('email')) {
@@ -50,8 +60,8 @@ class Profile extends Component
         }
 
         $user->save();
-
-        $this->dispatch('profile-updated', name: $user->name);
+        // $this->dispatch('profile-updated', name: $user->name);
+        $this->dispatch('show-success', message:  "Profile updated successfully!");
     }
 
     /**
@@ -59,8 +69,8 @@ class Profile extends Component
      */
     public function resendVerificationNotification(): void
     {
-        $user = Auth::user();
-
+        $user = User::find(Auth::id());
+        // $user = Auth::user();
         if ($user->hasVerifiedEmail()) {
             $this->redirectIntended(default: route('dashboard', absolute: false));
 
@@ -68,7 +78,6 @@ class Profile extends Component
         }
 
         $user->sendEmailVerificationNotification();
-
         Session::flash('status', 'verification-link-sent');
     }
 }
