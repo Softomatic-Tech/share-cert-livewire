@@ -27,9 +27,6 @@ class Profile extends Component
         $this->name = $this->user->name;
         $this->email = $this->user->email;
         $this->phone = $this->user->phone;
-        // $this->name = Auth::user()->name;
-        // $this->email = Auth::user()->email;
-        // $this->phone = Auth::user()->phone;
     }
 
     /**
@@ -50,7 +47,7 @@ class Profile extends Component
                 'max:255',
                 Rule::unique(User::class)->whereNotNull('email')->ignore($user->id),
             ],
-            'phone' => ['required', 'digits:10', 'unique:'.User::class],
+            'phone' => ['required', 'digits:10', Rule::unique('users', 'phone')->ignore($user->id)],
         ]);
 
         if (empty($validated['email']) && empty($validated['phone'])) {
