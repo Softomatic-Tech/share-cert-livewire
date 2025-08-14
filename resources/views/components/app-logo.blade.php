@@ -5,5 +5,5 @@
     <img src="{{ asset('images/logo.png') }}" alt="" class="w-full h-full">
 </div>
 <div class="ml-1 grid flex-1 text-left text-sm">
-    <span class="mb-0.5 truncate leading-none font-semibold">Share Certificate</span>
+    <span class="mb-0.5 truncate leading-none font-semibold">Share Certificate Management</span>
 </div>

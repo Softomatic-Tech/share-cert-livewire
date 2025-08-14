@@ -3,12 +3,10 @@
 namespace App\Livewire\Menus;
 
 use Livewire\Component;
-use App\Models\Society;
 use App\Models\SocietyDetail; 
-use Livewire\WithFileUploads;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
+use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Features\SupportFileUploads\WithFileUploads;
 
 class UpdateSocietyStatus extends Component
 {
@@ -17,6 +15,13 @@ class UpdateSocietyStatus extends Component
     public $currentStep = 1;
     public $society_id,$society_name, $total_flats, $address_1, $address_2, $pincode, $city, $state,$apartment_id,$building_name, $apartment_number, $owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
     public $agreementCopy,$memberShipForm,$allotmentLetter,$possessionLetter;
+    protected $userService;
+    public $fileKey;
+
+    public function boot(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
     public function render()
     {
         return view('livewire.menus.update-society-status');
@@ -24,6 +29,7 @@ class UpdateSocietyStatus extends Component
 
     public function mount($apartmentId)
     {
+        $this->fileKey = now()->timestamp;
         $this->loadSocietyData($apartmentId);
     }
 
@@ -100,40 +106,37 @@ class UpdateSocietyStatus extends Component
             'owner3_mobile' => 'nullable|digits:10',
         ]);
 
-        // Update Society
-        $society = Society::findOrFail($this->society_id);
-        $society->update([
-            'society_name' => $this->society_name,
-            'total_flats' => $this->total_flats,
-            'address_1' => $this->address_1,
-            'address_2' => $this->address_2,
-            'pincode' => $this->pincode,
-            'state' => $this->state,
-            'city' => $this->city,
-        ]);
+        $response = $this->userService->updateSocietyDetails(
+            [
+                'society_name' => $this->society_name,
+                'total_flats' => $this->total_flats,
+                'address_1' => $this->address_1,
+                'address_2' => $this->address_2,
+                'pincode' => $this->pincode,
+                'state' => $this->state,
+                'city' => $this->city,
+                'building_name' => $this->building_name,
+                'apartment_number' => $this->apartment_number,
+                'owner1_name' => $this->owner1_name,
+                'owner1_email' => $this->owner1_email,
+                'owner1_mobile' => $this->owner1_mobile,
+                'owner2_name' => $this->owner2_name,
+                'owner2_email' => $this->owner2_email,
+                'owner2_mobile' => $this->owner2_mobile,
+                'owner3_name' => $this->owner3_name,
+                'owner3_email' => $this->owner3_email,
+                'owner3_mobile' => $this->owner3_mobile,
+            ],
+            $this->society_id,
+            $this->apartment_id
+        );
 
-        // Update Society Details
-        $apartment = SocietyDetail::findOrFail($this->apartment_id);
-        $apartment->update([
-            'building_name'     => $this->building_name,
-            'apartment_number'  => $this->apartment_number,
-            'owner1_name'       => $this->owner1_name,
-            'owner1_mobile'     => $this->owner1_mobile,
-            'owner1_email'      => $this->owner1_email,
-            'owner2_name'       => $this->owner2_name,
-            'owner2_mobile'     => $this->owner2_mobile,
-            'owner2_email'      => $this->owner2_email,
-            'owner3_name'       => $this->owner3_name,
-            'owner3_mobile'     => $this->owner3_mobile,
-            'owner3_email'      => $this->owner3_email,
-        ]);
-
-        if($society || $apartment){
-            $this->dispatch('showSuccess', message:  "Society and details updated successfully!");
+        if ($response['status']) {
+            $this->dispatch('show-success', message:  $response['message']);
             $this->mount($this->apartment_id);
-            $this->currentStep = 1; // Reset to first step
-        }else{
-            $this->dispatch('showError', message:  "Society information could not be saved due to some error!");
+            $this->currentStep = 1;
+        } else {
+            $this->dispatch('show-error', message:  $response['message'] ?? 'Error updating society');
         }
     }
 
@@ -143,18 +146,15 @@ class UpdateSocietyStatus extends Component
             'agreementCopy' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
         ]);
 
-        $fileName = time().'.'.$this->agreementCopy->getClientOriginalExtension();
-        $path = $this->agreementCopy->storeAs('society_docs', $fileName, 'public');
-        $details = SocietyDetail::find($this->apartment_id);
-        if ($details) {
-            $details->agreementCopy = $fileName;
-            $details->save();
-            $this->dispatch('showSuccess', message:  "Agreement Copy uploaded successfully!");
-        } else {
-            $this->dispatch('showError', message:  "Society not found!");
-        }
-        $this->reset('agreementCopy');
-        $this->loadSocietyData($this->apartment_id);
+        try {
+            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->agreementCopy,'agreementCopy','agreementCopy');
+            $this->dispatch('show-success', message:  "Agreement Copy uploaded successfully!");
+            $this->reset('agreementCopy');
+            $this->fileKey = now()->timestamp;
+            $this->loadSocietyData($this->apartment_id);
+        } catch (\Exception $e) {
+        $this->dispatch('show-error', message: 'Something went wrong while uploading the Agreement Copy');
+        } 
     }
 
     public function uploadMemberShipForm()
@@ -162,20 +162,15 @@ class UpdateSocietyStatus extends Component
         $this->validate([
             'memberShipForm' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
         ]);
-
-        $fileName = time().'.'.$this->memberShipForm->getClientOriginalExtension();
-        $path = $this->memberShipForm->storeAs('society_docs', $fileName, 'public');
-        $details = SocietyDetail::find($this->apartment_id);
-        if ($details) {
-            $details->memberShipForm = $fileName;
-            $details->save();
-
-            $this->dispatch('showSuccess', message:  "Membership Form uploaded successfully!");
-        } else {
-            $this->dispatch('showError', message:  "Society not found!");
-        }
-        $this->reset('memberShipForm');
-        $this->loadSocietyData($this->apartment_id);
+        try {
+            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->memberShipForm,'memberShipForm','memberShipForm');
+            $this->dispatch('show-success', message:  "Membership Form uploaded successfully!");
+            $this->reset('memberShipForm');
+            $this->fileKey = now()->timestamp;
+            $this->loadSocietyData($this->apartment_id);
+        } catch (\Exception $e) {
+        $this->dispatch('show-error', message: 'Something went wrong while uploading the Membership Form');
+        } 
     }
 
     public function uploadAllotmentLetter()
@@ -184,19 +179,15 @@ class UpdateSocietyStatus extends Component
             'allotmentLetter' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
         ]);
 
-        $fileName = time().'.'.$this->allotmentLetter->getClientOriginalExtension();
-        $path = $this->allotmentLetter->storeAs('society_docs', $fileName, 'public');
-        $details = SocietyDetail::find($this->apartment_id);
-        if ($details) {
-            $details->allotmentLetter = $fileName;
-            $details->save();
-
-            $this->dispatch('showSuccess', message:  "Allotment Letter uploaded successfully!");
-        } else {
-            $this->dispatch('showError', message:  "Society not found!");
-        }
-        $this->reset('allotmentLetter');
-        $this->loadSocietyData($this->apartment_id);
+        try {
+            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->allotmentLetter, 'allotmentLetter', 'allotmentLetter');
+            $this->dispatch('show-success', message:  "Allotment Letter uploaded successfully!");
+            $this->reset('allotmentLetter');
+            $this->fileKey = now()->timestamp;
+            $this->loadSocietyData($this->apartment_id);
+        } catch (\Exception $e) {
+        $this->dispatch('show-error', message: 'Something went wrong while uploading the Allotment Letter');
+        } 
     }
 
     public function uploadPossessionLetter()
@@ -204,62 +195,25 @@ class UpdateSocietyStatus extends Component
         $this->validate([
             'possessionLetter' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
         ]);
-
-        $fileName = time().'.'.$this->possessionLetter->getClientOriginalExtension();
-        $path = $this->possessionLetter->storeAs('society_docs', $fileName, 'public');
-        $details = SocietyDetail::find($this->apartment_id);
-        if ($details) {
-            $details->possessionLetter = $fileName;
-            $details->save();
-
-            $this->dispatch('showSuccess', message:  "Possession Letter uploaded successfully!");
-        } else {
-            $this->dispatch('showError', message:  "Society not found!");
-        }
-        $this->reset('possessionLetter');
-        $this->loadSocietyData($this->apartment_id);
-    }
-
-    public function updateStatus($apartmentId)
-    {
-        $user=Auth::user();
-        $society = SocietyDetail::findOrFail($apartmentId);
-        $allDocumentsUploaded = $society->agreementCopy && $society->memberShipForm && $society->allotmentLetter && $society->possessionLetter;
-        $status = $society->status; 
-        if (is_string($status)) {
-            $status = json_decode($status, true);
-        }
-
-        foreach ($status['tasks'] as &$task) {
-            if ($task['name'] ==='Verify Details') {
-                $task['Status'] = 'Applied';
-                $task['updatedBy'] = $user->id ?? 'System';
-                $task['updateDateTime'] = now();
-            }
-
-            if ($task['name'] === 'Application') {
-                if ($allDocumentsUploaded) {
-                    $task['Status'] = 'Applied';
-                    $task['updatedBy'] = $user->id ?? 'System';
-                    $task['updateDateTime'] = now();
-                } else {
-                    $task['Status'] = 'Pending';
-                    $task['updatedBy'] = null;
-                    $task['updateDateTime'] = null;
-                }
-            }
-        }
-
-        // Save updated JSON
-        $society->status = json_encode($status);
-        $society->save();
+        try {
+            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->possessionLetter, 'possessionLetter', 'possessionLetter');
+            $this->dispatch('show-success', message:  "Possession Letter uploaded successfully!");
+            $this->reset('possessionLetter');
+            $this->fileKey = now()->timestamp;
+            $this->loadSocietyData($this->apartment_id);
+        } catch (\Exception $e) {
+        $this->dispatch('show-error', message: 'Something went wrong while uploading the Possession Letter');
+        } 
     }
 
     public function done()
     {
-        $this->updateStatus($this->apartment_id); 
-
+        $response=$this->userService->updateStatus($this->apartment_id); 
         $this->currentStep = 1;
-        $this->dispatch('showSuccess', message:  "Society details and its documents have been verified and submitted successfully!");
+        if ($response['status']) {
+        $this->dispatch('show-success', message:  $response['message']);
+        } else {
+            $this->dispatch('show-error', message:  $response['message'] ?? 'Error updating society status');
+        }
     }
 }

@@ -7,11 +7,12 @@ use App\Models\Role;
 use App\Models\Society;
 use App\Models\SocietyDetail;
 use Livewire\Component;
+use Livewire\WithPagination;
 use Illuminate\Http\RedirectResponse;
 
 class AdminDashboard extends Component
 {
-    public $users;
+    use WithPagination;
     public $adminRole;
     public $userRole;
     public $pendingApplication,$pendingApplicationCount,$pendingVerification,$pendingVerificationCount,$rejectedVerification,$rejectedVerificationCount;
@@ -19,11 +20,10 @@ class AdminDashboard extends Component
 
     public function render()
     {
-        return view('livewire.menus.admin-dashboard');
+        return view('livewire.menus.admin-dashboard',['users'=>User::where('role_id','!=',1)->paginate(10)]);
     }
 
     public function mount(){
-        $this->users=User::orderBy('id','desc')->get();
         $this->adminRole=Role::where('role','Admin')->value('id');
         $this->userRole=Role::where('role','Society User')->value('id');
 

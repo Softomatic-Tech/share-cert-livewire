@@ -1,12 +1,15 @@
 <section class="w-full">
     @include('partials.settings-heading')
 
+    <div class="py-4">
+        <livewire:menus.alerts />
+    </div>
     <x-settings.layout :heading="__('Profile')" :subheading="__('Update your name and email address')">
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
             <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
 
             <div>
-                <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
+                <flux:input wire:model="email" :label="__('Email')" type="email"  autocomplete="email" />
 
                 @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail &&! auth()->user()->hasVerifiedEmail())
                     <div>
@@ -25,6 +28,10 @@
                         @endif
                     </div>
                 @endif
+            </div>
+
+            <div>
+                <flux:input wire:model="phone" :label="__('Phone Number')" type="tel" required autocomplete="tel" maxlength="10" placeholder="xxxxxxxxxx" />
             </div>
 
             <div class="flex items-center gap-4">

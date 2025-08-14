@@ -1,42 +1,50 @@
-
 <div class="w-full">
-  <div class="flex justify-between items-center">
-      <h1 class="text-xl font-bold">Society List:</h1>
-      <div class="w-100">
-        <div class="flex justify-between items-center mt-2">
-            <flux:input type="text" placeholder="Search Society..." size="md" wire:model.live="search">
-              <x-slot name="iconTrailing">
-                  @if ($search)
-                  <flux:button size="sm" variant="subtle" icon="x-mark" class="-mr-1" wire:click="$set('search', '')" />
-                  @endif
-              </x-slot>
-            </flux:input> 
-        </div>
+  <div class="relative mb-2 w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2">
+      <div>
+          <flux:heading size="xl" level="1">{{ __('Society Details') }}</flux:heading>
       </div>
+      <div>
+          <div class="flex justify-between items-center mt-2">
+              <flux:input type="text" placeholder="Search Society..." size="md" wire:model.live="search">
+                  <x-slot name="iconTrailing">
+                      @if ($search)
+                      <flux:button size="sm" variant="subtle" icon="x-mark" class="-mr-1" wire:click="$set('search', '')" />
+                      @endif
+                  </x-slot>
+              </flux:input> 
+          </div>
+      </div>
+    </div>
   </div>
+  <flux:separator variant="subtle" />
 
   <div class="group block max-h-150 overflow-y-auto mt-4" aria-disabled="false" data-dui-accordion-container data-dui-accordion-mode="exclusive">
     @foreach ($societies as $society)
     <div 
-      class="flex items-center justify-between w-full border-b  text-left font-medium dark:text-white text-stone-800 cursor-pointer transition-colors duration-200 hover:bg-amber-100"
+      class="flex items-center justify-between w-full border-b text-left font-medium dark:text-white text-stone-800 cursor-pointer transition-colors duration-200 hover:bg-gray-200"
       data-dui-accordion-toggle
       data-dui-accordion-target="#basicAccordion{{ $society->id }}"
       aria-expanded="false" wire:click="toggleAccordion({{ $society->id }})">
-        <div class="grid grid-cols-2 gap-4 py-4">
-            <div>
-                <h3 class="font-bold text-lg">{{ $society->society_name }}</h3>
-                <h3>Total flats : {{ $society->total_flats }}</h3>
-            </div>
 
-            <div>
-                <strong>Address:</strong> 
-                    @if($society->address_1){{ $society->address_1 }},@endif
-                    @if($society->address_2){{ $society->address_2 }},@endif
-                    @if($society->city){{ $society->city }},@endif
-                    @if($society->state){{ $society->state }}@endif
-                    @if($society->pincode) - {{ $society->pincode }}@endif
-            </div>
-        </div>
+        <table class="w-full table-fixed">
+            <tbody>
+                <tr class="border-b border-neutral-200 dark:border-white/10">
+                    <td class="w-1/2 p-4 text-left align-top">
+                        <h3 class="font-bold text-lg">{{ $society->society_name }}</h3>
+                        <p>Total flats : {{ $society->total_flats }}</p>
+                    </td>
+                    <td class="w-1/2 p-4 text-left align-top">
+                        <strong class="font-bold text-lg">Address:</strong>
+                        @if($society->address_1){{ $society->address_1 }},@endif
+                        @if($society->address_2){{ $society->address_2 }},@endif
+                        @if($society->city){{ $society->city }},@endif
+                        @if($society->state){{ $society->state }}@endif
+                        @if($society->pincode) - {{ $society->pincode }}@endif
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
     <div id="basicAccordion{{ $society->id }}" class="{{ $openAccordionId === $society->id ? 'block' : 'hidden' }} overflow-hidden transition-all duration-300 border-b border-stone-200 dark:border-stone-700">
@@ -82,24 +90,36 @@
                           <br />@if($detail->owner3_mobile)<i class="fa-solid fa-phone"></i> {{ $detail->owner3_mobile }} @endif
                           <br />@if($detail->owner3_email)<i class="fas fa-envelope"></i> {{ $detail->owner3_email }}@endif
                         </td>
-                        <td class="whitespace-nowrap px-6 py-4">
+                        <td class="whitespace-nowrap px-6 py-4 text-center">
                           @if($detail->agreementCopy)
-                            <a href="{{ asset('storage/' . $detail->agreementCopy) }}" target="_blank" class="text-blue-500 hover:underline"><img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></a>
+                            <a href="{{ asset('storage/' . $detail->agreementCopy) }}" target="_blank">
+                              {{-- <img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"> --}}
+                              <i class="fa-solid fa-download"></i>
+                            </a>
                           @endif
                         </td>
-                        <td class="whitespace-nowrap px-6 py-4">
+                        <td class="whitespace-nowrap px-6 py-4 text-center">
                           @if($detail->memberShipForm)
-                            <a href="{{ asset('storage/' . $detail->memberShipForm) }}" target="_blank" class="text-blue-500 hover:underline"><img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></a>
+                            <a href="{{ asset('storage/' . $detail->memberShipForm) }}" target="_blank">
+                              {{-- <img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"> --}}
+                              <i class="fa-solid fa-download"></i>
+                            </a>
                           @endif
                         </td>
-                        <td class="whitespace-nowrap px-6 py-4">
+                        <td class="whitespace-nowrap px-6 py-4 text-center">
                           @if($detail->allotmentLetter)
-                            <a href="{{ asset('storage/' . $detail->allotmentLetter) }}" target="_blank" class="text-blue-500 hover:underline"><img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></a>
+                            <a href="{{ asset('storage/' . $detail->allotmentLetter) }}" target="_blank">
+                              {{-- <img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"> --}}
+                              <i class="fa-solid fa-download"></i>
+                            </a>
                           @endif
                         </td>
-                        <td class="whitespace-nowrap px-6 py-4">
+                        <td class="whitespace-nowrap px-6 py-4 text-center">
                           @if($detail->possessionLetter)
-                            <a href="{{ asset('storage/' . $detail->possessionLetter) }}" target="_blank" class="text-blue-500 hover:underline"><img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"></a>
+                            <a href="{{ asset('storage/' . $detail->possessionLetter) }}" target="_blank">
+                              {{-- <img src="{{ asset('images/document.svg') }}" alt="" class="w-6 h-6"> --}}
+                              <i class="fa-solid fa-download"></i>
+                            </a>
                           @endif
                         </td>
                     </tr>
