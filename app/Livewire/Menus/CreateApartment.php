@@ -130,6 +130,7 @@ class CreateApartment extends Component
 
         if($insertedCount==$csvFlats){
             $this->dispatch('show-success', message:  "{$csvFlats} entries inserted successfully!");
+            $this->reset('csv_file','society_id');
         }else{
             $this->dispatch('show-error', message:  "Society information could not be saved due to some error!");
         }

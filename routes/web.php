@@ -7,6 +7,7 @@ use App\Livewire\Menus\SocietyMultistepForm;
 use App\Livewire\Menus\CreateSociety;
 use App\Livewire\Menus\CreateApartment;
 use App\Livewire\Menus\SocietyList;
+use App\Livewire\Menus\UserList;
 use App\Livewire\Menus\IssueCertificate;
 use App\Livewire\Menus\SuperAdminDashboard;
 use App\Livewire\Menus\AdminDashboard;
@@ -16,6 +17,7 @@ use App\Livewire\Menus\ViewAllApartments;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Livewire\Menus\UpdateSocietyStatus;
+use App\Livewire\Menus\markRole;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -28,6 +30,7 @@ Route::middleware(['auth', 'role:Super Admin'])->group(function () {
     Route::get('/superadmin/dashboard', SuperAdminDashboard::class)->name('superadmin.dashboard');
     Route::get('/superadmin/society-multistep-form', SocietyMultistepForm::class)->name('menus.society_multistep_form');
     Route::get('/superadmin/society-list', SocietyList::class)->name('menus.society_list');
+    Route::get('/superadmin/user-list', UserList::class)->name('menus.user_list');
 });
 
 // Admin Routes
@@ -37,7 +40,7 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
     Route::get('/admin/view-apartments/{id}/{societyStatus}', ViewAllApartments::class)->name('admin.view-apartments');
     Route::get('/admin/create-society', CreateSociety::class)->name('menus.create_society');
     Route::get('/admin/create-apartment', CreateApartment::class)->name('menus.create_apartment');
-    
+    Route::get('/admin/mark-role', markRole::class)->name('menus.mark_role');
 });
 
 // User Routes

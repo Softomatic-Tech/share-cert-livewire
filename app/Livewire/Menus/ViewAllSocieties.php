@@ -11,7 +11,7 @@ class ViewAllSocieties extends Component
     public $societyDetail;
     public $documentName,$title,$detailId;
     public $isRejecting = false;
-    public $comment;
+    public $comment,$text;
     public $search = '';
 
     public function render()
@@ -80,6 +80,7 @@ class ViewAllSocieties extends Component
         // $this->reset(['id']); 
         $this->detailId = $id;
         $society = SocietyDetail::find($this->detailId);
+        $this->text='I have verified all details and documents. I hereby complete Verification of Application';
         $this->comment=$society->comment;
         $this->dispatch('open-modal', name: 'documentModal');
     }

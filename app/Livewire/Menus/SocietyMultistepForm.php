@@ -6,10 +6,11 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Society;
 use App\Models\SocietyDetail;
+use App\Models\State;
+use App\Models\City;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Illuminate\Support\Facades\Auth;
 
 class SocietyMultistepForm extends Component
 {
@@ -18,14 +19,15 @@ class SocietyMultistepForm extends Component
     public $csv_file;
     public $societyId = null;
     public $csvUploaded = false;
+    public $states, $cities=[];
     public $formData = [
         'society_name' => '',
         'total_flats'=>'',
         'address_1' => '',
         'address_2' => '',
         'pincode' => '',
-        'state' => '',
-        'city' => '',
+        'state_id' => '',
+        'city_id' => '',
     ];
 
     // Validation rules for each step
@@ -35,17 +37,36 @@ class SocietyMultistepForm extends Component
             'formData.address_1' => 'required|string|max:255',
             'formData.address_2' => 'nullable|string|max:255',
             'formData.pincode' => 'required|numeric|digits:6',
-            'formData.state' => 'required|string|max:255',
-            'formData.city' => 'required|string|max:255',
+            'formData.state_id' => 'required|exists:states,id',
+            'formData.city_id' => 'required|exists:cities,id',
             'formData.total_flats' => 'required|numeric',
         ],
         2=>[],
         3=>[]
     ];
 
+    protected $validationAttributes = [
+        'formData.society_name' => 'society name',
+            'formData.address_1'    => 'address line 1',
+            'formData.address_2'    => 'address line 2',
+            'formData.pincode'      => 'pincode',
+            'formData.state_id'        => 'state',
+            'formData.city_id'         => 'city',
+            'formData.total_flats'  => 'total flats',
+    ];
     public function render()
     {
         return view('livewire.menus.society-multistep-form');
+    }
+
+    public function mount(){
+        $this->states=State::all();
+    }
+
+    public function updatedFormDataStateID($stateId)
+    {
+        $this->cities = City::where('state_id', $stateId)->get();
+        $this->formData['city'] = null;
     }
 
     public function getUploadedDetailsProperty()
@@ -252,6 +273,7 @@ class SocietyMultistepForm extends Component
 
         if($insertedCount==$csvFlats){
             $this->dispatch('show-success', message:  "{$csvFlats} entries inserted successfully!");
+            $this->reset('csv_file');
         }else{
             $this->dispatch('show-error', message:  "Society information could not be saved due to some error!");
         }
@@ -274,12 +296,13 @@ class SocietyMultistepForm extends Component
             'address_1' => '',
             'address_2' => '',
             'pincode' => '',
-            'state' => '',
+            'state_id' => '',
             'city' => '',
         ];
 
-        $this->currentStep = 1;
-        $this->dispatch('show-success', message:  "Society and its details have been saved successfully!");
+        // $this->currentStep = 1;
+        // $this->dispatch('show-success', message:  "Society and its details have been saved successfully!");
+        return redirect()->route('superadmin.dashboard');
     }
 
 }
