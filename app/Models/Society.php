@@ -14,12 +14,22 @@ class Society extends Model
         'address_1',
         'address_2',
         'pincode',
-        'state',
-        'city'
+        'state_id',
+        'city_id'
     ];
 
     public function details()
     {
         return $this->hasMany(SocietyDetail::class);
+    }
+
+    public function state()
+    {
+        return $this->belongsTo(State::class, 'state_id');
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class, 'city_id');
     }
 }

@@ -1,9 +1,10 @@
-<div class="w-full">
-    <div class="relative mb-2 w-full">
+<div>
+    <div class="w-full mb-1">
         <div class="grid grid-cols-1 md:grid-cols-2">
-        <div>
-            <flux:heading size="xl" level="1">{{ __('Society Details') }}</flux:heading>
-        </div>
+        <flux:breadcrumbs>
+            <flux:breadcrumbs.item href="#">Admin</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item href="#">Society Details</flux:breadcrumbs.item>
+        </flux:breadcrumbs>
         <div>
             <div class="flex justify-between items-center mt-2">
                 <flux:input type="text" placeholder="Search Society..." size="md" wire:model.live="search">
@@ -29,77 +30,72 @@
                 <!-- Left Column -->
                 <div class="p-4 rounded">
                     <!-- Apartment + Owners -->
-                    <h3 class="font-bold text-xl">{{ $details->society->society_name }}</h3>
-                    <h3 class="font-bold text-amber-600 text-lg">{{ $details->building_name }} - {{ $details->apartment_number }}</h3>
+                    <h3 class="font-bold text-xl">{{ $details->building_name }} - {{ $details->apartment_number }} <flux:badge color="amber" class="ml-2">{{ $details->society->society_name }}</flux:badge></h3>
 
                     <!-- Owner List -->
-                    <div class="mt-2 space-y-2 text-sm">
-                        @if($details->owner1_name)
-                        <div>
-                            <div class="font-semibold">Owner 1: {{ $details->owner1_name }}</div>
-                            @if($details->owner1_mobile)
-                            <div class="text-gray-600 flex items-center gap-1">
-                                <i class="fa-solid fa-phone text-amber-500"></i>
-                                <span class="font-bold dark:text-zinc-500">{{ $details->owner1_mobile }}</span>
-                            </div>
-                            @endif
-                        </div>
-                        @endif
-
-                        @if($details->owner2_name)
-                        <div>
-                            <div class="font-semibold">Owner 2: {{ $details->owner2_name }}</div>
-                            @if($details->owner2_mobile)
-                            <div class="text-gray-600 flex items-center gap-1">
-                                <i class="fa-solid fa-phone text-amber-500"></i>
-                                <span class="font-bold dark:text-zinc-500">{{ $details->owner2_mobile }}</span>
-                            </div>
-                            @endif
-                        </div>
-                        @endif
-
-                        @if($details->owner3_name)
-                        <div>
-                            <div class="font-semibold">Owner 3: {{ $details->owner3_name }}</div>
-                            @if($details->owner3_mobile)
-                            <div class="text-gray-600 flex items-center gap-1">
-                                <i class="fa-solid fa-phone text-amber-500"></i>
-                                <span class="font-bold dark:text-zinc-500">{{ $details->owner3_mobile }}</span>
-                            </div>
-                            @endif
-                        </div>
-                        @endif
+                    <div class="mt-1">
+                        <table class="min-w-full table-fixed text-sm text-left dark:text-white">
+                            <thead>
+                            <tr>
+                                <th class="px-1 py-1 w-1/3">@if($details->owner1_name)Owner 1 @endif</th>
+                                <th class="px-1 py-1 w-1/3">@if($details->owner2_name)Owner 2 @endif</th>
+                                <th class="px-1 py-1 w-1/3">@if($details->owner3_name)Owner 3 @endif</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td class="px-1 py-1">
+                                    @if($details->owner1_name)
+                                    {{ $details->owner1_name }}<br />
+                                    @if($details->owner1_mobile)<flux:badge size="sm">{{ $details->owner1_mobile }}</flux:badge>@endif
+                                    @endif
+                                </td>
+                                <td class="px-1 py-1">
+                                    @if($details->owner2_name)
+                                    {{ $details->owner2_name }}<br />
+                                    @if($details->owner2_mobile)<flux:badge size="sm">{{ $details->owner2_mobile }}</flux:badge>@endif
+                                    @endif
+                                </td>
+                                <td class="px-1 py-1">
+                                    @if($details->owner3_name)
+                                    {{ $details->owner3_name }}<br />
+                                    @if($details->owner3_mobile)<flux:badge size="sm">{{ $details->owner3_mobile }}</flux:badge>@endif
+                                    @endif
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <!-- Documents -->
-                    <div class="mt-4 flex overflow-x-auto gap-2 whitespace-nowrap">
+                    <div class="mt-2 flex overflow-x-auto gap-2 whitespace-nowrap">
                         @if($details->agreementCopy)
-                        <div class="z-1 max-sm:hidden inline-block rounded-4xl bg-black px-4 py-2 text-sm/6 font-semibold text-white hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600">
-                                <a href="{{ asset('storage/society_docs/' . $details->agreementCopy) }}" target="_blank">
-                                <span class="font-bold text-sm">Copy of Agreement</span>
+                            <div class="z-1 max-sm:hidden inline-flex items-center justify-center rounded-full bg-black px-2 py-2 text-xs font-medium text-white dark:bg-gray-700 dark:hover:bg-gray-600">
+                                <a href="{{ asset('storage/society_docs/' . $details->agreementCopy) }}" target="_blank" class="flex items-center justify-center">
+                                    <span class="font-semibold">Copy of Agreement</span>
                                 </a>
-                        </div> 
+                            </div>
                         @endif
                         @if($details->memberShipForm)
-                        <div class="z-1 max-sm:hidden inline-block rounded-4xl bg-black px-4 py-2 text-sm/6 font-semibold text-white hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600">
-                            <a href="{{ asset('storage/society_docs/' . $details->memberShipForm) }}" target="_blank">
-                                <span class="font-bold text-sm">Membership Form</span>
-                            </a>
-                        </div>       
+                            <div class="z-1 max-sm:hidden inline-flex items-center justify-center rounded-full bg-black px-2 py-2 text-xs font-medium text-white dark:bg-gray-700 dark:hover:bg-gray-600">
+                                <a href="{{ asset('storage/society_docs/' . $details->memberShipForm) }}" target="_blank" class="flex items-center justify-center">
+                                    <span class="font-semibold">Membership Form</span>
+                                </a>
+                            </div>   
                         @endif
                         @if($details->allotmentLetter)
-                        <div class="z-1 max-sm:hidden inline-block rounded-4xl bg-black px-4 py-2 text-sm/6 font-semibold text-white hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600">
-                            <a href="{{ asset('storage/society_docs/' . $details->allotmentLetter) }}" target="_blank">
-                                <span class="font-bold text-sm">Allotment Letter</span>
-                            </a>
-                        </div>        
+                            <div class="z-1 max-sm:hidden inline-flex items-center justify-center rounded-full bg-black px-2 py-2 text-xs font-medium text-white dark:bg-gray-700 dark:hover:bg-gray-600">
+                                <a href="{{ asset('storage/society_docs/' . $details->allotmentLetter) }}" target="_blank" class="flex items-center justify-center">
+                                    <span class="font-semibold">Allotment Letter</span>
+                                </a>
+                            </div>      
                         @endif
                         @if($details->possessionLetter)
-                        <div class="z-1 max-sm:hidden inline-block rounded-4xl bg-black px-4 py-2 text-sm/6 font-semibold text-white hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600">
-                            <a href="{{ asset('storage/society_docs/' . $details->possessionLetter) }}" target="_blank">
-                                <span class="font-bold text-sm">Possession Letter</span>
-                            </a>
-                        </div>
+                            <div class="z-1 max-sm:hidden inline-flex items-center justify-center rounded-full bg-black px-2 py-2 text-xs font-medium text-white dark:bg-gray-700 dark:hover:bg-gray-600">
+                                <a href="{{ asset('storage/society_docs/' . $details->possessionLetter) }}" target="_blank" class="flex items-center justify-center">
+                                    <span class="font-semibold">Possession Letter</span>
+                                </a>
+                            </div> 
                         @endif 
                         <div>
                             @php
@@ -116,7 +112,7 @@
                             )
                             @if($details->agreementCopy)
                                 <flux:modal.trigger name="documentModal">
-                                    <flux:button variant="primary" x-on:click="$wire.setDocument('{{ $details->id }}')">Need Info</flux:button>
+                                    <flux:button variant="primary" x-on:click="$wire.setDocument('{{ $details->id }}')">Verify</flux:button>
                                 </flux:modal.trigger>
                             @endif
                             @endif
@@ -137,13 +133,13 @@
 
                             if ($step1['Status'] === 'Pending') {
                                 if ($step2 && $step2['Status'] === 'Pending') {
-                                    $note = 'Step 1 is pending and needs to be applied.';
+                                    $note = 'Application is pending and needs to be verified.';
                                 }elseif ($step2 && $step2['Status'] === 'Rejected') {
-                                    $note = 'Step 1 is pending and needs to be reviewed.';
+                                    $note = 'Application is pending and needs to be reviewed.';
                                 }
                             } elseif ($step1['Status'] === 'Applied') {
                                 if ($step2 && $step2['Status'] === 'Pending') {
-                                    $note = 'Step 2 needs to be verified and updated.';
+                                    $note = 'Admin Verification needs to be updated.';
                                 } elseif ($step2 && $step2['Status'] === 'Approved') {
                                     $note = 'All steps are done.';
                                 }
@@ -152,7 +148,7 @@
                         
                         <div class="w-full flex flex-col gap-4">
                             <div>
-                                <h2 class="text-lg font-bold mb-4">{{ $note }}</h2>
+                                <h2 class="text-sm font-bold mb-2">{{ $note }}</h2>
                             </div>
 
                             <div data-dui-stepper-container data-dui-initial-step="1" class="w-full mb-6">
@@ -192,7 +188,7 @@
         <!--Modal-->
         <flux:modal name="documentModal" class="md:w-96">
             <div class="space-y-6">
-                <div >
+                <div class="text-lg font-bold">
                     <flux:heading size="lg">Document Approval</flux:heading>
                 </div>
 
@@ -200,6 +196,8 @@
                 @if($isRejecting)
                     <flux:textarea type="text" wire:model="comment" placeholder="Enter reason for rejection..." value="{{ $comment }}"/>
                     @error('comment') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                @else
+                    <p class="text-sm font-normal">{{ $text }}</p>
                 @endif
 
                 <div class="flex justify-between">

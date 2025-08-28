@@ -17,35 +17,6 @@
                 </flux:navbar.item> --}}
             </flux:navbar>
             <flux:spacer />
-            <flux:navbar class="mr-1.5 space-x-0.5 py-0!">
-                @if(auth()->user()->role->role === 'Super Admin')
-                <flux:navbar.item  :href="route('menus.society_multistep_form')" :current="request()->routeIs('menus.society_multistep_form')"><i class="fa-solid fa-landmark dark:text-white"></i> <span class="font-bold dark:text-white">Create Society</span></flux:navbar.item>
-                <flux:navbar.item :href="route('menus.society_list')" :current="request()->routeIs('menus.society_list')"><i class="fa-solid fa-list" class="dark:text-white"></i><span class="font-bold dark:text-white"> List</span></flux:navbar.item>
-                @endif
-            </flux:navbar>
-            {{-- <flux:navbar class="mr-1.5 space-x-0.5 py-0!">
-                <flux:tooltip :content="__('Search')" position="bottom">
-                    <flux:navbar.item class="!h-10 [&>div>svg]:size-5" icon="magnifying-glass" href="#" :label="__('Search')" />
-                </flux:tooltip>
-                <flux:tooltip :content="__('Repository')" position="bottom">
-                    <flux:navbar.item
-                        class="h-10 max-lg:hidden [&>div>svg]:size-5"
-                        icon="folder-git-2"
-                        href="https://github.com/laravel/livewire-starter-kit"
-                        target="_blank"
-                        :label="__('Repository')"
-                    />
-                </flux:tooltip>
-                <flux:tooltip :content="__('Documentation')" position="bottom">
-                    <flux:navbar.item
-                        class="h-10 max-lg:hidden [&>div>svg]:size-5"
-                        
-                        href="https://laravel.com/docs/starter-kits"
-                        target="_blank"
-                        label="Documentation"
-                    />
-                </flux:tooltip>
-            </flux:navbar> --}}
 
             <!-- Desktop User Menu -->
             <flux:dropdown position="top" align="end">
@@ -107,23 +78,10 @@
                     {{ __('Home') }}
                     </flux:navlist.item>
 
-                    @if(auth()->user()->role->role === 'Admin')
-                    <flux:navbar.item icon="document-text" :href="route('menus.create_society')" :current="request()->routeIs('menus.create_society')">Create Society</flux:navbar.item>
-                    @endif
                 {{-- </flux:navlist.group> --}}
             </flux:navlist>
 
             <flux:spacer />
-
-            {{-- <flux:navlist variant="outline">
-                <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
-                {{ __('Repository') }}
-                </flux:navlist.item>
-
-                <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits" target="_blank">
-                {{ __('Documentation') }}
-                </flux:navlist.item>
-            </flux:navlist> --}}
         </flux:sidebar>
 
         {{ $slot }}

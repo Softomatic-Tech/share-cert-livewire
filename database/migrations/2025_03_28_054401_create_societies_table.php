@@ -18,8 +18,10 @@ return new class extends Migration
             $table->string('address_1');
             $table->string('address_2')->nullable();
             $table->string('pincode', 6);
-            $table->string('state');
-            $table->string('city'); 
+            $table->unsignedBigInteger('state_id');
+            $table->unsignedBigInteger('city_id'); 
+            $table->foreign('state_id')->references('id')->on('states')->onDelete('cascade');
+            $table->foreign('city_id')->references('id')->on('cities')->onDelete('cascade');
             $table->timestamp('created_at')->useCurrent()->nullable(false);
             $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate()->nullable(false);
         });

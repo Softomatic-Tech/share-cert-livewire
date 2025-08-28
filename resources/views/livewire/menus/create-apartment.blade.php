@@ -1,5 +1,9 @@
 <section class="w-full">
-    <h1 class="text-xl font-bold">Create Apartment</h1>
+    <flux:breadcrumbs>
+        <flux:breadcrumbs.item href="#">Admin</flux:breadcrumbs.item>
+        <flux:breadcrumbs.item href="#">Create Apartment</flux:breadcrumbs.item>
+    </flux:breadcrumbs>
+    <flux:separator variant="subtle" />
 
     <div class="rounded-lg shadow-lg p-6">
         <div class="mb-2">

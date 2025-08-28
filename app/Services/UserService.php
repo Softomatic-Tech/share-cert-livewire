@@ -42,8 +42,8 @@ class UserService
             'total_flats' => 'required|numeric',
             'address_1' => 'required|string|max:255',
             'pincode' => 'required|digits:6',
-            'state' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
+            'state_id' => 'required|exists:states,id',
+            'city_id' => 'required|exists:cities,id',
             'building_name' => 'required|string|max:255',
             'apartment_number' => 'required|string|max:50',
             'owner1_name' => 'required|string|max:255',
@@ -80,8 +80,8 @@ class UserService
             'address_1' => $validated['address_1'],
             'address_2' => $validated['address_2']?? null,
             'pincode' => $validated['pincode'],
-            'state' => $validated['state'],
-            'city' => $validated['city'],
+            'state_id' => $validated['state_id'],
+            'city_id' => $validated['city_id'],
         ]);
 
         // Update Society Details

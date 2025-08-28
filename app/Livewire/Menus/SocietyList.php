@@ -17,7 +17,7 @@ class SocietyList extends Component
 
     public function render()
     {
-        $societies = Society::query()
+        $societies = Society::with(['state','city'])
             ->when(strlen($this->search) >= 2, function ($query) {
                 $query->where('society_name', 'like', '%' . $this->search . '%');
             })

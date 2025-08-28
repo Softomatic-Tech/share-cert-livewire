@@ -1,6 +1,9 @@
-<div class="w-full">
-    <div class="relative mb-2 w-full">
-        <flux:heading size="xl" level="1">{{ __('Create Society') }}</flux:heading>
+<div>
+    <div class="mb-2 w-full">
+        <flux:breadcrumbs>
+            <flux:breadcrumbs.item href="#">Admin</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item href="#">Create Society</flux:breadcrumbs.item>
+        </flux:breadcrumbs>
         <flux:separator variant="subtle" />
     </div>
 
@@ -17,9 +20,19 @@
                         <flux:input type="text" :label="__('Total Flats')" wire:model="total_flats" />
                         <flux:input type="text"  :label="__('Address Line 1')" wire:model="address_1" />
                         <flux:input type="text"  :label="__('Address Line 2')" wire:model="address_2" />
+                        <flux:select wire:model.live="state_id" placeholder="Choose State..." :label="__('State')">
+                            <flux:select.option value="">Choose State...</flux:select.option>
+                            @foreach($states  as $st)
+                                <flux:select.option value="{{ $st->id }}">{{ $st->name }}</flux:select.option>
+                            @endforeach
+                        </flux:select>
+                        <flux:select wire:model="city_id" placeholder="Choose City..." :label="__('City')">
+                            <flux:select.option value="">Choose City...</flux:select.option>
+                            @foreach($cities  as $ct)
+                                <flux:select.option value="{{ $ct->id }}">{{ $ct->name }}</flux:select.option>
+                            @endforeach
+                        </flux:select>
                         <flux:input type="text" :label="__('Pincode')" wire:model="pincode" />
-                        <flux:input type="text" :label="__('City')" wire:model="city" />
-                        <flux:input type="text" :label="__('State')" wire:model="state" />
                     </div>
                     <div class="flex justify-end mt-4">
                         <flux:button variant="primary" type="submit">{{ __('Save') }}</flux:button>

@@ -1,9 +1,12 @@
-<section class="w-full">
-    <div class="relative w-full">
-        <flux:heading size="xl" level="1">{{ __('Create Society') }}</flux:heading>
+<section>
+    <div class="w-full">
+        <flux:breadcrumbs>
+            <flux:breadcrumbs.item href="#">User</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item href="#">Verify Society Details</flux:breadcrumbs.item>
+        </flux:breadcrumbs>
         <flux:separator variant="subtle" />
 
-        <div class="rounded-lg shadow-lg p-6">
+        <div class="rounded-lg shadow-lg py-4 px-6">
             <div class="stepwizard">
                 <div class="stepwizard-step">
                     <button type="button">1</button>
@@ -18,35 +21,45 @@
                     <p>Verify And Submit</p>
                 </div>
             </div>
-            <div class="py-4">
+            <div class="mb-2">
                 <livewire:menus.alerts />
             </div>
             <!-- Verify Details -->
             @if($currentStep == 1)
                 <div class="step-one">
                     <div class="card">
-                        <div class="card-header">Step 1: Verify Details</div>
+                        <div class="card-header font-bold">Step 1: Verify Details</div>
                         <div class="card-body">
                             <form wire:submit.prevent="nextStep">
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
-                                    <flux:input type="text" :label="__('Society Name')" wire:model="society_name" />
-                                    <flux:input type="text" :label="__('Total Flats')" wire:model="total_flats" />
-                                    <flux:input type="text"  :label="__('Address Line 1')" wire:model="address_1" />
-                                    <flux:input type="text"  :label="__('Address Line 2')" wire:model="address_2" />
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-2">
+                                    <flux:input type="text" :label="__('Society Name :')" wire:model="society_name" />
+                                    <flux:input type="text" :label="__('Total Flats :')" wire:model="total_flats" />
+                                    <flux:input type="text"  :label="__('Address Line 1 :')" wire:model="address_1" />
+                                    <flux:input type="text"  :label="__('Address Line 2 :')" wire:model="address_2" />
+                                    <flux:select wire:model.live="state_id" placeholder="Choose State..." :label="__('State')">
+                                        <flux:select.option value="">Choose State...</flux:select.option>
+                                        @foreach($states  as $st)
+                                            <flux:select.option value="{{ $st->id }}">{{ $st->name }}</flux:select.option>
+                                        @endforeach
+                                    </flux:select>
+                                    <flux:select wire:model="city_id" placeholder="Choose City..." :label="__('City')">
+                                        <flux:select.option value="">Choose City...</flux:select.option>
+                                        @foreach($cities  as $ct)
+                                            <flux:select.option value="{{ $ct->id }}">{{ $ct->name }}</flux:select.option>
+                                        @endforeach
+                                    </flux:select>
                                     <flux:input type="text" :label="__('Pincode')" wire:model="pincode" />
-                                    <flux:input type="text" :label="__('City')" wire:model="city" />
-                                    <flux:input type="text" :label="__('State')" wire:model="state" />
-                                    <flux:input type="text" :label="__('Building Name')" wire:model="building_name" />
-                                    <flux:input type="text" :label="__('Apartment Number')" wire:model="apartment_number" />
-                                    <flux:input type="text" :label="__('Owner 1 Name')" wire:model="owner1_name" />
-                                    <flux:input type="text" :label="__('Owner 1 Email')" wire:model="owner1_email" />
-                                    <flux:input type="text" :label="__('Owner 1 Mobile')" wire:model="owner1_mobile" />
-                                    <flux:input type="text" :label="__('Owner 2 Name')" wire:model="owner2_name" />
-                                    <flux:input type="text" :label="__('Owner 2 Email')" wire:model="owner2_email" />
-                                    <flux:input type="text" :label="__('Owner 2 Mobile')" class="form-control" wire:model="owner2_mobile" />
-                                    <flux:input type="text" :label="__('Owner 3 Name')" class="form-control" wire:model="owner3_name" />
-                                    <flux:input type="text" :label="__('Owner 3 Email')" wire:model="owner3_email" />
-                                    <flux:input type="text" :label="__('Owner 3 Mobile')" wire:model="owner3_mobile" />
+                                    <flux:input type="text" :label="__('Building Name :')" wire:model="building_name" />
+                                    <flux:input type="text" :label="__('Apartment Number :')" wire:model="apartment_number" />
+                                    <flux:input type="text" :label="__('Owner 1 Name :')" wire:model="owner1_name" />
+                                    <flux:input type="text" :label="__('Owner 1 Email :')" wire:model="owner1_email" />
+                                    <flux:input type="text" :label="__('Owner 1 Mobile :')" wire:model="owner1_mobile" />
+                                    <flux:input type="text" :label="__('Owner 2 Name :')" wire:model="owner2_name" />
+                                    <flux:input type="text" :label="__('Owner 2 Email :')" wire:model="owner2_email" />
+                                    <flux:input type="text" :label="__('Owner 2 Mobile :')" wire:model="owner2_mobile" />
+                                    <flux:input type="text" :label="__('Owner 3 Name :')" wire:model="owner3_name" />
+                                    <flux:input type="text" :label="__('Owner 3 Email :')" wire:model="owner3_email" />
+                                    <flux:input type="text" :label="__('Owner 3 Mobile :')" wire:model="owner3_mobile" />
                                 </div>
                                 <div class="flex justify-end mt-4">
                                     <flux:button variant="primary" type="button" wire:click="nextStep">{{ __('Next') }}</flux:button>
@@ -60,28 +73,30 @@
             @if($currentStep == 2)
                 <div class="step-two">
                     <div class="card">
-                        <div class="card-header">Step 2: Upload Documents</div>
+                        <div class="card-header font-bold">Step 2: Upload Documents</div>
                             <div class="card-body">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
                                     <!-- Form 1 -->
                                     <form wire:submit.prevent="uploadAgreementCopy" class="p-4 border rounded-md shadow-sm">
                                         <label class="block font-semibold mb-2">Xerox Copy Of Agreement</label>
                                         <div class="w-full mb-4" wire:key="file-input-{{ $fileKey }}">
-                                            <flux:input type="file" wire:model="agreementCopy" class="border border-gray-300 rounded px-2 py-1 w-full" />
-                                            @error('agreementCopy') <span class="text-red-500">{{ $message }}</span> @enderror
+                                            <flux:input type="file" wire:model="newAgreementCopy" class="border border-gray-300 rounded px-2 py-1 w-full" />
+                                            @error('newAgreementCopy') <span class="text-red-500">{{ $message }}</span> @enderror
                                         </div>
-                                
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            @if($agreementCopy)
                                             <div class="p-4">
+                                                @if ($agreementCopy && $agreementUploaded)
                                                 <a href="{{ asset('storage/society_docs/'.$agreementCopy) }}" 
                                                     target="_blank"  class="inline-flex items-center px-4 py-2 bg-amber-100 text-amber-700 font-semibold rounded-md hover:bg-amber-200 transition duration-200">
-                                                        IMPORT FILE <i class="fa-solid fa-file-import"></i> 
+                                                        IMPORT FILE <i class="fa-solid fa-file-import"></i>
                                                 </a>
+                                                @endif 
                                             </div>
-                                            @endif
+                                            
                                             <div class="p-4">
-                                                <flux:button variant="filled" type="submit" class="w-full" wire:loading.attr="disabled" wire:target="agreementCopy, uploadAgreementCopy">{{ __('UPLOAD FILE') }} <i class="fa-solid fa-upload"></i></flux:button>
+                                                @if ($newAgreementCopy)
+                                                <flux:button variant="filled" type="submit" class="w-full" wire:loading.attr="disabled" wire:target="newAgreementCopy, uploadAgreementCopy">{{ __('UPLOAD FILE') }} <i class="fa-solid fa-upload"></i></flux:button>
+                                                @endif
                                             </div>
                                         </div>
                                     </form>
@@ -90,21 +105,23 @@
                                     <form wire:submit.prevent="uploadMemberShipForm" class="p-4 border rounded-md  shadow-sm">
                                         <label class="block font-semibold mb-2">MemberShip Form</label>
                                         <div class="w-full mb-4" wire:key="file-input-{{ $fileKey }}">
-                                            <flux:input type="file" wire:model="memberShipForm" class="border border-gray-300 rounded px-2 py-1 w-full" />
-                                            @error('memberShipForm') <span class="text-red-500">{{ $message }}</span> @enderror
+                                            <flux:input type="file" wire:model="newMemberShipForm" class="border border-gray-300 rounded px-2 py-1 w-full" />
+                                            @error('newMemberShipForm') <span class="text-red-500">{{ $message }}</span> @enderror
                                         </div>
                                     
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            @if($memberShipForm)
                                             <div class="p-4">
+                                            @if ($memberShipForm && $membershipUploaded)
                                                 <a href="{{ asset('storage/society_docs/'.$memberShipForm) }}" 
                                                     target="_blank"  class="inline-flex items-center px-4 py-2 bg-amber-100 text-amber-700 font-semibold rounded-md hover:bg-amber-200 transition duration-200">
                                                         IMPORT FILE <i class="fa-solid fa-file-import"></i> 
                                                 </a>
-                                            </div>
                                             @endif
+                                            </div>
                                             <div class="p-4">
-                                                <flux:button variant="filled" type="submit" class="w-full" wire:loading.attr="disabled" wire:target="memberShipForm, uploadMemberShipForm">{{ __('UPLOAD FILE') }} <i class="fa-solid fa-upload"></i></flux:button>
+                                            @if ($newMemberShipForm)
+                                                <flux:button variant="filled" type="submit" class="w-full" wire:loading.attr="disabled" wire:target="newMemberShipForm, uploadMemberShipForm">{{ __('UPLOAD FILE') }} <i class="fa-solid fa-upload"></i></flux:button>
+                                            @endif
                                             </div>
                                         </div>
                                     </form>
@@ -113,22 +130,25 @@
                                     <form wire:submit.prevent="uploadAllotmentLetter" class="p-4 border rounded-md  shadow-sm">
                                         <label class="block font-semibold mb-2">Parking Allotment Letter</label>
                                         <div class="w-full mb-4" wire:key="file-input-{{ $fileKey }}">
-                                            <flux:input type="file" wire:model="allotmentLetter" class="border border-gray-300 rounded px-2 py-1 w-full" />
-                                            @error('allotmentLetter') <span class="text-red-500">{{ $message }}</span> @enderror
+                                            <flux:input type="file" wire:model="newAllotmentLetter" class="border border-gray-300 rounded px-2 py-1 w-full" />
+                                            @error('newAllotmentLetter') <span class="text-red-500">{{ $message }}</span> @enderror
                                         </div>
                                     
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            @if($allotmentLetter)
                                             <div class="p-4">
+                                                @if($allotmentLetter && $allotmentUploaded)
                                                 <a href="{{ asset('storage/society_docs/'.$allotmentLetter) }}" 
                                                     target="_blank"  class="inline-flex items-center px-4 py-2 bg-amber-100 text-amber-700 font-semibold rounded-md hover:bg-amber-200 transition duration-200">
                                                         IMPORT FILE <i class="fa-solid fa-file-import"></i> 
                                                 </a>
-                                            </div>
                                             @endif
-                                            <div class="p-4">
-                                                <flux:button variant="filled" type="submit" class="w-full" wire:loading.attr="disabled" wire:target="allotmentLetter, uploadAllotmentLetter">{{ __('UPLOAD FILE') }} <i class="fa-solid fa-upload"></i></flux:button>
                                             </div>
+                                            <div class="p-4">
+                                                @if ($newAllotmentLetter)
+                                                <flux:button variant="filled" type="submit" class="w-full" wire:loading.attr="disabled" wire:target="newAllotmentLetter, uploadAllotmentLetter">{{ __('UPLOAD FILE') }} <i class="fa-solid fa-upload"></i></flux:button>
+                                            @endif
+                                            </div>
+                                            
                                         </div>
                                     </form>
 
@@ -136,22 +156,24 @@
                                     <form wire:submit.prevent="uploadPossessionLetter" class="p-4 border rounded-md  shadow-sm">
                                         <label class="block font-semibold mb-2">Possession Letter</label>
                                         <div class="w-full mb-4" wire:key="file-input-{{ $fileKey }}">
-                                            <flux:input type="file" wire:model="possessionLetter" class="border border-gray-300 rounded px-2 py-1 w-full" />
-                                            @error('possessionLetter') <span class="text-red-500">{{ $message }}</span> @enderror
+                                            <flux:input type="file" wire:model="newPossessionLetter" class="border border-gray-300 rounded px-2 py-1 w-full" />
+                                            @error('newPossessionLetter') <span class="text-red-500">{{ $message }}</span> @enderror
                                         </div>
-                                    
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            @if($possessionLetter)
                                             <div class="p-4">
+                                            @if( $possessionLetter && $possessionUploaded)
                                                 <a href="{{ asset('storage/society_docs/'.$possessionLetter) }}" 
                                                     target="_blank"  class="inline-flex items-center px-4 py-2 bg-amber-100 text-amber-700 font-semibold rounded-md hover:bg-amber-200 transition duration-200">
                                                         IMPORT FILE <i class="fa-solid fa-file-import"></i> 
                                                 </a>
-                                            </div>
                                             @endif
-                                            <div class="p-4">
-                                                <flux:button variant="filled" type="submit" class="w-full" wire:loading.attr="disabled" wire:target="possessionLetter, uploadPossessionLetter">{{ __('UPLOAD FILE') }} <i class="fa-solid fa-upload"></i></flux:button>
                                             </div>
+                                            <div class="p-4">
+                                            @if ($newPossessionLetter)
+                                                <flux:button variant="filled" type="submit" class="w-full" wire:loading.attr="disabled" wire:target="newPossessionLetter, uploadPossessionLetter">{{ __('UPLOAD FILE') }} <i class="fa-solid fa-upload"></i></flux:button>
+                                            @endif
+                                            </div>
+                                            
                                         </div>
                                     </form>
                                 </div>
@@ -169,7 +191,7 @@
             @if($currentStep == 3)
                 <div class="step-three">
                     <div class="card">
-                        <div class="card-header">Step 3: Verification</div>
+                        <div class="card-header font-bold">Step 3: Verification</div>
                         <div class="p-4 border rounded">
                             <h2 class="text-lg font-semibold">Society Details:</h2>
                             <p><strong>Society Name:</strong> {{ $society_name }}</p>

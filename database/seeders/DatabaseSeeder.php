@@ -27,5 +27,7 @@ class DatabaseSeeder extends Seeder
             'role_id' => $superAdminId,
             'password' => bcrypt('password'), // if password is required for login
         ]);
+
+        $this->call(StateCitySeeder::class);
     }
 }

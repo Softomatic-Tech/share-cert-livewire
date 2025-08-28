@@ -19,4 +19,19 @@ class SuperAdminDashboard extends Component
         $this->totalApartments = SocietyDetail::count();
         $this->totalUsers = User::count();
     }
+
+    public function redirectToCreateSociety()
+    {
+        return redirect()->route('menus.society_multistep_form');
+    }
+
+    public function redirectToSocietyList()
+    {
+        return redirect()->route('menus.society_list');
+    }
+
+    public function redirectToUserList()
+    {
+        return redirect()->route('menus.user_list');
+    }
 }

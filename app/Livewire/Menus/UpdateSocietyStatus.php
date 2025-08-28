@@ -4,19 +4,26 @@ namespace App\Livewire\Menus;
 
 use Livewire\Component;
 use App\Models\SocietyDetail; 
+use App\Models\State;
+use App\Models\City;
 use App\Services\UserService;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 
 class UpdateSocietyStatus extends Component
 {
     use WithFileUploads;
-    public $apartment;
+    public $apartment,$state,$city;
+    public $states, $cities=[];
     public $currentStep = 1;
-    public $society_id,$society_name, $total_flats, $address_1, $address_2, $pincode, $city, $state,$apartment_id,$building_name, $apartment_number, $owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
+    public $society_id,$society_name, $total_flats, $address_1, $address_2, $pincode, $city_id, $state_id,$apartment_id,$building_name, $apartment_number, $owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
     public $agreementCopy,$memberShipForm,$allotmentLetter,$possessionLetter;
+    public $newAgreementCopy, $newMemberShipForm, $newAllotmentLetter, $newPossessionLetter;
     protected $userService;
     public $fileKey;
+    public $agreementUploaded =false;
+    public $membershipUploaded=false;
+    public $allotmentUploaded=false;
+    public $possessionUploaded= false;
 
     public function boot(UserService $userService)
     {
@@ -29,13 +36,19 @@ class UpdateSocietyStatus extends Component
 
     public function mount($apartmentId)
     {
+        $this->states=State::all();
         $this->fileKey = now()->timestamp;
         $this->loadSocietyData($apartmentId);
     }
 
+    public function updatedStateID($value)
+    {
+        $this->cities = City::where('state_id', $value)->get();
+    }
+
     public function loadSocietyData($apartmentId)
     {
-        $apartment = SocietyDetail::with('society')->findOrFail($apartmentId);
+        $apartment = SocietyDetail::with(['society.state','society.city'])->findOrFail($apartmentId);
         if ($apartment) {
             if ($apartment->society) {
                 $this->society_id = $apartment->society->id;
@@ -44,8 +57,11 @@ class UpdateSocietyStatus extends Component
                 $this->address_1 = $apartment->society->address_1;
                 $this->address_2 = $apartment->society->address_2;
                 $this->pincode = $apartment->society->pincode;
-                $this->city = $apartment->society->city;
-                $this->state = $apartment->society->state;
+                $this->state_id = $apartment->society->state_id;
+                $this->cities = City::where('state_id', $this->state_id)->get();
+                $this->city_id = $apartment->society->city_id;
+                $this->state = $apartment->society->state->name;
+                $this->city = $apartment->society->city->name;
             }
             $this->apartment_id = $apartment->id;
             $this->building_name = $apartment->building_name;
@@ -91,8 +107,8 @@ class UpdateSocietyStatus extends Component
             'total_flats' => 'required|numeric',
             'address_1' => 'required|string|max:255',
             'pincode' => 'required|digits:6',
-            'state' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
+            'state_id' => 'required|exists:states,id',
+            'city_id' => 'required|exists:cities,id',
             'building_name' => 'required|string|max:255',
             'apartment_number' => 'required|string|max:50',
             'owner1_name' => 'required|string|max:255',
@@ -113,8 +129,8 @@ class UpdateSocietyStatus extends Component
                 'address_1' => $this->address_1,
                 'address_2' => $this->address_2,
                 'pincode' => $this->pincode,
-                'state' => $this->state,
-                'city' => $this->city,
+                'state_id' => $this->state_id,
+                'city_id' => $this->city_id,
                 'building_name' => $this->building_name,
                 'apartment_number' => $this->apartment_number,
                 'owner1_name' => $this->owner1_name,
@@ -143,13 +159,14 @@ class UpdateSocietyStatus extends Component
     public function uploadAgreementCopy()
     {
         $this->validate([
-            'agreementCopy' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
+            'newAgreementCopy' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
         ]);
 
         try {
-            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->agreementCopy,'agreementCopy','agreementCopy');
+            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newAgreementCopy,'agreementCopy','newAgreementCopy');
             $this->dispatch('show-success', message:  "Agreement Copy uploaded successfully!");
-            $this->reset('agreementCopy');
+            $this->agreementUploaded = true;
+            $this->reset('newAgreementCopy');
             $this->fileKey = now()->timestamp;
             $this->loadSocietyData($this->apartment_id);
         } catch (\Exception $e) {
@@ -160,11 +177,12 @@ class UpdateSocietyStatus extends Component
     public function uploadMemberShipForm()
     {
         $this->validate([
-            'memberShipForm' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
+            'newMemberShipForm' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
         ]);
         try {
-            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->memberShipForm,'memberShipForm','memberShipForm');
+            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newMemberShipForm,'memberShipForm','memberShipForm');
             $this->dispatch('show-success', message:  "Membership Form uploaded successfully!");
+            $this->membershipUploaded = true;
             $this->reset('memberShipForm');
             $this->fileKey = now()->timestamp;
             $this->loadSocietyData($this->apartment_id);
@@ -176,11 +194,11 @@ class UpdateSocietyStatus extends Component
     public function uploadAllotmentLetter()
     {
         $this->validate([
-            'allotmentLetter' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
+            'newAllotmentLetter' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
         ]);
 
         try {
-            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->allotmentLetter, 'allotmentLetter', 'allotmentLetter');
+            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newAllotmentLetter, 'allotmentLetter', 'newAllotmentLetter');
             $this->dispatch('show-success', message:  "Allotment Letter uploaded successfully!");
             $this->reset('allotmentLetter');
             $this->fileKey = now()->timestamp;
@@ -193,12 +211,12 @@ class UpdateSocietyStatus extends Component
     public function uploadPossessionLetter()
     {
         $this->validate([
-            'possessionLetter' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
+            'newPossessionLetter' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
         ]);
         try {
-            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->possessionLetter, 'possessionLetter', 'possessionLetter');
+            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newPossessionLetter, 'possessionLetter', 'possessionLetter');
             $this->dispatch('show-success', message:  "Possession Letter uploaded successfully!");
-            $this->reset('possessionLetter');
+            $this->reset('newPossessionLetter');
             $this->fileKey = now()->timestamp;
             $this->loadSocietyData($this->apartment_id);
         } catch (\Exception $e) {
@@ -211,7 +229,8 @@ class UpdateSocietyStatus extends Component
         $response=$this->userService->updateStatus($this->apartment_id); 
         $this->currentStep = 1;
         if ($response['status']) {
-        $this->dispatch('show-success', message:  $response['message']);
+        // $this->dispatch('show-success', message:  $response['message']);
+        return redirect()->route('user.dashboard');
         } else {
             $this->dispatch('show-error', message:  $response['message'] ?? 'Error updating society status');
         }
