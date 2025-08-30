@@ -85,28 +85,28 @@
                         <!-- Documents -->
                         <div class="mt-2 flex overflow-x-auto gap-2 whitespace-nowrap">
                             @if($details->agreementCopy)
-                                <div class="z-1 max-sm:hidden inline-flex items-center justify-center rounded-full bg-black px-2 py-2 text-xs font-medium text-white dark:bg-gray-700 dark:hover:bg-gray-600">
+                                <div class="z-1 max-sm:hidden inline-flex items-center justify-center rounded-full bg-stone-400 px-2 py-2 text-xs font-medium text-white dark:bg-gray-700 dark:hover:bg-gray-600">
                                     <a href="{{ asset('storage/society_docs/' . $details->agreementCopy) }}" target="_blank" class="flex items-center justify-center">
                                         <span class="font-semibold">Copy of Agreement</span>
                                     </a>
                                 </div>
                             @endif
                             @if($details->memberShipForm)
-                                <div class="z-1 max-sm:hidden inline-flex items-center justify-center rounded-full bg-black px-2 py-2 text-xs font-medium text-white dark:bg-gray-700 dark:hover:bg-gray-600">
+                                <div class="z-1 max-sm:hidden inline-flex items-center justify-center rounded-full bg-stone-400 px-2 py-2 text-xs font-medium text-white dark:bg-gray-700 dark:hover:bg-gray-600">
                                     <a href="{{ asset('storage/society_docs/' . $details->memberShipForm) }}" target="_blank" class="flex items-center justify-center">
                                         <span class="font-semibold">Membership Form</span>
                                     </a>
                                 </div>   
                             @endif
                             @if($details->allotmentLetter)
-                                <div class="z-1 max-sm:hidden inline-flex items-center justify-center rounded-full bg-black px-2 py-2 text-xs font-medium text-white dark:bg-gray-700 dark:hover:bg-gray-600">
+                                <div class="z-1 max-sm:hidden inline-flex items-center justify-center rounded-full bg-stone-400 px-2 py-2 text-xs font-medium text-white dark:bg-gray-700 dark:hover:bg-gray-600">
                                     <a href="{{ asset('storage/society_docs/' . $details->allotmentLetter) }}" target="_blank" class="flex items-center justify-center">
                                         <span class="font-semibold">Allotment Letter</span>
                                     </a>
                                 </div>      
                             @endif
                             @if($details->possessionLetter)
-                                <div class="z-1 max-sm:hidden inline-flex items-center justify-center rounded-full bg-black px-2 py-2 text-xs font-medium text-white dark:bg-gray-700 dark:hover:bg-gray-600">
+                                <div class="z-1 max-sm:hidden inline-flex items-center justify-center rounded-full bg-stone-400 px-2 py-2 text-xs font-medium text-white dark:bg-gray-700 dark:hover:bg-gray-600">
                                     <a href="{{ asset('storage/society_docs/' . $details->possessionLetter) }}" target="_blank" class="flex items-center justify-center">
                                         <span class="font-semibold">Possession Letter</span>
                                     </a>
@@ -133,7 +133,7 @@
                                                 <span class="absolute -bottom-6 start-0 whitespace-nowrap text-[10px] sm:text-xs {{ $task['Status'] != 'Pending' ? 'text-stone-800 font-extrabold dark:text-white' : 'text-stone-500 font-normal dark:text-white' }}">{{ $task['name'] }}</span>
                                             </div>
                                             @if(!$loop->last)
-                                            <div class="flex-1 h-0.5 {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'bg-stone-400' : 'bg-amber-400'}}"></div>
+                                            <div class="flex-1 h-1 {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'bg-stone-400' : 'bg-amber-400'}}"></div>
                                             @endif
                                         </div>
                                         @endforeach
