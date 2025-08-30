@@ -180,10 +180,10 @@ class UpdateSocietyStatus extends Component
             'newMemberShipForm' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
         ]);
         try {
-            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newMemberShipForm,'memberShipForm','memberShipForm');
+            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newMemberShipForm,'memberShipForm','newMemberShipForm');
             $this->dispatch('show-success', message:  "Membership Form uploaded successfully!");
             $this->membershipUploaded = true;
-            $this->reset('memberShipForm');
+            $this->reset('newMemberShipForm');
             $this->fileKey = now()->timestamp;
             $this->loadSocietyData($this->apartment_id);
         } catch (\Exception $e) {
@@ -200,7 +200,8 @@ class UpdateSocietyStatus extends Component
         try {
             $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newAllotmentLetter, 'allotmentLetter', 'newAllotmentLetter');
             $this->dispatch('show-success', message:  "Allotment Letter uploaded successfully!");
-            $this->reset('allotmentLetter');
+            $this->allotmentUploaded = true;
+            $this->reset('newAllotmentLetter');
             $this->fileKey = now()->timestamp;
             $this->loadSocietyData($this->apartment_id);
         } catch (\Exception $e) {
@@ -216,6 +217,7 @@ class UpdateSocietyStatus extends Component
         try {
             $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newPossessionLetter, 'possessionLetter', 'possessionLetter');
             $this->dispatch('show-success', message:  "Possession Letter uploaded successfully!");
+            $this->possessionUploaded = true;
             $this->reset('newPossessionLetter');
             $this->fileKey = now()->timestamp;
             $this->loadSocietyData($this->apartment_id);

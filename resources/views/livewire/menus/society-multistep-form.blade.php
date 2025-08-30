@@ -110,10 +110,11 @@
             <div class="step-three">
                 <div class="card">
                     <div class="card-header">Step 3: Verification</div>
-                    <div class="m-4">
-                        <h4>Society: <strong>{{ $this->societyName }}</strong></h4>
-                    </div>
                     <div class="card-body">
+                        <div class="m-4">
+                            <h4>Society: <strong>{{ $this->societyName }}</strong></h4>
+                        </div>
+                    
                         <div class="overflow-x-auto w-full">
                             <div class="max-h-90 overflow-y-auto"> 
                                 @if ($this->uploadedDetails->isNotEmpty())
