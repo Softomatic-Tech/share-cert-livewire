@@ -21,13 +21,20 @@ class DatabaseSeeder extends Seeder
 
         // Now create a user and assign the "Society User" role
         User::factory()->create([
-            'name' => 'Test Society User',
-            'email' => 'test@example.com',
+            'name' => 'Super Admin',
+            'email' => 'superadmin@example.com',
             'phone' => '1234567890',
             'role_id' => $superAdminId,
-            'password' => bcrypt('password'), // if password is required for login
+            'password' => bcrypt('superadmin'), // if password is required for login
         ]);
 
+        User::factory()->create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'phone' => '7898588550',
+            'role_id' => $superAdminId,
+            'password' => bcrypt('admin'), // if password is required for login
+        ]);
         $this->call(StateCitySeeder::class);
     }
 }
