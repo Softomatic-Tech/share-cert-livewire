@@ -9,6 +9,7 @@ use App\Models\SocietyDetail;
 use App\Models\State;
 use App\Models\City;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -254,6 +255,7 @@ class SocietyMultistepForm extends Component
             ];
 
             SocietyDetail::create([
+                'user_id'=>Auth::id(),
                 'society_id' => $this->societyId,
                 'building_name' => $data[$indexes['building_name']],
                 'apartment_number' => $data[$indexes['apartment_number']],

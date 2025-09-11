@@ -7,6 +7,7 @@ use Livewire\WithFileUploads;
 use App\Models\Society;
 use App\Models\SocietyDetail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CreateApartment extends Component
@@ -112,6 +113,7 @@ class CreateApartment extends Component
             $owner2_name = trim(($data[$indexes['owner2_first_name']] ?? '') . ' ' . ($data[$indexes['owner2_middle_name']] ?? '') . ' ' . ($data[$indexes['owner2_last_name']] ?? ''));
             $owner3_name = trim(($data[$indexes['owner3_first_name']] ?? '') . ' ' . ($data[$indexes['owner3_middle_name']] ?? '') . ' ' . ($data[$indexes['owner3_last_name']] ?? ''));
             SocietyDetail::create([
+                'user_id'=>Auth::id(),
                 'society_id' => $this->society_id,
                 'building_name' => $data[$indexes['building_name']],
                 'apartment_number' => $data[$indexes['apartment_number']],

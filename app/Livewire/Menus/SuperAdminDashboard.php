@@ -30,7 +30,7 @@ class SuperAdminDashboard extends Component
         return redirect()->route('menus.society_list');
     }
 
-    public function redirectToUserList()
+    public function markRoleBySuperAdmin()
     {
         return redirect()->route('menus.user_list');
     }
