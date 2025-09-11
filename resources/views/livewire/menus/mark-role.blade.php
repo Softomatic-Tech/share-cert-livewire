@@ -8,7 +8,7 @@
     <div class="mb-2">
         <livewire:menus.alerts />
     </div>
-    <div class="shadow border rounded-lg p-4 flex flex-col max-w-full w-full md:w-[800px] mt-4">
+    <div class="shadow border rounded-lg p-4 flex flex-col max-w-full w-full mt-4">
         <div class="overflow-y-auto max-h-[300px]">
         <table class="min-w-full table-auto border text-sm text-left">
             <thead class="min-w-full text-start text-sm font-light text-surface dark:text-white">
@@ -27,7 +27,7 @@
                 <td class="px-4 py-2 border">{{ $user->name }}</td>
                 <td class="px-4 py-2 border text-right">{{ $user->phone }}</td>
                 <td class="px-4 py-2 border text-center">
-                 @if($user->role_id==3)
+                @if($user->role_id==3)
                     <flux:tooltip content="Mark As Admin">
                     <button type="button" class="bg-gray-300 dark:bg-gray-600 hover:bg-zinc-100 dark:hover:bg-zinc-600 font-bold py-2 px-4 border  rounded" wire:click="markRole({{ $user->id }}, 2)"><i class="fa-solid fa-user-tie"></i></button>
                     </flux:tooltip>

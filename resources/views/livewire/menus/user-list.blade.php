@@ -12,6 +12,7 @@
                 <th class="px-4 py-2 border">#</th>
                 <th class="px-4 py-2 border">Name</th>
                 <th class="px-4 py-2 border">Phone</th>
+                <th class="px-4 py-2 border">Action</th>
             </tr>
             </thead>
             <tbody>
@@ -21,6 +22,17 @@
                 <td class="px-4 py-2 border">{{ ($users->currentPage() - 1) * $users->perPage() + $loop->iteration }}</td>
                 <td class="px-4 py-2 border">{{ $user->name }}</td>
                 <td class="px-4 py-2 border text-center">{{ $user->phone }}</td>
+                <td class="px-4 py-2 border text-center">
+                @if($user->role_id==3)
+                    <flux:tooltip content="Mark As Admin">
+                    <button type="button" class="bg-gray-300 dark:bg-gray-600 hover:bg-zinc-100 dark:hover:bg-zinc-600 font-bold py-2 px-4 border  rounded" wire:click="markRole({{ $user->id }}, 2)"><i class="fa-solid fa-user-tie"></i></button>
+                    </flux:tooltip>
+                    @elseif($user->role_id==2)
+                    <flux:tooltip content="Mark As user">
+                    <button type="button" class="bg-gray-300 dark:bg-gray-600 hover:bg-zinc-100 dark:hover:bg-zinc-600 font-bold py-2 px-4 border rounded" wire:click="markRole({{ $user->id }}, 3)"><i class="fa-solid fa-users"></i></button>
+                    </flux:tooltip>
+                    @endif
+                </td>
             </tr>
             @endforeach
             </tbody>

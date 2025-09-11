@@ -118,20 +118,28 @@ class UserService
 
     public function uploadSocietyDocument($apartmentId, UploadedFile $file, string $columnName, string $validationField)
     {
-        $allowedExtensions = ['jpeg', 'png', 'jpg', 'gif', 'pdf', 'csv', 'xls', 'xlsx'];
+        $allowedExtensions = ['jpeg', 'png', 'jpg','pdf'];
 
         // Validate file type
         if (!in_array(strtolower($file->getClientOriginalExtension()), $allowedExtensions)) {
-            throw ValidationException::withMessages([
-                $validationField => 'Invalid file type.',
-            ]);
+            return [
+                'status'  => false,
+                'message' => 'Invalid file type , only '.implode(",",$allowedExtensions).' file extension are allowed.',
+            ];
+            // throw ValidationException::withMessages([
+            //     $validationField => 'Invalid file type.',
+            // ]);
         }
 
         // Validate file size (2 MB limit)
         if ($file->getSize() > 2 * 1024 * 1024) {
-            throw ValidationException::withMessages([
-                $validationField => 'File size should not exceed 2 MB.',
-            ]);
+            return [
+                'status'  => false,
+                'message' => 'File size should not exceed 2 MB.',
+            ];
+            // throw ValidationException::withMessages([
+            //     $validationField => 'File size should not exceed 2 MB.',
+            // ]);
         }
 
         // Store file
@@ -141,9 +149,13 @@ class UserService
         // Find society detail
         $details = SocietyDetail::find($apartmentId);
         if (!$details) {
-            throw ValidationException::withMessages([
-                'apartment_id' => 'Society not found.',
-            ]);
+            return [
+                'status'  => false,
+                'message' => 'Society not found.',
+            ];
+            // throw ValidationException::withMessages([
+            //     'apartment_id' => 'Society not found.',
+            // ]);
         }
 
         // Update correct column dynamically

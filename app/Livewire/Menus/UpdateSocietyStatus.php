@@ -24,6 +24,7 @@ class UpdateSocietyStatus extends Component
     public $membershipUploaded=false;
     public $allotmentUploaded=false;
     public $possessionUploaded= false;
+    public $approvedFiles;
 
     public function boot(UserService $userService)
     {
@@ -79,8 +80,38 @@ class UpdateSocietyStatus extends Component
             $this->memberShipForm=$apartment->memberShipForm;
             $this->allotmentLetter=$apartment->allotmentLetter;
             $this->possessionLetter=$apartment->possessionLetter;
+            $statusData = json_decode($apartment->status, true);
+
+            // prepare approved files array
+            $this->approvedFiles = [];
+            if (!empty($statusData['tasks'])) {
+                foreach ($statusData['tasks'] as $task) {
+                    if ($task['name'] === 'Application') {
+                        foreach ($task['subtasks'] ?? [] as $subtask) {
+                            if ($subtask['status'] === 'Approved') {
+                                $this->approvedFiles[] = $subtask['fileName'];
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
+
+    public function isFileApproved($statusData, $fileName): bool
+{
+    foreach ($statusData['tasks'] as $task) {
+        if ($task['name'] === 'Application') {
+            foreach ($task['subtasks'] ?? [] as $subtask) {
+                if (trim($subtask['fileName']) === trim($fileName) && $subtask['status'] === 'Approved') {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
 
     public function nextStep()
     {
@@ -159,8 +190,13 @@ class UpdateSocietyStatus extends Component
     public function uploadAgreementCopy()
     {
         $this->validate([
-            'newAgreementCopy' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
-        ]);
+            'newAgreementCopy' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
+        ],
+        [],
+        [
+            'newAgreementCopy' => 'Agreement Copy', // custom label
+        ]
+    );
 
         try {
             $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newAgreementCopy,'agreementCopy','newAgreementCopy');
@@ -177,8 +213,13 @@ class UpdateSocietyStatus extends Component
     public function uploadMemberShipForm()
     {
         $this->validate([
-            'newMemberShipForm' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
-        ]);
+            'newMemberShipForm' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
+        ],
+        [],
+        [
+            'newMemberShipForm' => 'MemberShip Form', // custom label
+        ]
+    );
         try {
             $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newMemberShipForm,'memberShipForm','newMemberShipForm');
             $this->dispatch('show-success', message:  "Membership Form uploaded successfully!");
@@ -194,8 +235,13 @@ class UpdateSocietyStatus extends Component
     public function uploadAllotmentLetter()
     {
         $this->validate([
-            'newAllotmentLetter' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
-        ]);
+            'newAllotmentLetter' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
+        ],
+        [],
+        [
+            'newAllotmentLetter' => 'Allotment Letter', // custom label
+        ]
+    );
 
         try {
             $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newAllotmentLetter, 'allotmentLetter', 'newAllotmentLetter');
@@ -212,8 +258,13 @@ class UpdateSocietyStatus extends Component
     public function uploadPossessionLetter()
     {
         $this->validate([
-            'newPossessionLetter' => 'required|file|mimes:jpeg,png,jpg,gif,pdf,csv,xls,xlsx|max:2048',
-        ]);
+            'newPossessionLetter' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
+        ],
+        [],
+        [
+            'newPossessionLetter' => 'Possession Letter', // custom label
+        ]
+    );
         try {
             $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newPossessionLetter, 'possessionLetter', 'possessionLetter');
             $this->dispatch('show-success', message:  "Possession Letter uploaded successfully!");

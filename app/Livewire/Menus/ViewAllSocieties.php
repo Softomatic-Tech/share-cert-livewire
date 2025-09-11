@@ -4,6 +4,7 @@ namespace App\Livewire\Menus;
 use App\Models\Society;
 use App\Models\SocietyDetail;
 use Livewire\Component;
+use Illuminate\Support\Facades\Log;
 
 class ViewAllSocieties extends Component
 {
@@ -13,6 +14,8 @@ class ViewAllSocieties extends Component
     public $isRejecting = false;
     public $comment,$text;
     public $search = '';
+    public $showDocumentModal = false;
+    public $url=null;
 
     public function render()
     {
@@ -82,7 +85,7 @@ class ViewAllSocieties extends Component
         $society = SocietyDetail::find($this->detailId);
         $this->text='I have verified all details and documents. I hereby complete Verification of Application';
         $this->comment=$society->comment;
-        $this->dispatch('open-modal', name: 'documentModal');
+        $this->dispatch('open-modal', name: 'verificationModal');
     }
 
     public function setRejecting()
@@ -142,5 +145,11 @@ class ViewAllSocieties extends Component
         if ($this->societyDetail->isEmpty()) {
             return redirect()->route('admin.dashboard'); 
         }
+    }
+
+    public function viewDocument($fileUrl)
+    {
+        $this->showDocumentModal = true;
+        $this->url = $fileUrl;
     }
 }

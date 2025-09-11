@@ -29,7 +29,7 @@
             </div>
             <p class=" text-3xl text-center font-bold dark:text-white">{{ $totalApartments }}</p>
         </div>
-        <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 bg-zinc-200 dark:bg-zinc-600 cursor-pointer" wire:click="redirectToUserList">
+        <div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 bg-zinc-200 dark:bg-zinc-600 cursor-pointer" wire:click="markRoleBySuperAdmin">
             <div class="flex items-center justify-center text-center gap-2">
                 <span class="w-10 h-10 bg-amber-500 text-white rounded-full flex items-center justify-center shadow-md hover:bg-zinc-600"><i class="fa-solid fa-users"></i></span> 
                 <p class="text-xl font-bold dark:text-white">Users</p>

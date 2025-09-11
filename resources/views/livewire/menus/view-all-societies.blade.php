@@ -70,32 +70,20 @@
                     <!-- Documents -->
                     <div class="mt-2 flex overflow-x-auto gap-2 whitespace-nowrap">
                         @if($details->agreementCopy)
-                            <div class="inline-flex items-center justify-center rounded-full bg-stone-400 text-white px-2 py-2 text-xs font-medium dark:bg-gray-700 dark:hover:bg-gray-600">
-                                <a href="{{ asset('storage/society_docs/' . $details->agreementCopy) }}" target="_blank" class="flex items-center justify-center">
-                                    <span class="font-semibold">Copy of Agreement</span>
-                                </a>
-                            </div>
+                            @php $fileUrl = asset('storage/society_docs/' . $details->agreementCopy); @endphp
+                            <button class="inline-flex items-center justify-center rounded-full bg-stone-400 text-white px-2 py-2 text-xs font-medium dark:bg-gray-700 dark:hover:bg-gray-600" wire:click="viewDocument('{{ $fileUrl }}')">Copy of Agreement</button>
                         @endif
                         @if($details->memberShipForm)
-                            <div class="inline-flex items-center justify-center rounded-full bg-stone-400 text-white px-2 py-2 text-xs font-medium dark:bg-gray-700 dark:hover:bg-gray-600">
-                                <a href="{{ asset('storage/society_docs/' . $details->memberShipForm) }}" target="_blank" class="flex items-center justify-center">
-                                    <span class="font-semibold">Membership Form</span>
-                                </a>
-                            </div>   
+                            @php $fileUrl = asset('storage/society_docs/' . $details->memberShipForm); @endphp
+                            <button class="inline-flex items-center justify-center rounded-full bg-stone-400 text-white px-2 py-2 text-xs font-medium dark:bg-gray-700 dark:hover:bg-gray-600" wire:click="viewDocument('{{ $fileUrl }}')">Membership Form</button>
                         @endif
                         @if($details->allotmentLetter)
-                            <div class="inline-flex items-center justify-center rounded-full bg-stone-400 text-white px-2 py-2 text-xs font-medium dark:bg-gray-700 dark:hover:bg-gray-600">
-                                <a href="{{ asset('storage/society_docs/' . $details->allotmentLetter) }}" target="_blank" class="flex items-center justify-center">
-                                    <span class="font-semibold">Allotment Letter</span>
-                                </a>
-                            </div>      
+                            @php $fileUrl = asset('storage/society_docs/' . $details->allotmentLetter); @endphp
+                            <button class="inline-flex items-center justify-center rounded-full bg-stone-400 text-white px-2 py-2 text-xs font-medium dark:bg-gray-700 dark:hover:bg-gray-600" wire:click="viewDocument('{{ $fileUrl }}')">Allotment Letter</button> 
                         @endif
                         @if($details->possessionLetter)
-                            <div class="inline-flex items-center justify-center rounded-full bg-stone-400 text-white px-2 py-2 text-xs font-medium dark:bg-gray-700 dark:hover:bg-gray-600">
-                                <a href="{{ asset('storage/society_docs/' . $details->possessionLetter) }}" target="_blank" class="flex items-center justify-center">
-                                    <span class="font-semibold">Possession Letter</span>
-                                </a>
-                            </div> 
+                            @php $fileUrl = asset('storage/society_docs/' . $details->possessionLetter); @endphp
+                            <button class="inline-flex items-center justify-center rounded-full bg-stone-400 text-white px-2 py-2 text-xs font-medium dark:bg-gray-700 dark:hover:bg-gray-600" wire:click="viewDocument('{{ $fileUrl }}')">Possession Letter</button> 
                         @endif 
                         <div>
                             @php
@@ -111,7 +99,7 @@
                                 $verification && $verification['Status'] === 'Pending'
                             )
                             @if($details->agreementCopy)
-                                <flux:modal.trigger name="documentModal">
+                                <flux:modal.trigger name="verificationModal">
                                     <flux:button variant="primary" x-on:click="$wire.setDocument('{{ $details->id }}')">Verify</flux:button>
                                 </flux:modal.trigger>
                             @endif
@@ -186,7 +174,56 @@
         </div>
     
         <!--Modal-->
-        <flux:modal name="documentModal" class="md:w-96">
+        <flux:modal  wire:model="showDocumentModal" class="!max-w-7xl w-full">
+            <div class="space-y-6">
+                <div class="text-lg font-bold">
+                    <flux:heading size="lg">Document View</flux:heading>
+                </div>
+
+                @if(!$fileUrl)
+                {{-- Loader --}}
+                <div class="flex justify-center items-center h-[70vh]">
+                    <div class="animate-spin rounded-full h-10 w-10 border-4 border-stone-400 border-t-transparent"></div>
+                    <span class="ml-3 text-stone-600 dark:text-stone-300">Loading document...</span>
+                </div>
+                @else
+                    @php
+                        $extension = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
+                    @endphp
+
+                    {{-- Images --}}
+                    @if(in_array($extension, ['jpg','jpeg','png','gif','webp']))
+                        <img src="{{ $url }}" alt="preview" class="w-full rounded" />
+
+                    {{-- PDF --}}
+                    @elseif($extension === 'pdf')
+                        <iframe src="{{ $url }}#toolbar=0" class="w-full h-[70vh]" frameborder="0"></iframe>
+
+                    {{-- Office documents & others --}}
+                    @elseif(in_array($extension, ['doc','docx']))
+                        <div class="flex flex-col items-center">
+                            <img src="{{ asset('images/icons/word.svg') }}" alt="Word file" class="w-24 h-24 mb-2">
+                            <a href="{{ $url }}" class="underline">Click To Download File</a>
+                        </div>
+
+                    @elseif(in_array($extension, ['xls','xlsx']))
+                        <div class="flex flex-col items-center">
+                            <img src="{{ asset('images/icons/excel.svg') }}" alt="Excel file" class="w-24 h-24 mb-2">
+                            <a href="{{ $url }}" class="underline">Click To Download File</a>
+                        </div>
+
+                    {{-- Default for zip/others --}}
+                    @else
+                        <div class="flex flex-col items-center">
+                            <img src="/images/icons/file.png" alt="File" class="w-24 h-24 mb-2">
+                            <a href="{{ $url }}" target="_blank" class="underline">Download File</a>
+                        </div>
+                    @endif
+                @endif
+            </div>
+        </flux:modal>
+
+        <flux:modal name="verificationModal" class="md:w-96">
             <div class="space-y-6">
                 <div class="text-lg font-bold">
                     <flux:heading size="lg">Document Approval</flux:heading>

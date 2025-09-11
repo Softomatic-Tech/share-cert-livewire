@@ -31,6 +31,7 @@ Route::middleware(['auth', 'role:Super Admin'])->group(function () {
     Route::get('/superadmin/society-multistep-form', SocietyMultistepForm::class)->name('menus.society_multistep_form');
     Route::get('/superadmin/society-list', SocietyList::class)->name('menus.society_list');
     Route::get('/superadmin/user-list', UserList::class)->name('menus.user_list');
+    Route::get('/superadmin/user-list', markRole::class)->name('menus.user_list');
 });
 
 // Admin Routes

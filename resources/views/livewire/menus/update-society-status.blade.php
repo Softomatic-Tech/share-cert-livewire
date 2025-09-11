@@ -78,6 +78,7 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
                                     <!-- Form 1 -->
                                     <form wire:submit.prevent="uploadAgreementCopy" class="p-4 border rounded-md shadow-sm">
+                                        @if(! in_array($agreementCopy, $approvedFiles))
                                         <label class="block font-semibold mb-2">Xerox Copy Of Agreement</label>
                                         <div class="w-full mb-4" wire:key="file-input-{{ $fileKey }}">
                                             <flux:input type="file" wire:model="newAgreementCopy" class="border border-gray-300 rounded px-2 py-1 w-full" />
@@ -99,9 +100,11 @@
                                                 @endif
                                             </div>
                                         </div>
+                                        @endif
                                     </form>
                                     
                                     <!-- Form 2 -->
+                                    @if(! in_array($memberShipForm, $approvedFiles))
                                     <form wire:submit.prevent="uploadMemberShipForm" class="p-4 border rounded-md  shadow-sm">
                                         <label class="block font-semibold mb-2">MemberShip Form</label>
                                         <div class="w-full mb-4" wire:key="file-input-{{ $fileKey }}">
@@ -125,8 +128,9 @@
                                             </div>
                                         </div>
                                     </form>
-
+                                    @endif
                                     <!-- Form 3 -->
+                                    @if(! in_array($allotmentLetter, $approvedFiles))
                                     <form wire:submit.prevent="uploadAllotmentLetter" class="p-4 border rounded-md  shadow-sm">
                                         <label class="block font-semibold mb-2">Parking Allotment Letter</label>
                                         <div class="w-full mb-4" wire:key="file-input-{{ $fileKey }}">
@@ -148,11 +152,12 @@
                                                 <flux:button variant="filled" type="submit" class="w-full" wire:loading.attr="disabled" wire:target="newAllotmentLetter, uploadAllotmentLetter">{{ __('UPLOAD FILE') }} <i class="fa-solid fa-upload"></i></flux:button>
                                             @endif
                                             </div>
-                                            
                                         </div>
                                     </form>
+                                    @endif
 
                                     <!-- Form 4 -->
+                                    @if(! in_array($possessionLetter, $approvedFiles))
                                     <form wire:submit.prevent="uploadPossessionLetter" class="p-4 border rounded-md  shadow-sm">
                                         <label class="block font-semibold mb-2">Possession Letter</label>
                                         <div class="w-full mb-4" wire:key="file-input-{{ $fileKey }}">
@@ -173,9 +178,9 @@
                                                 <flux:button variant="filled" type="submit" class="w-full" wire:loading.attr="disabled" wire:target="newPossessionLetter, uploadPossessionLetter">{{ __('UPLOAD FILE') }} <i class="fa-solid fa-upload"></i></flux:button>
                                             @endif
                                             </div>
-                                            
                                         </div>
                                     </form>
+                                    @endif
                                 </div>
 
                                 <div class="flex justify-end mt-4">
