@@ -30,7 +30,7 @@ class AdminDashboard extends Component
     public $editOwnersModal= false;
     public $url=null;
     public $apartment_id,$building_name, $apartment_number, $owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
-
+    public $selectedSocietyId;
     public function render()
     {
         return view('livewire.menus.admin-dashboard');
@@ -98,6 +98,7 @@ class AdminDashboard extends Component
 
     public function selectSociety($id)
     {
+        $this->selectedSocietyId = $id;
         $this->societyDetail = SocietyDetail::with('society')
             ->where('society_id',$id)->get()
             ->filter(function ($item) {
