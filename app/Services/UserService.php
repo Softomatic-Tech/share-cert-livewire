@@ -187,14 +187,14 @@ class UserService
 
         foreach ($status['tasks'] as &$task) {
             if ($task['name'] ==='Verify Details') {
-                $task['Status'] = 'Applied';
+                $task['Status'] = 'Approved';
                 $task['updatedBy'] = $user->id ?? 'System';
                 $task['updateDateTime'] = now();
             }
 
             if ($task['name'] === 'Application') {
                 if ($allDocumentsUploaded) {
-                    $task['Status'] = 'Applied';
+                    $task['Status'] = 'Approved';
                     $task['updatedBy'] = $user->id ?? 'System';
                     $task['updateDateTime'] = now();
                 } else {

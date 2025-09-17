@@ -53,6 +53,12 @@
     @apply grid gap-2;
 }
 
+@layer utilities {
+  .force-keep {
+    @apply grid-cols-3 col-span-1 col-span-2;
+  }
+}
+
 [data-flux-label] {
     @apply  !mb-0 !leading-tight;
 }
