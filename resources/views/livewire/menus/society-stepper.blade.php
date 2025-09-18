@@ -1,22 +1,22 @@
 <div>
 @if($societyDetails->isEmpty())
-    <div class="bg-white rounded-lg border border-gray-200 shadow-sm p-6 text-center">
-        <p class="text-gray-500">No apartments found for the selected society.</p>
+    <div class="rounded-lg border shadow-sm p-6 text-center">
+        <p class="text-gray-500 dark:text-white">No apartments found for the selected society.</p>
     </div>
 @else
 @foreach($societyDetails as $details)
-    <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-shadow my-4">
-        <div class="grid grid-cols-1 md:grid-cols-2 border-b border-gray-300 relative">
+    <div class="rounded-lg border shadow-sm hover:shadow-lg transition-shadow my-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 border-b relative">
             <div class="p-4">
-                <p class="text-lg font-bold text-gray-900">{{ $details->building_name }} - {{ $details->apartment_number }}</p>
-                @if($details->owner1_mobile)<p class="text-sm text-gray-500">Owner1 Phone: {{ $details->owner1_mobile }}</p>@endif
-                @if($details->owner1_email)<p class="text-sm text-gray-500">Email: {{ $details->owner1_email }}</p>@endif
+                <p class="text-lg font-bold text-gray-900 dark:text-white">{{ $details->building_name }} - {{ $details->apartment_number }}</p>
+                @if($details->owner1_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner1 Phone: {{ $details->owner1_mobile }}</p>@endif
+                @if($details->owner1_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner1_email }}</p>@endif
                 <p class="mb-1"></p>
-                @if($details->owner2_mobile)<p class="text-sm text-gray-500">Owner2 Phone: {{ $details->owner2_mobile }}</p>@endif
-                @if($details->owner2_email)<p class="text-sm text-gray-500">Email: {{ $details->owner2_email }}</p>@endif
+                @if($details->owner2_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner2 Phone: {{ $details->owner2_mobile }}</p>@endif
+                @if($details->owner2_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner2_email }}</p>@endif
                 <p class="mb-1"></p>
-                @if($details->owner3_mobile)<p class="text-sm text-gray-500">Owner3 Phone: {{ $details->owner3_mobile }}</p>@endif
-                @if($details->owner3_email)<p class="text-sm text-gray-500">Email: {{ $details->owner3_email }}</p>@endif
+                @if($details->owner3_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner3 Phone: {{ $details->owner3_mobile }}</p>@endif
+                @if($details->owner3_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner3_email }}</p>@endif
             </div>
             <div class="p-4">
                 @php
@@ -104,7 +104,7 @@
                                                 default => $task['name']
                                             };
                                         @endphp
-                                        <span class="absolute -bottom-6 start-0 whitespace-nowrap text-[10px] sm:text-xs {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}}">{{ $label }}
+                                        <span class="absolute -bottom-6 start-0 whitespace-nowrap text-[10px] sm:text-xs {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}} dark:text-white">{{ $label }}
                                         </span>
                                     </div>
                                     @if(!$loop->last)
@@ -118,7 +118,7 @@
                 @endif
             </div>
             <flux:tooltip content="Edit Apartment">
-                <button class="font-bold absolute top-2 right-4 px-2 py-1 border rounded-md" wire:click="fetchOwnersDetail('{{ $details->id }}')"><i class="fa-solid fa-edit text-sm"></i></button>
+                <button class="font-bold absolute top-0 right-0 px-2 py-1 border rounded-md" wire:click="fetchOwnersDetail('{{ $details->id }}')"><i class="fa-solid fa-edit text-sm"></i></button>
             </flux:tooltip>
         </div>
         <!--Documents Section (below the grid) -->
