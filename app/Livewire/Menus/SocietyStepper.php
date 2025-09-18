@@ -139,8 +139,8 @@ class SocietyStepper extends Component
 
         if ($response) {
             $this->dispatch('show-success', message:  'Owner Details updated successfully!');
-            $this->editOwnersModal = false;
             $this->fetchOwnersDetail($this->apartment_id);
+            $this->editOwnersModal = false;
         } else {
             $this->dispatch('show-error', message:  'Some error occurs while update owner details');
             $this->editOwnersModal = false;

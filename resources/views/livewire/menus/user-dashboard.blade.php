@@ -33,30 +33,30 @@
             @endphp
             <div>
                 @if($needsAttention && $details->comment)
-                <div class="px-4 py-2 my-2 rounded-lg bg-amber-100 border-amber-400 border-2">
-                    <p class="text-md font-bold dark:text-black">Your Application for {{ $details->details_name }} {{ $details->apartment_number }} at {{ $details->society->society_name }} need attention.</p>
-                    <p class="text-md font-bold dark:text-black">Please Correct Following-</p>
-                    <p class="text-sm dark:text-black"> {{ $details->comment }}</p>
+                <div class="px-4 py-2 my-2 rounded-lg border-amber-400 border-2">
+                    <p class="text-md font-bold dark:text-white">Your Application for {{ $details->details_name }} {{ $details->apartment_number }} at {{ $details->society->society_name }} need attention.</p>
+                    <p class="text-md font-bold dark:text-white">Please Correct Following-</p>
+                    <p class="text-sm dark:text-white"> {{ $details->comment }}</p>
                 </div>
                 @endif
                 <header class="mb-2">
-                    <h1 class="text-xl font-bold text-gray-900"> {{ $details->society->society_name }}
+                    <h1 class="text-xl font-bold text-gray-900 dark:text-white"> {{ $details->society->society_name }}
                         Flats</h1>
                 </header>
 
                 <div class="flex flex-col gap-4">
-                    <div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-shadow my-4">
+                    <div class="rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-shadow my-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 border-b border-gray-300 relative">
                             <div class="p-4">
-                                <p class="text-lg font-bold text-gray-900">{{ $details->building_name }} - {{ $details->apartment_number }}</p>
-                                @if($details->owner1_mobile)<p class="text-sm text-gray-500">Owner1 Phone: {{ $details->owner1_mobile }}</p>@endif
-                                @if($details->owner1_email)<p class="text-sm text-gray-500">Email: {{ $details->owner1_email }}</p>@endif
+                                <p class="text-lg font-bold text-gray-900 dark:text-white">{{ $details->building_name }} - {{ $details->apartment_number }}</p>
+                                @if($details->owner1_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner1 Phone: {{ $details->owner1_mobile }}</p>@endif
+                                @if($details->owner1_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner1_email }}</p>@endif
                                 <p class="mb-1"></p>
-                                @if($details->owner2_mobile)<p class="text-sm text-gray-500">Owner2 Phone: {{ $details->owner2_mobile }}</p>@endif
-                                @if($details->owner2_email)<p class="text-sm text-gray-500">Email: {{ $details->owner2_email }}</p>@endif
+                                @if($details->owner2_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner2 Phone: {{ $details->owner2_mobile }}</p>@endif
+                                @if($details->owner2_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner2_email }}</p>@endif
                                 <p class="mb-1"></p>
-                                @if($details->owner3_mobile)<p class="text-sm text-gray-500">Owner3 Phone: {{ $details->owner3_mobile }}</p>@endif
-                                @if($details->owner3_email)<p class="text-sm text-gray-500">Email: {{ $details->owner3_email }}</p>@endif
+                                @if($details->owner3_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner3 Phone: {{ $details->owner3_mobile }}</p>@endif
+                                @if($details->owner3_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner3_email }}</p>@endif
                             </div>
                             <div class="p-4">
                                 @php
@@ -125,7 +125,7 @@
                                                         <span class="relative grid h-8 w-8 place-items-center rounded-full {{ $colors[$i] }}">
                                                         <i class="fa-solid {{ $icons[$i] }} text-white"></i>
                                                         </span>
-                                                        <span class="absolute -bottom-6 start-0 whitespace-nowrap text-[10px] sm:text-xs {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}}">{{ $task['name'] }}
+                                                        <span class="absolute -bottom-6 start-0 whitespace-nowrap text-[10px] sm:text-xs {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}} dark:text-white">{{ $task['name'] }}
                                                         </span>
                                                     </div>
                                                     @if(!$loop->last)
