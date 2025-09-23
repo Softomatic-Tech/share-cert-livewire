@@ -7,7 +7,7 @@
             </div>
             <div>
                 <flux:tooltip content="Create Society">
-                    <button type="button" class="bg-amber-500 text-white font-bold py-2 px-4 rounded cursor-pointer" wire:click="redirectToCreateSociety"><i class="fa-solid fa-plus"></i></button>
+                    <button type="button" class="border font-bold py-1 px-2 rounded cursor-pointer" wire:click="redirectToCreateSociety"><i class="fa-solid fa-plus"></i></button>
                 </flux:tooltip>
             </div>
         </div>

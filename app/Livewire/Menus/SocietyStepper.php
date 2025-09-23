@@ -3,20 +3,21 @@
 namespace App\Livewire\Menus;
 
 use Livewire\Component;
-use App\Models\Society;
+use App\Models\Timeline;
 use App\Models\SocietyDetail;
-use Illuminate\Support\Facades\Log;
 
 class SocietyStepper extends Component
 {
     public $detailId,$societyId, $societyKey,$societyDetails; 
-    public $comment,$text,$checkApproved;
+    public $comment,$text,$checkApproved,$timelines,$timelineValues;
     public $isRejecting = false;
     public $verificationModal = false;
     public $apartment_id,$building_name, $apartment_number, $owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
     public $showDocumentModal = false;
     public $editOwnersModal= false;
     public $url=null;
+    public $taskNameMap = [];
+    public $timelineMap = [];
     public function render()
     {
         return view('livewire.menus.society-stepper');
@@ -24,6 +25,14 @@ class SocietyStepper extends Component
 
     public function mount($id,$key)
     {
+        // Fetch timelines
+        $this->timelines =Timeline::where('id', '!=', 1)->orderBy('id')->get();
+        $this->timelineMap = $this->timelines->pluck('name', 'id')->toArray();
+        $this->timelineValues = array_values($this->timelineMap);  
+        $this->taskNameMap = [];
+        foreach ($this->timelines as $timeline) {
+            $this->taskNameMap[$timeline->name] = $timeline->name;
+        }
         $this->loadSocietyDetails($id,$key);
     }
 
@@ -36,20 +45,37 @@ class SocietyStepper extends Component
             ->filter(function ($item) {
             $json = json_decode($item->status, true);
             if (!isset($json['tasks'])) return false;
-            $tasks = collect($json['tasks']);
+            $tasks = collect($json['tasks'])->keyBy('name');
 
-            if ($this->societyKey == 'all') {
+            if ($this->societyKey == 0) {
                 return $tasks->contains(fn($task) => ($task['Status'] ?? null) === 'Pending');
-            } else {
-                $data = $tasks->firstWhere('name', $this->societyKey);
-                return ($data && ($data['Status'] ?? null) === 'Pending');
+            } 
+            $this->timelines =Timeline::where('id', '!=', 1)->orderBy('id')->get();
+            $dependencies = [];
+            $previousSteps = [];
+            $idToName = [];
+
+            foreach ($this->timelines as $timeline) {
+                $idToName[$timeline->id] = $timeline->name;
+                $dependencies[$timeline->name] = $previousSteps;
+                $previousSteps[] = $timeline->name;
             }
+            $currentStep = $idToName[$this->societyKey] ?? null;
+            if (!$currentStep) return false;
+            // Ensure all dependencies are Approved
+            foreach ($dependencies[$currentStep] ?? [] as $dep) {
+                if (($tasks[$dep]['Status'] ?? null) !== 'Approved') {
+                    return false;
+                }
+            }
+            // Finally, check the selected filter is Pending
+            return ($tasks[$currentStep]['Status'] ?? null) === 'Pending';
         });
     }
     
     public function getFileStatus($statusData, $fileName)
     {
-        $applicationTask = collect($statusData['tasks'])->firstWhere('name', 'Application');
+        $applicationTask = collect($statusData['tasks'])->firstWhere('name', $this->timelineValues[0]);
         if ($applicationTask) {
             $subtask = collect($applicationTask['subtasks'] ?? [])
                 ->firstWhere('fileName', basename(trim($fileName)));
@@ -61,7 +87,7 @@ class SocietyStepper extends Component
     
     public function areAllFourFilesApproved($statusData, array $expectedFiles = [])
     {
-        $applicationTask = collect($statusData['tasks'])->firstWhere('name', 'Application');
+        $applicationTask = collect($statusData['tasks'])->firstWhere('name', $this->timelineValues[0]);
         if (!$applicationTask) {
             return false; // No Application task found
         }
@@ -175,7 +201,7 @@ class SocietyStepper extends Component
         $society = SocietyDetail::find($this->detailId); 
         $data = json_decode($society->status, true);
         foreach ($data['tasks'] as &$task) {
-            if ($task['name']=='Verification') {
+            if ($task['name']==$this->timelineValues[1]) {
                 $task['Status'] = 'Approved';
             }
         }
@@ -198,11 +224,11 @@ class SocietyStepper extends Component
         $society = SocietyDetail::find($this->detailId); 
         $data = json_decode($society->status, true);
         foreach ($data['tasks'] as &$task) {
-            if ($task['name']=='Verification') {
+            if ($task['name']==$this->timelineValues[1]) {
                 $task['Status'] = 'Rejected';
             }
 
-            if ($task['name']=='Verify Details' || $task['name']=='Application') {
+            if ($task['name']=='Verify Details' || $task['name']==$this->timelineValues[0]) {
                 $task['Status'] = 'Pending';
             }
         }
@@ -223,28 +249,29 @@ class SocietyStepper extends Component
         $society = SocietyDetail::find($this->detailId); 
         $societyData = json_decode($society->status, true);
         foreach ($societyData['tasks'] as &$task) {
-            if ($task['name']=='Application') {
-                // Check if subtask already exists
-                $found = false;
-                foreach ($task['subtasks'] ?? [] as &$subtask) {
-                    if (trim((string) $subtask['fileName']) === trim((string) $fileName)) {
-                        // Update existing status
-                        $subtask['status'] = $fileStatus;
-                        $found = true;
-                        break;
-                    }
+            if ($task['name'] === $this->timelineValues[0]) {
+                // Ensure subtasks array exists
+                if (!isset($task['subtasks']) || !is_array($task['subtasks'])) {
+                    $task['subtasks'] = [];
                 }
 
-                // If not found, insert new subtask
-                if (! $found) {
-                    // Add new subtask only if not already added
+                // Look for existing subtask
+                $index = collect($task['subtasks'])->search(function ($sub) use ($fileName) {
+                    return trim((string) $sub['fileName']) === trim((string) $fileName);
+                });
+
+                if ($index !== false) {
+                    // Update existing entry (Approved ↔ Rejected)
+                    $task['subtasks'][$index]['status'] = $fileStatus;
+                } else {
+                    // Insert new entry
                     $task['subtasks'][] = [
                         "fileName" => trim((string) $fileName),
-                        "status"   => $fileStatus
-                    ];
+                        "status"   => $fileStatus];
                 }
             }
         }
+
         $society->status = json_encode($societyData);
         $society->save();
         if($society){

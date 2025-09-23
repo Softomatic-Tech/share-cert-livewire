@@ -96,15 +96,9 @@
                                         <i class="fa-solid {{ $icons[$i] }} text-white"></i>
                                         </span>
                                         @php
-                                            $label = match($task['name']) {
-                                                'Application' => 'Application',
-                                                'Verification' => 'Verification',
-                                                'Certificate Generated' => 'Waiting',
-                                                'Certificate Delivered' => 'Delivered',
-                                                default => $task['name']
-                                            };
+                                            $label = $taskNameMap[$task['name']] ?? $task['name'];
                                         @endphp
-                                        <span class="absolute -bottom-6 start-0 whitespace-nowrap text-[10px] sm:text-xs {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}} dark:text-white">{{ $label }}
+                                        <span class="absolute -bottom-8 start-0 whitespace-wrap text-[10px] {{ in_array($task['Status'], ['Pending', 'Rejected']) ? 'text-stone-500 font-normal' : 'text-stone-800 font-extrabold'}} dark:text-white">{{ $label }}
                                         </span>
                                     </div>
                                     @if(!$loop->last)
@@ -131,12 +125,15 @@
                 $isApproved =$this->getFileStatus($statusData, $details->agreementCopy);
                 @endphp
             <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                @if($isApproved=='Approved')
                 <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                @else
+                <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                @endif
                 Copy of Agreement
             </div>
             @else
             <div class="flex items-center text-xs">
-                <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
                 Copy of Agreement
             </div>
             @endif
@@ -145,12 +142,15 @@
             $isApproved =$this->getFileStatus($statusData, $details->memberShipForm);
             @endphp
             <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                @if($isApproved=='Approved')
                 <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                @else
+                <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                @endif
                 Membership Form
             </div>
             @else
             <div class="flex items-center text-xs">
-                <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
                 Membership Form
             </div>
             @endif
@@ -159,12 +159,15 @@
             $isApproved =$this->getFileStatus($statusData, $details->allotmentLetter);
             @endphp
             <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                @if($isApproved=='Approved')
                 <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                @else
+                <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                @endif
                 Allotment Letter
             </div>
             @else
             <div class="flex items-center text-xs">
-                <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
                 Allotment Letter
             </div>
             @endif
@@ -173,12 +176,15 @@
             $isApproved =$this->getFileStatus($statusData, $details->possessionLetter);
             @endphp
             <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                @if($isApproved=='Approved')
                 <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                @else
+                <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                @endif
                 Possession Letter
             </div>
             @else
             <div class="flex items-center text-xs">
-                <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
                 Possession Letter
             </div>
             @endif
@@ -212,6 +218,16 @@
             <iframe src="{{ $url }}#toolbar=0" class="w-full h-[70vh]" frameborder="0"></iframe>
         @endif
             <div class="flex justify-between">
+                @if($checkApproved=='Approved')
+                <flux:modal.close>
+                    <flux:button x-on:click="$wire.updateFileStatus('{{ $detailId }}','{{ $fileName }}','Rejected')" variant="danger">Reject</flux:button>
+                    </flux:modal.close>
+                @endif
+                @if($checkApproved=='Rejected')
+                <flux:modal.close>
+                    <flux:button variant="primary" x-on:click="$wire.updateFileStatus('{{ $detailId }}','{{ $fileName }}','Approved')">Approve</flux:button>
+                    </flux:modal.close>
+                @endif
                 @if($checkApproved=='')
                     <flux:modal.close>
                         <flux:button variant="primary" x-on:click="$wire.updateFileStatus('{{ $detailId }}','{{ $fileName }}','Approved')">Approve</flux:button>

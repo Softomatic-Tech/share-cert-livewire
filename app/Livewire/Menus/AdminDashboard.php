@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Role;
 use App\Models\Society;
 use App\Models\SocietyDetail;
+use App\Models\Timeline;
 use Livewire\Component;
 use Illuminate\Support\Facades\Log;
 use Livewire\WithPagination;
@@ -25,13 +26,15 @@ class AdminDashboard extends Component
     public $documentName,$title,$detailId;
     public $societyDetail = null;
     public $selectedSocietyId, $societyName,$filterId;
-    public string $filterKey = 'all';
+    public $filterKey = 0;
+    public $timelines;
     public function render()
     {
         return view('livewire.menus.admin-dashboard');
     }
 
     public function mount(){
+        $this->timelines =Timeline::where('id', '!=', 1)->get();
         $this->societies =Society::with(['state','city'])->get();
         $this->usersCount=User::where('role_id','!=',1)->count();
         $this->adminRole=Role::where('role','Admin')->value('id');
