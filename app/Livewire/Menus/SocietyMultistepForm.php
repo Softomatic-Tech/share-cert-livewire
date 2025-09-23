@@ -8,6 +8,7 @@ use App\Models\Society;
 use App\Models\SocietyDetail;
 use App\Models\State;
 use App\Models\City;
+use App\Models\Timeline;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -20,6 +21,7 @@ class SocietyMultistepForm extends Component
     public $csv_file;
     public $societyId = null;
     public $csvUploaded = false;
+    public $timelines,$timelineValues,$timelineMap;
     public $states, $cities=[];
     public $formData = [
         'society_name' => '',
@@ -200,6 +202,10 @@ class SocietyMultistepForm extends Component
             $this->dispatch('show-error', message:  "CSV must contain exactly {$expectedFlats} valid flat entries. Found {$csvFlats}. Row(s) skipped: " . implode(', ', $invalidRows));
             return;
         }
+        $this->timelines =Timeline::orderBy('id')->get();
+        $this->timelineMap = $this->timelines->pluck('name', 'id')->toArray();
+        $this->timelineValues = array_values($this->timelineMap); 
+        
         foreach ($validRows as $data) {
             $owner1_name = trim($data[$indexes['owner1_first_name']] . ' ' . ($data[$indexes['owner1_middle_name']] ?? '') . ' ' . ($data[$indexes['owner1_last_name']] ?? ''));
             $owner2_name = trim(($data[$indexes['owner2_first_name']] ?? '') . ' ' . ($data[$indexes['owner2_middle_name']] ?? '') . ' ' . ($data[$indexes['owner2_last_name']] ?? ''));
@@ -207,7 +213,7 @@ class SocietyMultistepForm extends Component
             $status=[
                 "tasks" => [
                     [
-                        "name" => "Verify Details",
+                        "name" => $this->timelineValues[0],
                         "responsibilityOf"=> "ApartmentOwner",
                         "Status" => "Pending",
                         "createdBy" => "System",
@@ -216,7 +222,7 @@ class SocietyMultistepForm extends Component
                         "updateDateTime" => null
                     ],
                     [
-                        "name" => "Application",
+                        "name" => $this->timelineValues[1],
                         "responsibilityOf"=> "ApartmentOwner",
                         "Status" => "Pending",
                         "createdBy" => null,
@@ -225,7 +231,7 @@ class SocietyMultistepForm extends Component
                         "updateDateTime" => null,
                     ],
                     [
-                        "name" => "Verification",
+                        "name" => $this->timelineValues[2],
                         "responsibilityOf"=> "DearSociety",
                         "Status" => "Pending",
                         "createdBy" => "System",
@@ -234,7 +240,7 @@ class SocietyMultistepForm extends Component
                         "updateDateTime" => null
                     ],
                     [
-                        "name" => "Certificate Generated",
+                        "name" => $this->timelineValues[3],
                         "responsibilityOf"=> "DearSociety",
                         "Status" => "Pending",
                         "createdBy" => null,
@@ -243,7 +249,7 @@ class SocietyMultistepForm extends Component
                         "updateDateTime" => null
                     ],
                     [
-                        "name" => "Certificate Delivered",
+                        "name" => $this->timelineValues[4],
                         "responsibilityOf"=> "DearSociety",
                         "Status" => "Pending",
                         "createdBy" => null,

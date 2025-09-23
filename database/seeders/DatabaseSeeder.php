@@ -5,7 +5,6 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Role;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -36,5 +35,6 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('admin'), // if password is required for login
         ]);
         $this->call(StateCitySeeder::class);
+        $this->call(TimelineSeeder::class);
     }
 }

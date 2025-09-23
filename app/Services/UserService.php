@@ -18,7 +18,7 @@ class UserService
         return Auth::user();
     }
 
-    public function getSocietyDetail(?string $search = null){
+    public function getSocietyDetail($id=null){
         $societyDetail = SocietyDetail::with('society')
             ->where(function ($query) {
                 $userMobile = Auth::user()->phone;
@@ -26,12 +26,11 @@ class UserService
                     ->orWhere('owner2_mobile', $userMobile)
                     ->orWhere('owner3_mobile', $userMobile);
             })
-            ->when($search && strlen($search) >= 2, function ($query) use ($search) {
-                $query->whereHas('society', function ($q) use ($search) {
-                    $q->where('society_name', 'like', '%' . $search . '%');
-                });
+            ->when($id, function ($query) use ($id) {
+                // Filter by society id if provided
+                $query->where('id', $id);
             })
-            ->get();
+            ->orderBy('id','desc')->get();
             return $societyDetail;
     }
 

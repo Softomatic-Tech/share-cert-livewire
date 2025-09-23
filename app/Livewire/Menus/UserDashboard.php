@@ -3,13 +3,16 @@
 namespace App\Livewire\Menus;
 
 use App\Services\UserService;
+use App\Models\SocietyDetail;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class UserDashboard extends Component
 {
     public $societyDetail = [];
+    public $apartmentList = [];
     public $search = '';
-    protected $detailId,$userService,$checkApproved;
+    protected $detailId,$userService,$checkApproved,$selectedApartmentId;
     public $url=null;
     public $showDocumentModal = false;
 
@@ -25,14 +28,13 @@ class UserDashboard extends Component
 
     public function mount()
     {
-        $this->societyDetail=$this->userService->getSocietyDetail();
+        $this->apartmentList=$this->userService->getSocietyDetail();
     }
 
-    public function updatedSearch()
+    public function selectApartment($id)
     {
-        if (strlen($this->search) >= 2 || $this->search === '') {
-            $this->societyDetail = $this->userService->getSocietyDetail($this->search);
-        }
+        $this->selectedApartmentId = $id;
+        $this->societyDetail=$this->userService->getSocietyDetail($this->selectedApartmentId);
     }
 
     public function verifyDetails($apartmentId)
