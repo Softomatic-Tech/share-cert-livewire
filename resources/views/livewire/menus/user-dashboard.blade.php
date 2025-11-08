@@ -2,7 +2,7 @@
     <div class="mb-1 w-full">
         <div>
             <flux:breadcrumbs>
-                <flux:breadcrumbs.item href="#">{{ __('Welcome') }} {{ Auth::user()->name }} !</flux:breadcrumbs.item>
+                <flux:breadcrumbs.item href="{{ route('user.dashboard') }}">{{ __('Welcome') }} {{ Auth::user()->name }} !</flux:breadcrumbs.item>
             </flux:breadcrumbs>
         </div>
         
@@ -150,7 +150,7 @@
                                     </div>
                                     @if($needsAttention)
                                     <flux:tooltip content="Edit Apartment">
-                                        <button class="font-bold absolute top-2 right-4 px-2 py-1 border rounded-md cursor-pointer" wire:click="verifyDetails({{ $details->id }})"><i class="fa-solid fa-edit text-sm"></i></button>
+                                        <button class="font-bold absolute top-0 right-0 px-2 py-1 border rounded-md cursor-pointer" wire:click="verifyDetails({{ $details->id }})"><i class="fa-solid fa-edit text-sm"></i></button>
                                     </flux:tooltip>
                                     @endif
                                 </div>
@@ -226,6 +226,22 @@
                                     <div class="flex items-center text-xs">
                                         Possession Letter
                                     </div>
+                                    @endif
+                                    @php
+                                        $statusData = json_decode($details->status, true);
+                                        $tasks = collect($statusData['tasks'] ?? []);
+
+                                        // Get statuses by task name
+                                        $verifyStatus = $tasks->firstWhere('name', 'Verify Details')['Status'] ?? null;
+                                        $applicationStatus = $tasks->firstWhere('name', 'Application')['Status'] ?? null;
+                                        $verificationStatus = $tasks->firstWhere('name', 'Verification')['Status'] ?? null;
+                                        $generationStatus = $tasks->firstWhere('name', 'Certificate Generated')['Status'] ?? null;
+                                    @endphp
+                                    @php
+                                    $showCertificateDownloadButton = ($verifyStatus === 'Approved' && $applicationStatus === 'Approved' && $verificationStatus === 'Approved' && $generationStatus==='Approved');
+                                    @endphp
+                                    @if($showCertificateDownloadButton)
+                                    <div class="flex items-center text-xs justify-center cursor-pointer" onclick="window.open('{{ route('menus.certificate.view', ['id' => $details->id]) }}', '_blank')">View Certificate</div>
                                     @endif
                                 </div>
                             </div>

@@ -50,6 +50,9 @@
                                     @endforeach
                                 </flux:select>
                                 <flux:input type="text" :label="__('Pincode :')" wire:model="formData.pincode" />
+                                <flux:input type="text"  :label="__('Registration No :')" wire:model="formData.registration_no" />
+                                <flux:input type="text"  :label="__('No of Shares :')" wire:model="formData.no_of_shares" />
+                                <flux:input type="text"  :label="__('Share Value :')" wire:model="formData.share_value" />
                             </div>
                             <div class="flex justify-end mt-4">
                                 <flux:button variant="primary" type="button" wire:click="nextStep">{{ __('Next') }}</flux:button>
@@ -118,12 +121,30 @@
                         <div class="overflow-x-auto w-full">
                             <div class="max-h-90 overflow-y-auto"> 
                                 @if ($this->uploadedDetails->isNotEmpty())
+                                @php
+                                    $society = \App\Models\Society::find($this->societyId);
+                                    $expectedShares = (float) ($society->no_of_shares ?? 0);
+                                    $uploadedShares = (float) $this->uploadedDetails->sum('no_of_shares');
+                                    $diff = $uploadedShares - $expectedShares;
+                                @endphp
+                                @if ($diff !== 0)
+                                    <div class="bg-red-100 text-red-800 p-2 mb-3 rounded">
+                                        Total shares mismatch! Expected {{ $expectedShares }}, but found {{ $uploadedShares }}
+                                        ({{ $diff > 0 ? 'more' : 'less' }} by {{ abs($diff) }}).
+                                    </div>
+                                @else
+                                    <div class="bg-green-100 text-green-800 p-2 mb-3 rounded">
+                                        Total shares perfectly match ({{ $expectedShares }}).
+                                    </div>
+                                @endif
                                 <table class="min-w-full text-start text-sm font-light text-surface dark:text-white">
                                     <thead class="border-b border-neutral-200 font-medium dark:border-white/10">
                                         <tr>
                                             <th scope="col" class="px-6 py-4">#</th>
                                             <th scope="col" class="px-6 py-4">Building Name</th>
                                             <th scope="col" class="px-6 py-4">Apartment Number</th>
+                                            <th scope="col" class="px-6 py-4">Certificate No</th>
+                                            <th scope="col" class="px-6 py-4">No of Shares</th>
                                             <th scope="col" class="px-6 py-4">Owner 1 Details</th>
                                             <th scope="col" class="px-6 py-4">Owner 2 Details</th>
                                             <th scope="col" class="px-6 py-4">Owner 3 Details</th>
@@ -135,6 +156,8 @@
                                             <td class="whitespace-nowrap px-6 py-4 font-medium">{{ $index + 1 }}</td>
                                             <td class="whitespace-nowrap px-6 py-4">{{ $detail->building_name }}</td>
                                             <td class="whitespace-nowrap px-6 py-4">{{ $detail->apartment_number }}</td>
+                                            <td class="whitespace-nowrap px-6 py-4">{{ $detail->certificate_no }}</td>
+                                            <td class="whitespace-nowrap px-6 py-4">{{ $detail->no_of_shares }}</td>
                                             <td class="whitespace-nowrap px-6 py-4">
                                                 {{ $detail->owner1_name }} 
                                                 <br />@if($detail->owner1_mobile)<i class="fa-solid fa-phone"></i> {{ $detail->owner1_mobile }} @endif

@@ -281,4 +281,24 @@ class SocietyStepper extends Component
             $this->dispatch('show-error', message: 'Something went wrong to approve document!');
         }
     }
+
+    public function generateCertificate($id)
+    {
+        $this->detailId = $id;
+        $society = SocietyDetail::find($this->detailId); 
+        $data = json_decode($society->status, true);
+        foreach ($data['tasks'] as &$task) {
+            if ($task['name']==$this->timelineValues[2]) {
+                $task['Status'] = 'Approved';
+            }
+        }
+        $society->status = json_encode($data);
+        $society->save();
+        if($society){
+            $this->dispatch('show-success', message: 'All details have verified and certificate have been generated successfully!');
+            $this->mount($this->societyId,$this->societyKey);
+        }else{
+            $this->dispatch('show-error', message: 'Something went wrong to approve document!');
+        }
+    }
 }

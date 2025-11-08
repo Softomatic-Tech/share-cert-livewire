@@ -11,7 +11,7 @@ use App\Models\City;
 
 class CreateSociety extends Component
 {
-    public $society_name, $address_1, $address_2, $pincode, $state_id, $city_id, $total_flats;
+    public $society_name, $address_1, $address_2, $pincode, $state_id, $city_id, $total_flats,$registration_no,$no_of_shares,$share_value;
     public $states, $cities=[];
     protected $validationAttributes = [
         'state_id' => 'state',
@@ -41,11 +41,14 @@ class CreateSociety extends Component
             'state_id' => 'required|exists:states,id',
             'city_id' => 'required|exists:cities,id',
             'total_flats' => 'required|numeric',
+            'registration_no' => 'required|string',
+            'no_of_shares' => 'required|numeric',
+            'share_value' => 'required|numeric',
         ]);
         $society=Society::create($validated);
         if($society){
             $this->dispatch('show-success', message: 'Society information saved successfully!');
-            $this->reset(['society_name', 'address_1', 'address_2', 'pincode', 'state_id', 'city_id', 'total_flats']);
+            $this->reset(['society_name', 'address_1', 'address_2', 'pincode', 'state_id', 'city_id', 'total_flats','registration_no','no_of_shares','share_value']);
         }else{
             $this->dispatch('show-error', message: 'Society information could not be saved due to some error!');
         }

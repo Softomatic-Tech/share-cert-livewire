@@ -31,6 +31,9 @@ class SocietyMultistepForm extends Component
         'pincode' => '',
         'state_id' => '',
         'city_id' => '',
+        'registration_no'=>'',
+        'no_of_shares'=>'',
+        'share_value'=>'',
     ];
 
     // Validation rules for each step
@@ -42,7 +45,9 @@ class SocietyMultistepForm extends Component
             'formData.pincode' => 'required|numeric|digits:6',
             'formData.state_id' => 'required|exists:states,id',
             'formData.city_id' => 'required|exists:cities,id',
-            'formData.total_flats' => 'required|numeric',
+            'formData.registration_no' => 'required|string',
+            'formData.no_of_shares' => 'required|numeric',
+            'formData.share_value' => 'required|numeric',
         ],
         2=>[],
         3=>[]
@@ -50,12 +55,15 @@ class SocietyMultistepForm extends Component
 
     protected $validationAttributes = [
         'formData.society_name' => 'society name',
-            'formData.address_1'    => 'address line 1',
-            'formData.address_2'    => 'address line 2',
-            'formData.pincode'      => 'pincode',
-            'formData.state_id'        => 'state',
-            'formData.city_id'         => 'city',
-            'formData.total_flats'  => 'total flats',
+        'formData.address_1'    => 'address line 1',
+        'formData.address_2'    => 'address line 2',
+        'formData.pincode'      => 'pincode',
+        'formData.state_id'     => 'state',
+        'formData.city_id'      => 'city',
+        'formData.total_flats'  => 'total flats',
+        'formData.registration_no'  => 'registration no',
+        'formData.no_of_shares'  => 'no of shares',
+        'formData.share_value'  => 'share value',
     ];
     public function render()
     {
@@ -103,6 +111,7 @@ class SocietyMultistepForm extends Component
                 return;
             }
         }
+
         $this->currentStep++;
     }
 
@@ -139,6 +148,8 @@ class SocietyMultistepForm extends Component
         $columns = [
             'building_name',
             'apartment_number',
+            'certificate_no',
+            'no_of_shares',
             'owner1_first_name', 'owner1_middle_name', 'owner1_last_name',
             'owner1_mobile', 'owner1_email',
             'owner2_first_name', 'owner2_middle_name', 'owner2_last_name',
@@ -165,7 +176,7 @@ class SocietyMultistepForm extends Component
         $fullPath = Storage::path($path);
         $file = fopen($fullPath, 'r');  
         $header = fgetcsv($file); 
-        $requiredHeaders = ['building_name', 'apartment_number','owner1_first_name', 'owner1_mobile'];   
+        $requiredHeaders = ['building_name', 'apartment_number','certificate_no','no_of_shares','owner1_first_name', 'owner1_mobile'];   
         $headerMap = array_map('trim', $header);
         foreach ($requiredHeaders as $required) {
             if (!in_array($required, $headerMap)) {
@@ -175,23 +186,31 @@ class SocietyMultistepForm extends Component
             }
         }
         $indexes = array_flip($headerMap);
-        $dataRows = [];
         $insertedCount = 0;
         $validRows = [];
         $invalidRows = [];
         $rowNumber = 2;
+        $totalCsvShares = 0;
         $society = Society::find($this->societyId);
         $expectedFlats = (int) $society->total_flats;
+        $expectedShares = (float) $society->no_of_shares;
         while (($data = fgetcsv($file)) !== FALSE) {
             $buildingName = $data[$indexes['building_name']] ?? null;
             $apartmentNumber = $data[$indexes['apartment_number']] ?? null;
+            $certificateNo = $data[$indexes['certificate_no']] ?? null;
+            $noOfShares = $data[$indexes['no_of_shares']] ?? null;
             $owner1First = $data[$indexes['owner1_first_name']] ?? null;
             $owner1Mobile = $data[$indexes['owner1_mobile']] ?? null;
 
-            if (empty($buildingName) || empty($apartmentNumber) || empty($owner1First) || empty($owner1Mobile)) {
+            if (empty($buildingName) || empty($apartmentNumber) || empty($certificateNo) || empty($noOfShares) || empty($owner1First) || empty($owner1Mobile)) {
                 $invalidRows[] = $rowNumber;
             } else {
-                $validRows[] = $data;
+                if (!is_numeric($noOfShares)) {
+                    $invalidRows[] = $rowNumber;
+                } else {
+                    $totalCsvShares += (float) $noOfShares;
+                    $validRows[] = $data;
+                }
             }
                 $rowNumber++;
         }
@@ -202,6 +221,12 @@ class SocietyMultistepForm extends Component
             $this->dispatch('show-error', message:  "CSV must contain exactly {$expectedFlats} valid flat entries. Found {$csvFlats}. Row(s) skipped: " . implode(', ', $invalidRows));
             return;
         }
+        // if ($totalCsvShares != $expectedShares) {
+        //     $diff = $totalCsvShares - $expectedShares;
+        //     $status = $diff > 0 ? 'more' : 'less';
+        //     $this->dispatch('show-error', message: "Total shares mismatch! Expected {$expectedShares}, but found {$totalCsvShares} in CSV ({$status} by " . abs($diff) . ").");
+        //     return;
+        // }
         $this->timelines =Timeline::orderBy('id')->get();
         $this->timelineMap = $this->timelines->pluck('name', 'id')->toArray();
         $this->timelineValues = array_values($this->timelineMap); 
@@ -265,6 +290,8 @@ class SocietyMultistepForm extends Component
                 'society_id' => $this->societyId,
                 'building_name' => $data[$indexes['building_name']],
                 'apartment_number' => $data[$indexes['apartment_number']],
+                'certificate_no' => $data[$indexes['certificate_no']],
+                'no_of_shares' => $data[$indexes['no_of_shares']],
                 'owner1_name' => $owner1_name,
                 'owner1_mobile' => $data[$indexes['owner1_mobile']] ?? null,
                 'owner1_email' => $data[$indexes['owner1_email']] ?? null,
@@ -306,6 +333,9 @@ class SocietyMultistepForm extends Component
             'pincode' => '',
             'state_id' => '',
             'city' => '',
+            'registration_no' => '',
+            'no_of_shares' => '',
+            'share_value' => ''
         ];
 
         // $this->currentStep = 1;

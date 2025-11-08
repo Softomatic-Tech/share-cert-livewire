@@ -3,7 +3,7 @@
     <div class="w-full">
         <div class="flex justify-between items-center">
             <flux:breadcrumbs>
-                <flux:breadcrumbs.item href="#">Admin Dashboard</flux:breadcrumbs.item>
+                <flux:breadcrumbs.item href="{{ route('admin.dashboard') }}">Admin Dashboard</flux:breadcrumbs.item>
             </flux:breadcrumbs>
             <div class="flex gap-4">
                 <flux:tooltip content="Create Society">

@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Livewire\Menus\UpdateSocietyStatus;
 use App\Livewire\Menus\markRole;
+use App\Livewire\Menus\DownloadCertificate;
+
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -42,6 +44,7 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
     Route::get('/admin/create-society', CreateSociety::class)->name('menus.create_society');
     Route::get('/admin/create-apartment', CreateApartment::class)->name('menus.create_apartment');
     Route::get('/admin/mark-role', markRole::class)->name('menus.mark_role');
+    Route::get('/admin/certificate/{id}', DownloadCertificate::class)->name('admin.certificate.view');
 });
 
 // User Routes
@@ -56,6 +59,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
     Route::get('/issue-certificate/{id}', IssueCertificate::class)->name('menus.issue-certificate');
+    Route::get('/certificate/{id}', DownloadCertificate::class)->name('menus.certificate.view');
 });
 
 require __DIR__.'/auth.php';

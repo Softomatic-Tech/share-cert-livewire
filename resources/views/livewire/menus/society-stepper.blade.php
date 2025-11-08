@@ -5,6 +5,19 @@
     </div>
 @else
 @foreach($societyDetails as $details)
+    @php
+        $statusData = json_decode($details->status, true);
+        $tasks = collect($statusData['tasks'] ?? []);
+
+        // Get statuses by task name
+        $verifyStatus = $tasks->firstWhere('name', 'Verify Details')['Status'] ?? null;
+        $applicationStatus = $tasks->firstWhere('name', 'Application')['Status'] ?? null;
+        $verificationStatus = $tasks->firstWhere('name', 'Verification')['Status'] ?? null;
+        $generationStatus = $tasks->firstWhere('name', 'Certificate Generated')['Status'] ?? null;
+    @endphp
+    @if($details->certificate_remark)
+    <p>{{ $details->certificate_remark }}</p>
+    @endif
     <div class="rounded-lg border shadow-sm hover:shadow-lg transition-shadow my-4">
         <div class="grid grid-cols-1 md:grid-cols-2 border-b relative">
             <div class="p-4">
@@ -111,9 +124,28 @@
                     </div>
                 @endif
             </div>
-            <flux:tooltip content="Edit Apartment">
+            @php
+                $showCertificateDownloadButton = ( $verifyStatus === 'Approved' && $applicationStatus === 'Approved' && $verificationStatus === 'Approved' && $generationStatus==='Approved');
+            @endphp
+            <div class="absolute top-0 right-0 flex space-x-2">
+                @if($showCertificateDownloadButton)
+                <flux:tooltip content="View Certificate">
+                    <button class="font-bold px-2 py-1 border rounded-md" onclick="window.open('{{ route('admin.certificate.view', ['id' => $details->id]) }}', '_blank')">
+                        <i class="fa-solid fa-certificate text-sm"></i>
+                    </button>
+                </flux:tooltip>
+                @endif
+
+                <flux:tooltip content="Edit Apartment">
+                    <button class="font-bold px-2 py-1 border rounded-md" wire:click="fetchOwnersDetail('{{ $details->id }}')">
+                        <i class="fa-solid fa-edit text-sm"></i>
+                    </button>
+                </flux:tooltip>
+            </div>
+
+            {{-- <flux:tooltip content="Edit Apartment">
                 <button class="font-bold absolute top-0 right-0 px-2 py-1 border rounded-md" wire:click="fetchOwnersDetail('{{ $details->id }}')"><i class="fa-solid fa-edit text-sm"></i></button>
-            </flux:tooltip>
+            </flux:tooltip>--}}
         </div>
         <!--Documents Section (below the grid) -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-2 p-2">
@@ -190,9 +222,16 @@
             @endif
             @php
             $allApproved = $this->areAllFourFilesApproved($statusData, [$details->agreementCopy,$details->memberShipForm,$details->allotmentLetter,$details->possessionLetter]);
+            $showVerificationButton = ($allApproved && $verifyStatus === 'Approved' && $applicationStatus === 'Approved' && $verificationStatus === 'Pending');
             @endphp
-            @if ($allApproved) 
+            @if ($showVerificationButton) 
             <div class="flex items-center text-xs justify-center cursor-pointer" wire:click="setDocument('{{ $details->id }}')">Verify Documents</div>
+            @endif
+            @php
+            $showCertificateGenerateButton = ($verifyStatus === 'Approved' && $applicationStatus === 'Approved' && $verificationStatus === 'Approved' && $generationStatus==='Pending');
+            @endphp
+            @if($showCertificateGenerateButton)
+            <div class="flex items-center text-xs justify-center cursor-pointer" wire:click="generateCertificate('{{ $details->id }}')">Generate Certificate</div>
             @endif
         </div>
     </div>
