@@ -1,7 +1,7 @@
 <section>
     <div class="w-full">
         <flux:breadcrumbs>
-            <flux:breadcrumbs.item href="#">User</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item href="{{ route('user.dashboard') }}">User</flux:breadcrumbs.item>
             <flux:breadcrumbs.item href="#">Verify Society Details</flux:breadcrumbs.item>
         </flux:breadcrumbs>
         <flux:separator variant="subtle" />

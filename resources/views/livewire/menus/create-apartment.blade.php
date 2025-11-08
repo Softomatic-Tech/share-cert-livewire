@@ -1,6 +1,6 @@
 <section class="w-full">
     <flux:breadcrumbs>
-        <flux:breadcrumbs.item href="#">Admin</flux:breadcrumbs.item>
+        <flux:breadcrumbs.item href="{{ route('admin.dashboard') }}">Admin</flux:breadcrumbs.item>
         <flux:breadcrumbs.item href="#">Create Apartment</flux:breadcrumbs.item>
     </flux:breadcrumbs>
     <flux:separator variant="subtle" />

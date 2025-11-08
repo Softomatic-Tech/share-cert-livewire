@@ -1,7 +1,7 @@
 <div>
     <div class="mb-2 w-full">
         <flux:breadcrumbs>
-            <flux:breadcrumbs.item href="#">Admin</flux:breadcrumbs.item>
+            <flux:breadcrumbs.item href="{{ route('admin.dashboard') }}">Admin</flux:breadcrumbs.item>
             <flux:breadcrumbs.item href="#">Create Society</flux:breadcrumbs.item>
         </flux:breadcrumbs>
         <flux:separator variant="subtle" />
@@ -33,6 +33,9 @@
                             @endforeach
                         </flux:select>
                         <flux:input type="text" :label="__('Pincode')" wire:model="pincode" />
+                        <flux:input type="text"  :label="__('Registration No :')" wire:model="registration_no" />
+                        <flux:input type="text"  :label="__('No of Shares :')" wire:model="no_of_shares" />
+                        <flux:input type="text"  :label="__('Share Value :')" wire:model="share_value" />
                     </div>
                     <div class="flex justify-end mt-4">
                         <flux:button variant="primary" type="submit">{{ __('Save') }}</flux:button>

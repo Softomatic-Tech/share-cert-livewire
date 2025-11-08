@@ -15,7 +15,10 @@ class Society extends Model
         'address_2',
         'pincode',
         'state_id',
-        'city_id'
+        'city_id',
+        'registration_no',
+        'no_of_shares',
+        'share_value'
     ];
 
     public function details()
