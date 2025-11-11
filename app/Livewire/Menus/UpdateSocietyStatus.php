@@ -98,19 +98,15 @@ class UpdateSocietyStatus extends Component
         }
     }
 
-    public function isFileApproved($statusData, $fileName): bool
-{
-    foreach ($statusData['tasks'] as $task) {
-        if ($task['name'] === 'Application') {
-            foreach ($task['subtasks'] ?? [] as $subtask) {
-                if (trim($subtask['fileName']) === trim($fileName) && $subtask['status'] === 'Approved') {
-                    return true;
-                }
-            }
-        }
+    public function isFileApproved($statusData, $fileName)
+    {
+        $data = [
+            'statusData' => $statusData,
+            'fileName' => $fileName,
+        ];
+        $response=$this->userService->checkFileApproval($data);
+        return $response;
     }
-    return false;
-}
 
 
     public function nextStep()

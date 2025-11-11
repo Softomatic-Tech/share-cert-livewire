@@ -13,14 +13,40 @@ class SocietyController extends Controller
     {
         $this->userService = $userService;
     }
-    public function index(Request $request)
+    public function societyDetails(Request $request)
     {
-        $search = $request->query('search', null);
+        $search = $request->search;
         $societies = $this->userService->getSocietyDetail($search);
 
+        if ($search && $societies->count() === 1) {
+            return response()->json([
+                'success' => true,
+                'data' => $societies->first()
+            ]);
+        }
+
+        // Otherwise, return list
         return response()->json([
             'success' => true,
             'data' => $societies
+        ]);
+    }
+
+    public function show($search)
+    {
+        // Force numeric id; return 404 if not found or not owned by this user
+        $society = $this->userService->getSocietyDetail($search);
+
+        if (!$society) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Society not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $society
         ]);
     }
 
@@ -106,6 +132,19 @@ class SocietyController extends Controller
     public function updateStatus(Request $request)
     {
         $response=$this->userService->updateStatus($request->apartment_id); 
+        return response()->json($response);
+    }
+
+    public function isFileApproved(Request $request)
+    {
+        $statusData = $request->statusData;
+        $fileName = $request->fileName;
+
+        $data = [
+            'statusData' => $statusData,
+            'fileName' => $fileName,
+        ];
+        $response=$this->userService->checkFileApproval($data);
         return response()->json($response);
     }
 }

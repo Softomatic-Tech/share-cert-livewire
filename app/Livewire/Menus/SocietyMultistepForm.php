@@ -47,7 +47,7 @@ class SocietyMultistepForm extends Component
             'formData.city_id' => 'required|exists:cities,id',
             'formData.registration_no' => 'required|string',
             'formData.no_of_shares' => 'required|numeric',
-            'formData.share_value' => 'required|numeric',
+            'formData.share_value' => 'required|numeric|decimal:0,2',
         ],
         2=>[],
         3=>[]

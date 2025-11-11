@@ -6,9 +6,6 @@ use App\Models\SocietyDetail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
-
 class UserService
 {
     protected $societyDetail = [];
@@ -18,19 +15,27 @@ class UserService
         return Auth::user();
     }
 
-    public function getSocietyDetail($id=null){
-        $societyDetail = SocietyDetail::with('society')
+    public function getSocietyDetail($search=null){
+        $query = SocietyDetail::with('society')
             ->where(function ($query) {
                 $userMobile = Auth::user()->phone;
                 $query->where('owner1_mobile', $userMobile)
                     ->orWhere('owner2_mobile', $userMobile)
                     ->orWhere('owner3_mobile', $userMobile);
-            })
-            ->when($id, function ($query) use ($id) {
-                // Filter by society id if provided
-                $query->where('id', $id);
-            })
-            ->orderBy('id','desc')->get();
+            });
+            if ($search) {
+                $query->where(function ($subQuery) use ($search) {
+                    if (is_numeric($search)) {
+                        $subQuery->where('id', $search)
+                                ->orWhere('apartment_number', $search);
+                    } else {
+                        $subQuery->where('building_name', 'like', "%{$search}%");
+                    }
+                });
+            } else {
+                $query->orderBy('id', 'desc');
+            }
+            $societyDetail = $search ? collect([$query->first()]) : $query->get();
             return $societyDetail;
     }
 
@@ -43,6 +48,9 @@ class UserService
             'pincode' => 'required|digits:6',
             'state_id' => 'required|exists:states,id',
             'city_id' => 'required|exists:cities,id',
+            'registration_no' => 'required|string',
+            'no_of_shares' => 'required|numeric',
+            'share_value' => 'required|numeric|decimal:0,2',
             'building_name' => 'required|string|max:255',
             'apartment_number' => 'required|string|max:50',
             'owner1_name' => 'required|string|max:255',
@@ -54,6 +62,9 @@ class UserService
             'owner3_name' => 'nullable|string|max:255',
             'owner3_email' => 'nullable|string|email|max:255',
             'owner3_mobile' => 'nullable|digits:10',
+            'certificate_no' => 'nullable|numeric',
+            'no_of_each_share' => 'nullable|numeric',
+                
         ]);
 
         if ($validator->fails()) {
@@ -81,6 +92,9 @@ class UserService
             'pincode' => $validated['pincode'],
             'state_id' => $validated['state_id'],
             'city_id' => $validated['city_id'],
+            'registration_no' => $validated['registration_no'],
+            'no_of_shares' => $validated['no_of_shares'],
+            'share_value' => $validated['share_value'],
         ]);
 
         // Update Society Details
@@ -94,6 +108,8 @@ class UserService
         $apartment->update([
             'building_name'     => $validated['building_name'],
             'apartment_number'  => $validated['apartment_number'],
+            'certificate_no'    => $validated['certificate_no'],
+            'no_of_shares'      => $validated['no_of_each_share'],
             'owner1_name'       => $validated['owner1_name'],
             'owner1_mobile'     => $validated['owner1_mobile'],
             'owner1_email'      => $validated['owner1_email'] ?? null,
@@ -125,9 +141,6 @@ class UserService
                 'status'  => false,
                 'message' => 'Invalid file type , only '.implode(",",$allowedExtensions).' file extension are allowed.',
             ];
-            // throw ValidationException::withMessages([
-            //     $validationField => 'Invalid file type.',
-            // ]);
         }
 
         // Validate file size (2 MB limit)
@@ -211,5 +224,43 @@ class UserService
             'status'  => true,
             'message' => 'Society details and its documents have been verified and submitted successfully!',
         ];
+    }
+
+    public function checkFileApproval($data)
+    {
+        // Validate input
+        $validator =Validator::make($data, [
+            'statusData' => 'required|array',
+            'fileName' => 'required|string'
+        ]);
+
+        $statusData = $validator['statusData'];
+        $fileName = $validator['fileName'];
+
+        // Check approval
+        $isApproved = false;
+
+        foreach ($statusData['tasks'] as $task) {
+            if ($task['name'] === 'Application') {
+                foreach ($task['subtasks'] ?? [] as $subtask) {
+                    if (
+                        isset($subtask['fileName'], $subtask['status']) &&
+                        trim($subtask['fileName']) === trim($fileName) &&
+                        $subtask['status'] === 'Approved'
+                    ) {
+                        $isApproved = true;
+                        break 2; // Exit both loops
+                    }
+                }
+            }
+        }
+
+        // Return JSON response
+        if ($isApproved) {
+            return true;
+        } else {
+            return false;
+            
+        }
     }
 }
