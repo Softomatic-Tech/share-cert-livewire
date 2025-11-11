@@ -3,9 +3,9 @@
 
         <h1 class="text-xl font-bold text-center text-gray-800 mb-4"><u>Certificate Preview</u></h1>
         <h2 class="font-bold">Certificate Status: {{ ucwords($details->certificate_status) }}</h2>
-        {{-- @if($details->certificate_remark) --}}
+        @if($details->certificate_remark)
         <span class="font-bold">Certificate Remark: </span><span class="text-red-500"><i>"{{ $details->certificate_remark }}"</i></span>
-        {{-- @endif --}}
+        @endif
         @if(auth()->user()->role->role_id === 3)
         <span class="text-lg">Disclaimer:</span><span> This document is a provisional copy and holds no legal validity. The original certificate will be digitally issued upon approval.</span>
         @endif

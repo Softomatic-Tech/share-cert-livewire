@@ -43,7 +43,7 @@ class CreateSociety extends Component
             'total_flats' => 'required|numeric',
             'registration_no' => 'required|string',
             'no_of_shares' => 'required|numeric',
-            'share_value' => 'required|numeric',
+            'share_value' => 'required|numeric|decimal:0,2',
         ]);
         $society=Society::create($validated);
         if($society){
