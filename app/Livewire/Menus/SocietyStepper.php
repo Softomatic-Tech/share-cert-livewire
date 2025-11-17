@@ -4,6 +4,7 @@ namespace App\Livewire\Menus;
 
 use Livewire\Component;
 use App\Models\Timeline;
+use App\Models\Society;
 use App\Models\SocietyDetail;
 
 class SocietyStepper extends Component
@@ -12,7 +13,7 @@ class SocietyStepper extends Component
     public $comment,$text,$checkApproved,$timelines,$timelineValues;
     public $isRejecting = false;
     public $verificationModal = false;
-    public $apartment_id,$building_name, $apartment_number, $owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
+    public $apartment_id,$building_name, $apartment_number, $certificate_no, $individual_no_of_share, $share_capital_amount, $owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
     public $showDocumentModal = false;
     public $editOwnersModal= false;
     public $url=null;
@@ -113,6 +114,9 @@ class SocietyStepper extends Component
             $this->apartment_id = $this->detailId;
             $this->building_name = $apartment->building_name;
             $this->apartment_number = $apartment->apartment_number;
+            $this->certificate_no = $apartment->certificate_no;
+            $this->individual_no_of_share = $apartment->no_of_shares;
+            $this->share_capital_amount = $apartment->share_capital_amount;
             $this->owner1_name = $apartment->owner1_name;
             $this->owner1_mobile = $apartment->owner1_mobile;
             $this->owner1_email = $apartment->owner1_email;
@@ -149,9 +153,44 @@ class SocietyStepper extends Component
                 'message' => 'Owner Details not found!'
             ];
         }
+        $society = Society::find($this->societyId);
+        if (empty($society->no_of_shares) || empty($society->share_value)) {
+            $this->dispatch('show-error', message: "Society shares or share value is not set. Please update society details first.");
+            $this->editOwnersModal = false;
+            return;
+        }
+        $expectedShares = (float) $society->no_of_shares;
+        $expectedAmount = (float) ($society->no_of_shares * $society->share_value ?? 0);
+        $givenShares = $this->individual_no_of_share;
+        $givenAmount = $this->share_capital_amount;
+        $existingShares = SocietyDetail::where('society_id', $this->societyId)
+            ->when($this->detailId, fn($q) => $q->where('id', '!=', $this->detailId))
+            ->sum('no_of_shares');
+
+        $existingAmount = SocietyDetail::where('society_id', $this->societyId)
+            ->when($this->detailId, fn($q) => $q->where('id', '!=', $this->detailId))
+            ->sum('share_capital_amount');
+        $totalSharesAfter = $existingShares + $givenShares;
+        $totalAmountAfter = $existingAmount + $givenAmount;
+        if ($totalSharesAfter > $expectedShares) {
+            $excess = $totalSharesAfter - $expectedShares;
+            $this->dispatch('show-error', message: "Total allocated shares cannot exceed {$expectedShares}. Current total = {$existingShares}, entered = {$givenShares} (exceeds by {$excess}).");
+            $this->editOwnersModal = false;
+            return;
+        }
+
+        if ($totalAmountAfter  > $expectedAmount) {
+            $excess = $totalAmountAfter - $expectedAmount;
+            $this->dispatch('show-error', message: "Total allocated share capital cannot exceed {$expectedAmount}. Current total = {$existingAmount}, entered = {$givenAmount} (exceeds by {$excess}).");
+            $this->editOwnersModal = false;
+            return;
+        }
         $response=$apartment->update([
             'building_name'     => $this->building_name,
             'apartment_number'  => $this->apartment_number,
+            'certificate_no' => $this->certificate_no,
+            'no_of_shares' => $this->individual_no_of_share,
+            'share_capital_amount' => $this->share_capital_amount,
             'owner1_name'       => $this->owner1_name,
             'owner1_mobile'     => $this->owner1_mobile,
             'owner1_email'      => $this->owner1_email ?? null,
@@ -285,7 +324,11 @@ class SocietyStepper extends Component
     public function generateCertificate($id)
     {
         $this->detailId = $id;
-        $society = SocietyDetail::find($this->detailId); 
+        $society = SocietyDetail::find($this->detailId);
+        if(!$society->no_of_shares || !$society->share_capital_amount){
+            $this->dispatch('show-error', message: 'Individual no of shares or share amount is empty. Please update to generate certificate!');
+            return;
+        }
         $data = json_decode($society->status, true);
         foreach ($data['tasks'] as &$task) {
             if ($task['name']==$this->timelineValues[2]) {

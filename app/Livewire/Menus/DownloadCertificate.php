@@ -66,13 +66,14 @@ class DownloadCertificate extends Component
 
     public function submitRemarks()
     {
+        $this->certificate_status='changes_required';
         if (empty($this->certificate_remark)) {
             $this->dispatch('show-error', message:  "Please enter remarks before submitting.");
             return;
         }
         $society = SocietyDetail::find($this->detailId);
         if ($this->detailId) {
-            $updated = SocietyDetail::where('id', $this->detailId)->update(['certificate_remark' => $this->certificate_remark]);
+            $updated = SocietyDetail::where('id', $this->detailId)->update(['certificate_status' => $this->certificate_status,'certificate_remark' => $this->certificate_remark]);
 
             $this->showRemarkBox = false;
             $this->certificate_remark = '';

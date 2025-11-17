@@ -3,6 +3,7 @@
 namespace App\Livewire\Menus;
 
 use Livewire\Component;
+use App\Models\Society; 
 use App\Models\SocietyDetail; 
 use App\Models\State;
 use App\Models\City;
@@ -15,7 +16,7 @@ class UpdateSocietyStatus extends Component
     public $apartment,$state,$city;
     public $states, $cities=[];
     public $currentStep = 1;
-    public $society_id,$society_name, $total_flats, $address_1, $address_2, $pincode, $city_id, $state_id,$apartment_id,$building_name, $apartment_number, $owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
+    public $society_id,$society_name, $total_flats, $address_1, $address_2, $pincode, $city_id, $state_id,$registration_no,$no_of_shares,$share_value,$apartment_id,$building_name, $apartment_number,$certificate_no,$individual_no_of_share, $share_capital_amount,$owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
     public $agreementCopy,$memberShipForm,$allotmentLetter,$possessionLetter;
     public $newAgreementCopy, $newMemberShipForm, $newAllotmentLetter, $newPossessionLetter;
     protected $userService;
@@ -63,10 +64,16 @@ class UpdateSocietyStatus extends Component
                 $this->city_id = $apartment->society->city_id;
                 $this->state = $apartment->society->state->name;
                 $this->city = $apartment->society->city->name;
+                $this->registration_no = $apartment->society->registration_no;
+                $this->no_of_shares = $apartment->society->no_of_shares;
+                $this->share_value = $apartment->society->share_value;
             }
             $this->apartment_id = $apartment->id;
             $this->building_name = $apartment->building_name;
             $this->apartment_number = $apartment->apartment_number;
+            $this->certificate_no = $apartment->certificate_no;
+            $this->individual_no_of_share = $apartment->no_of_shares;
+            $this->share_capital_amount = $apartment->share_capital_amount;
             $this->owner1_name = $apartment->owner1_name;
             $this->owner1_mobile = $apartment->owner1_mobile;
             $this->owner1_email = $apartment->owner1_email;
@@ -112,7 +119,13 @@ class UpdateSocietyStatus extends Component
     public function nextStep()
     {
         if ($this->currentStep == 1) {
-            $this->updateSocietyDetails(); 
+            $society = Society::find($this->society_id);
+            if (empty($society->no_of_shares) || empty($society->share_value)) {
+                $this->dispatch('show-error', message: "No of shares or share amount is not set. Unable to verify society details");
+                return;
+            }else{
+                $this->updateSocietyDetails(); 
+            }
         }
 
         if ($this->currentStep === 3) {
@@ -158,8 +171,14 @@ class UpdateSocietyStatus extends Component
                 'pincode' => $this->pincode,
                 'state_id' => $this->state_id,
                 'city_id' => $this->city_id,
+                'registration_no' => $this->registration_no,
+                'no_of_shares' => $this->no_of_shares,
+                'share_value' => $this->share_value,
                 'building_name' => $this->building_name,
                 'apartment_number' => $this->apartment_number,
+                'certificate_no' => $this->certificate_no,
+                'individual_no_of_share' => $this->individual_no_of_share,
+                'share_capital_amount' => $this->share_capital_amount,
                 'owner1_name' => $this->owner1_name,
                 'owner1_email' => $this->owner1_email,
                 'owner1_mobile' => $this->owner1_mobile,

@@ -34,8 +34,8 @@
                         </flux:select>
                         <flux:input type="text" :label="__('Pincode')" wire:model="pincode" />
                         <flux:input type="text"  :label="__('Registration No :')" wire:model="registration_no" />
-                        <flux:input type="text"  :label="__('No of Shares :')" wire:model="no_of_shares" />
-                        <flux:input type="text"  :label="__('Share Value :')" wire:model="share_value" />
+                        <flux:input type="number"  :label="__('Total No of Shares :')" wire:model="no_of_shares" />
+                        <flux:input type="number"  :label="__('Each Share Value :')" wire:model="share_value" />
                     </div>
                     <div class="flex justify-end mt-4">
                         <flux:button variant="primary" type="submit">{{ __('Save') }}</flux:button>

@@ -15,7 +15,7 @@
             </div>
         </div>
         <flux:separator variant="subtle" />
-        <div class="mb-2">
+        <div class="my-2">
             <livewire:menus.alerts />
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2 min-h-screen">
@@ -53,15 +53,15 @@
                 <!-- Filters -->
                 <div class="flex items-center gap-4 mb-4">
                     @php $startKey=0; @endphp
-                    <button class="border items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium cursor-pointer" wire:click="setFilter('{{ $selectedSocietyId }}',{{ $startKey }})">
+                    <button class="border items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium cursor-pointer" wire:click="setFilter({{ $selectedSocietyId }},{{ $startKey }})">
                         All
                     </button>
                     @foreach($timelines as $label)
-                    {{-- @foreach(['all' => 'All','Application' => 'Application Pending','Verification' => 'Verification Pending','Certificate Generated' => 'Certificate Generated','Certificate Delivered' => 'Certificate Delivered'] as $key => $label) --}}
-                        <button class="border items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium cursor-pointer" wire:click="setFilter('{{ $selectedSocietyId }}',{{ $label->id }})">
+                        <button class="border items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium cursor-pointer" wire:click="setFilter({{ $selectedSocietyId }},{{ $label->id }})">
                             Pending {{ $label->name }}
                         </button>
                     @endforeach
+                    <button type="button" class="border items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium cursor-pointer" wire:click="assignShareToApartment({{ $selectedSocietyId }})">Assign Shares</button>
                 </div>
                 <!-- Loader -->
                 <div wire:loading.flex wire:target="setFilter" class="justify-center items-center py-4">
@@ -76,4 +76,103 @@
             </main>
         </div>
     </div>
-</div>
+    
+    <flux:modal  wire:model="showAssignModal" class="!max-w-3xl w-full">
+        <div class="space-y-6">
+            <div class="text-lg font-bold">
+                <flux:heading size="lg">Assign Shares</flux:heading>
+            </div>
+            @if ($step === 1)
+                <!-- STEP 1: Basic Share Details Form -->
+                <div>
+                    <div class="mb-3">
+                        <flux:input type="number" :label="__('Total No of Shares :')" wire:model="no_of_shares" />
+                    </div>
+
+                    <div class="mb-3">
+                        <flux:input type="number" :label="__('Each Share Value :')" wire:model="share_value" />
+                    </div>
+
+                    <div class="flex justify-end mt-4">
+                        <flux:button variant="primary" wire:click="saveShares">Save & Next</flux:button>
+                    </div>
+                </div>
+            @endif
+
+            @if ($step === 2)
+                <!-- STEP 2: Apartment-level Share Form -->
+                <div>
+                    <h3 class="text-base font-semibold mb-3">Choose Share Assignment Type</h3>
+                    <div class="space-y-2 mb-4">
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" wire:model.live="assignType" value="equal" />
+                            <span class="text-sm">Assign equal number of shares to all apartments</span>
+                        </label>
+
+                        <label class="flex items-center space-x-2">
+                            <input type="radio" wire:model.live="assignType" value="individual" />
+                            <span class="text-sm">Assign individual number of shares to each apartment</span>
+                        </label>
+                    </div>
+
+                    <div wire:loading.flex wire:target="assignType" class="justify-center items-center py-4 px-4">
+                        <div class="animate-spin rounded-full h-6 w-6 border-2 border-t-transparent border-green-500"></div>
+                        <span class="ml-2 text-sm text-gray-600">Loading...</span>
+                    </div>
+                    <div wire:loading.remove wire:target="assignType">
+                        <!-- Equal shares -->
+                        @if ($assignType === 'equal')
+                            <div class="border rounded-md p-3 bg-gray-50">
+                                <div class="mb-3">
+                                    <flux:input type="number"  :label="__('No. of Shares (Each) :')" wire:model="individual_no_of_share" />
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <flux:input type="number"  :label="__('Share Capital Amount (Each) :')" wire:model="share_capital_amount" />
+                                </div>
+
+                                <div class="flex justify-end">
+                                    <flux:button variant="primary" type="button" wire:click="saveEqualShares">Save</flux:button>
+                                </div>
+                            </div>
+                        @endif
+
+                        <!-- Individual shares -->
+                        @if ($assignType === 'individual')
+                            <div class="max-h-64 overflow-y-auto border rounded-md p-3 bg-gray-50">
+                                @foreach ($apartments as $index => $apt)
+                                    <div class="grid grid-cols-3 gap-2 mb-2 items-center">
+                                        <div>
+                                        <span class="text-sm font-medium">{{ $apt['name'] }}</span>
+                                        </div>
+                                        <div>
+                                        <flux:input type="number" wire:model="apartments.{{ $index }}.individual_no_of_share" placeholder="No of shares" />
+                                        @error('apartments.' . $index . '.individual_no_of_share')
+                                            <span class="text-xs text-red-500">{{ $message }}</span>
+                                        @enderror
+                                        </div>
+                                        <div>
+                                        <flux:input type="number" wire:model="apartments.{{ $index }}.share_capital_amount" placeholder="Amount" />
+                                        @error('apartments.' . $index . '.share_capital_amount')
+                                            <span class="text-xs text-red-500">{{ $message }}</span>
+                                        @enderror
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div class="flex justify-end mt-4">
+                                <flux:button variant="primary" type="button"  wire:click="saveIndividualShares"
+                                    >Save All</flux:button>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
+
+            <div class="flex justify-end mt-4">
+                <button wire:click="closeModal" class="px-3 py-1 border rounded-md text-sm">Close</button>
+            </div>
+        </div>
+    </flux:modal>
+    </div>

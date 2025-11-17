@@ -4,10 +4,10 @@
         <h1 class="text-xl font-bold text-center text-gray-800 mb-4"><u>Certificate Preview</u></h1>
         <h2 class="font-bold">Certificate Status: {{ ucwords($details->certificate_status) }}</h2>
         @if($details->certificate_remark)
-        <span class="font-bold">Certificate Remark: </span><span class="text-red-500"><i>"{{ $details->certificate_remark }}"</i></span>
+        <p><span class="font-bold">Certificate Remark: </span><span class="text-red-500"><i>"{{ $details->certificate_remark }}"</i></span></p>
         @endif
-        @if(auth()->user()->role->role_id === 3)
-        <span class="text-lg">Disclaimer:</span><span> This document is a provisional copy and holds no legal validity. The original certificate will be digitally issued upon approval.</span>
+        @if(auth()->user()->role->id === 3)
+        <span class="text-lg font-bold">Disclaimer:</span><span> This document is a provisional copy and holds no legal validity. The original certificate will be digitally issued upon approval.</span>
         @endif
         {{-- PDF Preview --}}
         @if($pdfUrl)
@@ -16,21 +16,21 @@
         @else
             <p class="text-center text-gray-500">Generating certificate preview...</p>
         @endif
-        @if(auth()->user()->role->role_id === 3)
+        @if(auth()->user()->role->id === 3)
         {{-- Action Buttons --}}
         @if($details->certificate_status !== 'approved')
         <div class="mt-6 flex justify-center space-x-4">
             {{-- Approve Button --}}
             <button 
                 wire:click="approveCertificate"
-                class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-md shadow">
+                class="bg-green-500 text-white font-semibold px-6 py-2 rounded-md shadow">
                 Everything is OK
             </button>
 
             {{-- Needs Changes Button --}}
             <button
                 wire:click="showRemarksBox"
-                class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-6 py-2 rounded-md shadow">
+                class="bg-yellow-500 text-white font-semibold ml-2 px-6 py-2 rounded-md shadow">
                 Need Changes
             </button>
         </div>

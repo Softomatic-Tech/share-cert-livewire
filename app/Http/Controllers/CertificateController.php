@@ -60,6 +60,7 @@ class CertificateController extends Controller
 
     public function submitRemarks(Request $request)
     {
+        $certificate_status='changes_required';
         $certificate_remark=$request->certificate_remark;
         if (empty($certificate_remark)) {
             return response()->json([
@@ -69,7 +70,7 @@ class CertificateController extends Controller
         }
         $society = SocietyDetail::find($request->id);
         if ($society){
-            $updated = SocietyDetail::where('id', $request->id)->update(['certificate_remark' => $certificate_remark]);
+            $updated = SocietyDetail::where('id', $request->id)->update(['certificate_status' => $certificate_status,'certificate_remark' => $certificate_remark]);
             return response()->json([
                 'success' => true,
                 'message' => 'Remark saved and certificate marked for changes.'

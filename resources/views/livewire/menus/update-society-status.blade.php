@@ -32,8 +32,8 @@
                         <div class="card-body">
                             <form wire:submit.prevent="nextStep">
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-2">
-                                    <flux:input type="text" :label="__('Society Name :')" wire:model="society_name" />
-                                    <flux:input type="text" :label="__('Total Flats :')" wire:model="total_flats" />
+                                    <flux:input type="text" :label="__('Society Name :')" wire:model="society_name" readonly />
+                                    <flux:input type="text" :label="__('Total Flats :')" wire:model="total_flats" readonly />
                                     <flux:input type="text"  :label="__('Address Line 1 :')" wire:model="address_1" />
                                     <flux:input type="text"  :label="__('Address Line 2 :')" wire:model="address_2" />
                                     <flux:select wire:model.live="state_id" placeholder="Choose State..." :label="__('State')">
@@ -49,8 +49,14 @@
                                         @endforeach
                                     </flux:select>
                                     <flux:input type="text" :label="__('Pincode')" wire:model="pincode" />
+                                    <flux:input type="text"  :label="__('Registration No :')" wire:model="registration_no" readonly />
+                                    <flux:input type="number"  :label="__('No of Shares :')" wire:model="no_of_shares" readonly />
+                                    <flux:input type="number"  :label="__('Share Value :')" wire:model="share_value" readonly />
                                     <flux:input type="text" :label="__('Building Name :')" wire:model="building_name" />
                                     <flux:input type="text" :label="__('Apartment Number :')" wire:model="apartment_number" />
+                                    <flux:input type="text"  :label="__('Certificate No :')" wire:model="certificate_no" />
+                                    <flux:input type="number"  :label="__('No of Each Share :')" wire:model="individual_no_of_share" />
+                                    <flux:input type="number"  :label="__('Each Share Amount :')" wire:model="share_capital_amount" />
                                     <flux:input type="text" :label="__('Owner 1 Name :')" wire:model="owner1_name" />
                                     <flux:input type="text" :label="__('Owner 1 Email :')" wire:model="owner1_email" />
                                     <flux:input type="text" :label="__('Owner 1 Mobile :')" wire:model="owner1_mobile" />
@@ -201,6 +207,9 @@
                             <h2 class="text-lg font-semibold">Society Details:</h2>
                             <p><strong>Society Name:</strong> {{ $society_name }}</p>
                             <p><strong>Total Flats:</strong> {{ $total_flats }}</p>
+                            <p><strong>Registration No:</strong> {{ $registration_no }}</p>
+                            <p><strong>No of Shares:</strong> {{ $no_of_shares }}</p>
+                            <p><strong>Share Value:</strong> {{ $share_value }}</p>
                             <p><strong>Address:</strong> 
                                 @if($address_1){{ $address_1 }},@endif
                                 @if($address_2){{ $address_2 }},@endif
