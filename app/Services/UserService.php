@@ -63,7 +63,7 @@ class UserService
             'owner3_email' => 'nullable|string|email|max:255',
             'owner3_mobile' => 'nullable|digits:10',
             'certificate_no' => 'nullable|numeric',
-            'no_of_each_share' => 'nullable|numeric',
+            'individual_no_of_share' => 'nullable|numeric',
                 
         ]);
 
@@ -109,7 +109,8 @@ class UserService
             'building_name'     => $validated['building_name'],
             'apartment_number'  => $validated['apartment_number'],
             'certificate_no'    => $validated['certificate_no'],
-            'no_of_shares'      => $validated['no_of_each_share'],
+            'no_of_shares'      => $validated['individual_no_of_share'],
+            'share_capital_amount' => $validated['share_capital_amount'],
             'owner1_name'       => $validated['owner1_name'],
             'owner1_mobile'     => $validated['owner1_mobile'],
             'owner1_email'      => $validated['owner1_email'] ?? null,

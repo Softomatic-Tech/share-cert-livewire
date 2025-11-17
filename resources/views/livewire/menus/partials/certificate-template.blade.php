@@ -11,13 +11,12 @@
   Authorised Share Capital of Rs.
   @php 
     $count=0;
-    $details->authorised_capital=$details->society->no_of_shares*$details->society->share_value;
     $details->divided_into=$details->share_to=$details->society->total_flats;
   @endphp
-  <span class="underline">{{ $details->authorised_capital ?? '0' }}</span>
+  <span class="underline">{{ $details->share_capital_amount ?? '0' }}</span>
   Divided into
   <span class="underline">{{ $details->divided_into ?? '0' }}</span>
-  shares of Rs. 50/- each
+  shares of Rs. {{ $details->society->share_value ?? '0' }}/- each
 </div>
 
 <div class="society-name">{{ $details->society->society_name }}</div>

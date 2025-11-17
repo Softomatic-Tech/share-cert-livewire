@@ -51,8 +51,8 @@
                                 </flux:select>
                                 <flux:input type="text" :label="__('Pincode :')" wire:model="formData.pincode" />
                                 <flux:input type="text"  :label="__('Registration No :')" wire:model="formData.registration_no" />
-                                <flux:input type="text"  :label="__('No of Shares :')" wire:model="formData.no_of_shares" />
-                                <flux:input type="text"  :label="__('Share Value :')" wire:model="formData.share_value" />
+                                <flux:input type="number"  :label="__('Total No of Shares :')" wire:model="formData.no_of_shares" />
+                                <flux:input type="number"  :label="__('Each Share Value :')" wire:model="formData.share_value" />
                             </div>
                             <div class="flex justify-end mt-4">
                                 <flux:button variant="primary" type="button" wire:click="nextStep">{{ __('Next') }}</flux:button>
@@ -115,7 +115,22 @@
                     <div class="card-header">Step 3: Verification</div>
                     <div class="card-body">
                         <div class="m-4">
-                            <h4>Society: <strong>{{ $this->societyName }}</strong></h4>
+                            @if ($this->societyDetails)
+                            <h4><strong>{{ $this->societyDetails->society_name}}</strong></h4>
+                            <p><strong>Total Flats:</strong> {{ $this->societyDetails->total_flats}}</p>
+                            <p><strong>Registration No:</strong> {{ $this->societyDetails->registration_no }}</p>
+                            <p><strong>Total No of Shares:</strong> {{ $this->societyDetails->no_of_shares }}</p>
+                            <p><strong>Each Share Value:</strong> {{ $this->societyDetails->share_value }}</p>
+                            <p><strong>Address:</strong> 
+                                @if($this->societyDetails->address_1){{ $this->societyDetails->address_1 }},@endif
+                                @if($this->societyDetails->address_2){{ $this->societyDetails->address_2 }},@endif
+                                @if($this->societyDetails->city->name){{ $this->societyDetails->city->name }},@endif
+                                @if($this->societyDetails->state->name){{ $this->societyDetails->state->name }}@endif
+                                @if($this->societyDetails->pincode) - {{ $this->societyDetails->pincode }}@endif
+                            </p>
+                            @else
+                                <p>No society selected.</p>
+                            @endif
                         </div>
                     
                         <div class="overflow-x-auto w-full">
@@ -125,18 +140,33 @@
                                     $society = \App\Models\Society::find($this->societyId);
                                     $expectedShares = (float) ($society->no_of_shares ?? 0);
                                     $uploadedShares = (float) $this->uploadedDetails->sum('no_of_shares');
-                                    $diff = $uploadedShares - $expectedShares;
+                                    $diffShares = (float)$uploadedShares - (float)$expectedShares;
+                                    $expectedAmount = (float) ($society->no_of_shares * $society->share_value ?? 0);
+                                    $uploadedAmount = (float) $this->uploadedDetails->sum('share_capital_amount');
+                                    $diffAmount = (float)$uploadedAmount - (float)$expectedAmount;
                                 @endphp
-                                @if ($diff !== 0)
-                                    <div class="bg-red-100 text-red-800 p-2 mb-3 rounded">
-                                        Total shares mismatch! Expected {{ $expectedShares }}, but found {{ $uploadedShares }}
-                                        ({{ $diff > 0 ? 'more' : 'less' }} by {{ abs($diff) }}).
+                                @if ($diffShares != 0)
+                                    @if($diffAmount != 0)
+                                        <div class="bg-red-100 text-red-800 p-2 mb-3 rounded">
+                                            Total shares and amount mismatch! Expected {{ $expectedShares }}, but found {{ $uploadedShares }} ({{ $diffShares > 0 ? 'more' : 'less' }} by {{ abs($diffShares) }}) and Expected {{ $expectedAmount }}, but found {{ $uploadedAmount }} ({{ $diffAmount > 0 ? 'more' : 'less' }} by {{ abs($diffAmount) }}).
+                                        </div>
+                                    @else
+                                        <div class="bg-red-100 text-red-800 p-2 mb-3 rounded">
+                                        Total shares mismatch! Expected {{ $expectedShares }}, but found {{ $uploadedShares }} ({{ $diffShares > 0 ? 'more' : 'less' }} by {{ abs($diffShares) }}).
                                     </div>
+                                    @endif
                                 @else
+                                    @if($diffAmount != 0)
+                                        <div class="bg-red-100 text-red-800 p-2 mb-3 rounded">
+                                            Total shares amount mismatch! Expected {{ $expectedAmount }}, but found {{ $uploadedAmount }} ({{ $diffAmount > 0 ? 'more' : 'less' }} by {{ abs($diffAmount) }}).
+                                        </div>
+                                    @else
                                     <div class="bg-green-100 text-green-800 p-2 mb-3 rounded">
-                                        Total shares perfectly match ({{ $expectedShares }}).
+                                        Total shares ({{ $expectedShares }}) and amount ({{ $expectedAmount }}) perfectly match.
                                     </div>
+                                    @endif
                                 @endif
+
                                 <table class="min-w-full text-start text-sm font-light text-surface dark:text-white">
                                     <thead class="border-b border-neutral-200 font-medium dark:border-white/10">
                                         <tr>
@@ -144,7 +174,7 @@
                                             <th scope="col" class="px-6 py-4">Building Name</th>
                                             <th scope="col" class="px-6 py-4">Apartment Number</th>
                                             <th scope="col" class="px-6 py-4">Certificate No</th>
-                                            <th scope="col" class="px-6 py-4">No of Shares</th>
+                                            <th scope="col" class="px-6 py-4">No of Shares/Each Share Amount</th>
                                             <th scope="col" class="px-6 py-4">Owner 1 Details</th>
                                             <th scope="col" class="px-6 py-4">Owner 2 Details</th>
                                             <th scope="col" class="px-6 py-4">Owner 3 Details</th>
@@ -157,7 +187,7 @@
                                             <td class="whitespace-nowrap px-6 py-4">{{ $detail->building_name }}</td>
                                             <td class="whitespace-nowrap px-6 py-4">{{ $detail->apartment_number }}</td>
                                             <td class="whitespace-nowrap px-6 py-4">{{ $detail->certificate_no }}</td>
-                                            <td class="whitespace-nowrap px-6 py-4">{{ $detail->no_of_shares }}</td>
+                                            <td class="whitespace-nowrap px-6 py-4">{{ $detail->no_of_shares }}/{{ $detail->share_capital_amount }}</td>
                                             <td class="whitespace-nowrap px-6 py-4">
                                                 {{ $detail->owner1_name }} 
                                                 <br />@if($detail->owner1_mobile)<i class="fa-solid fa-phone"></i> {{ $detail->owner1_mobile }} @endif

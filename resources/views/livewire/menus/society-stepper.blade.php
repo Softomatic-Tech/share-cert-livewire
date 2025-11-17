@@ -22,14 +22,16 @@
         <div class="grid grid-cols-1 md:grid-cols-2 border-b relative">
             <div class="p-4">
                 <p class="text-lg font-bold text-gray-900 dark:text-white">{{ $details->building_name }} - {{ $details->apartment_number }}</p>
-                @if($details->owner1_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner1 Phone: {{ $details->owner1_mobile }}</p>@endif
-                @if($details->owner1_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner1_email }}</p>@endif
-                <p class="mb-1"></p>
-                @if($details->owner2_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner2 Phone: {{ $details->owner2_mobile }}</p>@endif
-                @if($details->owner2_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner2_email }}</p>@endif
-                <p class="mb-1"></p>
-                @if($details->owner3_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner3 Phone: {{ $details->owner3_mobile }}</p>@endif
-                @if($details->owner3_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner3_email }}</p>@endif
+                @if($details->no_of_shares)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Individual No of Shares: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->no_of_shares }}</span></p>@endif
+                @if($details->share_capital_amount)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Share Capital Amount: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->share_capital_amount }}</span></p>@endif
+                @if($details->owner1_mobile)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Owner1 Phone: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->owner1_mobile }}</span></p>@endif
+                @if($details->owner1_email)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Email: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->owner1_email }}</span></p>@endif
+                <p class="mb-1"></span></p>
+                @if($details->owner2_mobile)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Owner2 Phone: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->owner2_mobile }}</span></p>@endif
+                @if($details->owner2_email)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Email: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->owner2_email }}</span></p>@endif
+                <p class="mb-1"></span></p>
+                @if($details->owner3_mobile)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Owner3 Phone: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->owner3_mobile }}</span></p>@endif
+                @if($details->owner3_email)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Email: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->owner3_email }}</span></p>@endif
             </div>
             <div class="p-4">
                 @php
@@ -318,6 +320,9 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
                 <flux:input type="text" :label="__('Building Name :')" wire:model="building_name" />
                 <flux:input type="text" :label="__('Apartment Number :')" wire:model="apartment_number" />
+                <flux:input type="text"  :label="__('Certificate No :')" wire:model="certificate_no" />
+                <flux:input type="number"  :label="__('No of Each Share :')" wire:model="individual_no_of_share" />
+                <flux:input type="number"  :label="__('Each Share Amount :')" wire:model="share_capital_amount" />
                 <flux:input type="text" :label="__('Owner 1 Name :')" wire:model="owner1_name" />
                 <flux:input type="text" :label="__('Owner 1 Email :')" wire:model="owner1_email" />
                 <flux:input type="text" :label="__('Owner 1 Mobile :')" wire:model="owner1_mobile" />

@@ -4,13 +4,13 @@
         message = $event.detail.message;
         type = 'error';
         visible = true;
-        setTimeout(() => visible = false, 3000);
+        setTimeout(() => visible = false, 5000);
     "
     x-on:show-success.window="
         message = $event.detail.message;
         type = 'success';
         visible = true;
-        setTimeout(() => visible = false, 3000);
+        setTimeout(() => visible = false, 5000);
     "
 >
     <!-- Error Callout -->
