@@ -22,16 +22,16 @@
         <div class="grid grid-cols-1 md:grid-cols-2 border-b relative">
             <div class="p-4">
                 <p class="text-lg font-bold text-gray-900 dark:text-white">{{ $details->building_name }} - {{ $details->apartment_number }}</p>
-                @if($details->no_of_shares)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Individual No of Shares: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->no_of_shares }}</span></p>@endif
-                @if($details->share_capital_amount)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Share Capital Amount: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->share_capital_amount }}</span></p>@endif
-                @if($details->owner1_mobile)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Owner1 Phone: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->owner1_mobile }}</span></p>@endif
-                @if($details->owner1_email)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Email: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->owner1_email }}</span></p>@endif
+                @if($details->no_of_shares)<p><span class="text-sm font-bold dark:text-white">Individual No of Shares :  </span><span class="text-sm dark:text-white">{{ $details->no_of_shares }}</span></p>@endif
+                @if($details->share_capital_amount)<p><span class="text-sm font-bold dark:text-white">Share Capital Amount :  </span><span class="text-sm dark:text-white">{{ $details->share_capital_amount }}</span></p>@endif
+                @if($details->owner1_mobile)<p><span class="text-sm font-bold dark:text-white">Owner1 Phone :  </span><span class="text-sm dark:text-white">{{ $details->owner1_mobile }}</span></p>@endif
+                @if($details->owner1_email)<p><span class="text-sm font-bold dark:text-white">Email :  </span><span class="text-sm dark:text-white">{{ $details->owner1_email }}</span></p>@endif
                 <p class="mb-1"></span></p>
-                @if($details->owner2_mobile)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Owner2 Phone: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->owner2_mobile }}</span></p>@endif
-                @if($details->owner2_email)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Email: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->owner2_email }}</span></p>@endif
+                @if($details->owner2_mobile)<p><span class="text-sm font-bold dark:text-white">Owner2 Phone :  </span><span class="text-sm dark:text-white">{{ $details->owner2_mobile }}</span></p>@endif
+                @if($details->owner2_email)<p><span class="text-sm font-bold dark:text-white">Email :  </span><span class="text-sm dark:text-white">{{ $details->owner2_email }}</span></p>@endif
                 <p class="mb-1"></span></p>
-                @if($details->owner3_mobile)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Owner3 Phone: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->owner3_mobile }}</span></p>@endif
-                @if($details->owner3_email)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Email: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->owner3_email }}</span></p>@endif
+                @if($details->owner3_mobile)<p><span class="text-sm font-bold dark:text-white">Owner3 Phone :  </span><span class="text-sm dark:text-white">{{ $details->owner3_mobile }}</span></p>@endif
+                @if($details->owner3_email)<p><span class="text-sm font-bold dark:text-white">Email :  </span><span class="text-sm dark:text-white">{{ $details->owner3_email }}</span></p>@endif
             </div>
             <div class="p-4">
                 @php

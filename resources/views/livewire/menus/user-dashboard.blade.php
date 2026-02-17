@@ -13,9 +13,9 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-2 min-h-screen">
         <!-- Sidebar -->
-        <aside class="border-r flex flex-col md:flex-row p-2 space-y-4">
+        <aside class="border-r flex flex-col md:flex-row p-2">
             <h2 class="text-xl font-bold text-gray-800 dark:text-white">APARTMENTS</h2>
-            <div class="space-y-4">
+            <div class="space-y-4 overflow-y-auto max-h-[600px]">
                 @foreach($apartmentList as $index => $apartment)
                     <div wire:click="selectApartment({{ $apartment->id }})"
                         class="p-4 rounded-lg border hover:shadow-md transition-shadow cursor-pointer">
@@ -59,14 +59,14 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 border-b border-gray-300 relative">
                                     <div class="p-4">
                                         <p class="text-lg font-bold text-gray-900 dark:text-white">{{ $details->building_name }} - {{ $details->apartment_number }}</p>
-                                        @if($details->owner1_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner1 Phone: {{ $details->owner1_mobile }}</p>@endif
-                                        @if($details->owner1_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner1_email }}</p>@endif
+                                        @if($details->owner1_mobile)<p><span class="text-sm font-bold dark:text-white">Owner1 Phone :  </span><span class="text-sm dark:text-white">{{ $details->owner1_mobile }}</span></p>@endif
+                                        @if($details->owner1_email)<p><span class="text-sm font-bold dark:text-white">Email :  </span><span class="text-sm dark:text-white">{{ $details->owner1_email }}</span></p>@endif
                                         <p class="mb-1"></p>
-                                        @if($details->owner2_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner2 Phone: {{ $details->owner2_mobile }}</p>@endif
-                                        @if($details->owner2_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner2_email }}</p>@endif
+                                        @if($details->owner2_mobile)<p><span class="text-sm font-bold dark:text-white">Owner2 Phone :  </span><span class="text-sm dark:text-white">{{ $details->owner2_mobile }}</span></p>@endif
+                                        @if($details->owner2_email)<p><span class="text-sm font-bold dark:text-white">Email :  </span><span class="text-sm dark:text-white">{{ $details->owner2_email }}</span></p>@endif
                                         <p class="mb-1"></p>
-                                        @if($details->owner3_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner3 Phone: {{ $details->owner3_mobile }}</p>@endif
-                                        @if($details->owner3_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner3_email }}</p>@endif
+                                        @if($details->owner3_mobile)<p><span class="text-sm font-bold dark:text-white">Owner3 Phone :  </span><span class="text-sm dark:text-white">{{ $details->owner3_mobile }}</span></p>@endif
+                                        @if($details->owner3_email)<p><span class="text-sm font-bold dark:text-white">Email :  </span><span class="text-sm dark:text-white">{{ $details->owner3_email }}</span></p>@endif
                                     </div>
                                     <div class="p-4">
                                         @php

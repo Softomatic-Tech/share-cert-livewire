@@ -28,13 +28,16 @@ class UserDashboard extends Component
 
     public function mount()
     {
-        $this->apartmentList=$this->userService->getSocietyDetail();
+        $search ='';
+        $userMobile = Auth::user()->phone;
+        $this->apartmentList=$this->userService->getSocietyDetail($search,$userMobile);
     }
 
     public function selectApartment($id)
     {
         $this->selectedApartmentId = $id;
-        $this->societyDetail=$this->userService->getSocietyDetail($this->selectedApartmentId);
+        $userMobile = Auth::user()->phone;
+        $this->societyDetail=$this->userService->getSocietyDetail($this->selectedApartmentId,$userMobile);
     }
 
     public function verifyDetails($apartmentId)

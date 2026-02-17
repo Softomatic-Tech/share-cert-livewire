@@ -21,9 +21,9 @@ class Profile extends Component
     /**
      * Mount the component.
      */
-    public function mount(UserService $userService)
+    public function mount()
     {
-        $this->user = $userService->getAuthenticatedUser();
+        $this->user = Auth::user();
         $this->name = $this->user->name;
         $this->email = $this->user->email;
         $this->phone = $this->user->phone;

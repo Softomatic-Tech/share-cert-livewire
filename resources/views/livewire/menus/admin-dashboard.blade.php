@@ -18,11 +18,11 @@
         <div class="my-2">
             <livewire:menus.alerts />
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 min-h-screen">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
             <!-- Sidebar -->
-            <aside class="border-r flex flex-col md:flex-row p-2 space-y-4">
+            <aside class="border-r flex flex-col md:flex-row px-2 space-y-4">
                 <h2 class="text-xl font-bold text-gray-800 dark:text-white">SOCIETIES</h2>
-                <div class="space-y-4">
+                <div class="space-y-4 overflow-y-auto max-h-[600px]">
                     @foreach($societies as $index => $society)
                         <div wire:click="selectSociety({{ $society->id }})"
                             class="p-4 rounded-lg border hover:shadow-md transition-shadow cursor-pointer">

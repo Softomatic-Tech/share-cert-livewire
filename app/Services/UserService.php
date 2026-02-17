@@ -4,21 +4,18 @@ namespace App\Services;
 use App\Models\Society;
 use App\Models\SocietyDetail;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
+
 class UserService
 {
     protected $societyDetail = [];
-    protected $search;   
-    public function getAuthenticatedUser()
-    {
-        return Auth::user();
-    }
+    protected $search;  
+    protected $userMobile; 
 
-    public function getSocietyDetail($search=null){
-        $query = SocietyDetail::with('society')
-            ->where(function ($query) {
-                $userMobile = Auth::user()->phone;
+    public function getSocietyDetail($search=null,$userMobile){
+        $query = SocietyDetail::with(['society.state', 'society.city'])
+            ->where(function ($query) use ($userMobile) {
                 $query->where('owner1_mobile', $userMobile)
                     ->orWhere('owner2_mobile', $userMobile)
                     ->orWhere('owner3_mobile', $userMobile);
@@ -64,10 +61,11 @@ class UserService
             'owner3_mobile' => 'nullable|digits:10',
             'certificate_no' => 'nullable|numeric',
             'individual_no_of_share' => 'nullable|numeric',
-                
+            'share_capital_amount' => 'nullable|numeric'   
         ]);
 
         if ($validator->fails()) {
+            Log::info('VALIDATION ERRORS', $validator->errors()->toArray());
             return [
                 'status'  => false,
                 'message' => 'Validation failed',
@@ -178,13 +176,13 @@ class UserService
         return [
             'status'  => true,
             'message' => ucfirst(str_replace('_', ' ', $columnName)) . ' uploaded successfully!',
-            'file'    => $fileName,
+            'type'=> $columnName, 
+            'file' => $fileName,
         ];
     }
 
-    public function updateStatus($apartmentId)
+    public function updateStatus($apartmentId,$user_id)
     {
-        $user=Auth::user();
         $society = SocietyDetail::findOrFail($apartmentId);
         if (!$society) {
             return [
@@ -201,14 +199,14 @@ class UserService
         foreach ($status['tasks'] as &$task) {
             if ($task['name'] ==='Verify Details') {
                 $task['Status'] = 'Approved';
-                $task['updatedBy'] = $user->id ?? 'System';
+                $task['updatedBy'] = $user_id ?? 'System';
                 $task['updateDateTime'] = now();
             }
 
             if ($task['name'] === 'Application') {
                 if ($allDocumentsUploaded) {
                     $task['Status'] = 'Approved';
-                    $task['updatedBy'] = $user->id ?? 'System';
+                    $task['updatedBy'] = $user_id ?? 'System';
                     $task['updateDateTime'] = now();
                 } else {
                     $task['Status'] = 'Pending';

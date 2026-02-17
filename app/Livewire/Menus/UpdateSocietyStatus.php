@@ -7,6 +7,7 @@ use App\Models\Society;
 use App\Models\SocietyDetail; 
 use App\Models\State;
 use App\Models\City;
+use Illuminate\Support\Facades\Auth;
 use App\Services\UserService;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 
@@ -294,7 +295,8 @@ class UpdateSocietyStatus extends Component
 
     public function done()
     {
-        $response=$this->userService->updateStatus($this->apartment_id); 
+        $user=Auth::user();
+        $response=$this->userService->updateStatus($this->apartment_id,$user->id); 
         $this->currentStep = 1;
         if ($response['status']) {
         // $this->dispatch('show-success', message:  $response['message']);
