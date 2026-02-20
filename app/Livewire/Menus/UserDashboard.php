@@ -12,7 +12,8 @@ class UserDashboard extends Component
     public $societyDetail = [];
     public $apartmentList = [];
     public $search = '';
-    protected $detailId,$userService,$checkApproved,$selectedApartmentId;
+    public $selectedApartmentId;
+    protected $detailId,$userService,$checkApproved;
     public $url=null;
     public $showDocumentModal = false;
 
@@ -23,12 +24,16 @@ class UserDashboard extends Component
 
     public function render()
     {
+        $this->apartmentList = $this->userService->getSocietyDetail($this->search);
         return view('livewire.menus.user-dashboard');
     }
 
     public function mount()
     {
-        $this->apartmentList=$this->userService->getSocietyDetail();
+        $apartments = $this->userService->getSocietyDetail();
+        if ($apartments->isNotEmpty()) {
+            $this->selectApartment($apartments->first()->id);
+        }
     }
 
     public function selectApartment($id)

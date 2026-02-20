@@ -14,93 +14,149 @@ use Illuminate\Support\Facades\Storage;
 class AdminDashboard extends Component
 {
     use WithPagination;
-    public $societies,$societyDetails=[];
-    public $apartments=[];
+    public $societies, $societyDetails = [];
+    public $apartments = [];
     public $userRole;
-    public $pendingApplication,$pendingApplicationCount,$pendingVerification,$pendingVerificationCount,$rejectedVerification,$rejectedVerificationCount;
-    public $pendingVerificationStatus,$approvedVerificationStatus,$rejectedVerificationStatus;
-    public $pendingVerificationStatusCount=0;
-    public $approvedVerificationStatusCount=0;
-    public $rejectedVerificationStatusCount=0;
-    public $issueCertificateCount,$usersCount;
-    public $selectedSocietyId, $societyName,$filterId,$societyById;
-    public $societyId=0;
+    public $pendingApplication, $pendingApplicationCount, $pendingVerification, $pendingVerificationCount, $rejectedVerification, $rejectedVerificationCount;
+    public $pendingVerificationStatus, $approvedVerificationStatus, $rejectedVerificationStatus;
+    public $pendingVerificationStatusCount = 0;
+    public $approvedVerificationStatusCount = 0;
+    public $rejectedVerificationStatusCount = 0;
+    public $issueCertificateCount, $usersCount;
+    public $selectedSocietyId, $societyName, $filterId, $societyById;
+    public $societyId = 0;
     public $filterKey = 0;
+    public $search = '';
     public $timelines;
+    public $societyPendingVerificationCount = 0;
+    public $societyPendingApplicationCount = 0;
+    public $pendingVerificationTimelineId = 0;
     public $showAssignModal = false;
-    public $step = 1; 
-    public $no_of_shares,$share_value,$individual_no_of_share,$share_capital_amount;
+    public $step = 1;
+    public $no_of_shares, $share_value, $individual_no_of_share, $share_capital_amount;
     public $assignType = null;
-    
+
     public function render()
     {
+        $societiesQuery = Society::with(['state', 'city']);
+
+        if ($this->search) {
+            $societiesQuery->where('society_name', 'like', '%' . $this->search . '%');
+        }
+
+        $this->societies = $societiesQuery->get();
+
         return view('livewire.menus.admin-dashboard');
     }
 
-    public function mount(){
-        $this->timelines =Timeline::where('id', '!=', 1)->get();
-        $this->societies =Society::with(['state','city'])->get();
-        $this->usersCount=User::where('role_id','!=',1)->count();
-        $this->userRole=Role::where('role','Society User')->value('id');
+    public function mount()
+    {
+        $this->timelines = Timeline::where('id', '!=', 1)->get();
+        // Store the Pending Verification timeline id for default filter
+        $verificationTimeline = Timeline::where('name', 'like', '%Verification%')->first();
+        $this->pendingVerificationTimelineId = $verificationTimeline ? $verificationTimeline->id : 0;
+        $this->usersCount = User::where('role_id', '!=', 1)->count();
+        $this->userRole = Role::where('role', 'Society User')->value('id');
 
         $this->pendingApplication = SocietyDetail::get()
             ->filter(function ($item) {
-            $json = json_decode($item->status, true);
-            if (!isset($json['tasks'])) return false;
-            $tasks = collect($json['tasks']);
-            $verify = $tasks->firstWhere('name', 'Verify Details');
-            $application = $tasks->firstWhere('name', 'Application');
-            $verification = $tasks->firstWhere('name', 'Verification');
-            return (
-                ($verify && $verify['Status'] === 'Pending') &&
-                ($application && $application['Status'] === 'Pending') &&
-                ($verification && $verification['Status'] === 'Pending')
-            );
-            
-            return false;
-        });
-        $this->pendingApplicationCount=$this->pendingApplication->count();
+                $json = json_decode($item->status, true);
+                if (!isset($json['tasks']))
+                    return false;
+                $tasks = collect($json['tasks']);
+                $verify = $tasks->firstWhere('name', 'Verify Details');
+                $application = $tasks->firstWhere('name', 'Application');
+                $verification = $tasks->firstWhere('name', 'Verification');
+                return (
+                    ($verify && $verify['Status'] === 'Pending') &&
+                    ($application && $application['Status'] === 'Pending') &&
+                    ($verification && $verification['Status'] === 'Pending')
+                );
+
+                return false;
+            });
+        $this->pendingApplicationCount = $this->pendingApplication->count();
 
         $this->pendingVerification = SocietyDetail::get()
             ->filter(function ($item) {
-            $json = json_decode($item->status, true);
-            if (!isset($json['tasks'])) return false;
-            $tasks = collect($json['tasks']);
-            $verify = $tasks->firstWhere('name', 'Verify Details');
-            $application = $tasks->firstWhere('name', 'Application');
-            $verification = $tasks->firstWhere('name', 'Verification');
-            return (
-                $verify && $verify['Status'] === 'Applied' &&
-                $application && $application['Status'] === 'Applied' &&
-                $verification && $verification['Status'] === 'Pending'
-            );
-            
-        });
-        $this->pendingVerificationCount=$this->pendingVerification->count();
+                $json = json_decode($item->status, true);
+                if (!isset($json['tasks']))
+                    return false;
+                $tasks = collect($json['tasks']);
+                $verify = $tasks->firstWhere('name', 'Verify Details');
+                $application = $tasks->firstWhere('name', 'Application');
+                $verification = $tasks->firstWhere('name', 'Verification');
+                return (
+                    $verify && $verify['Status'] === 'Applied' &&
+                    $application && $application['Status'] === 'Applied' &&
+                    $verification && $verification['Status'] === 'Pending'
+                );
+
+            });
+        $this->pendingVerificationCount = $this->pendingVerification->count();
 
         $this->rejectedVerification = SocietyDetail::get()
             ->filter(function ($item) {
-            $json = json_decode($item->status, true);
-            if (!isset($json['tasks'])) return false;
-            $tasks = collect($json['tasks']);
-            $verify = $tasks->firstWhere('name', 'Verify Details');
-            $application = $tasks->firstWhere('name', 'Application');
-            $verification = $tasks->firstWhere('name', 'Verification');
-            return (
-                $verify && $verify['Status'] === 'Pending' &&
-                $application && $application['Status'] === 'Pending' &&
-                $verification && $verification['Status'] === 'Rejected'
-            );
-            
-        });
-        $this->rejectedVerificationCount=$this->rejectedVerification->count();
-        $this->issueCertificateCount=100;
+                $json = json_decode($item->status, true);
+                if (!isset($json['tasks']))
+                    return false;
+                $tasks = collect($json['tasks']);
+                $verify = $tasks->firstWhere('name', 'Verify Details');
+                $application = $tasks->firstWhere('name', 'Application');
+                $verification = $tasks->firstWhere('name', 'Verification');
+                return (
+                    $verify && $verify['Status'] === 'Pending' &&
+                    $application && $application['Status'] === 'Pending' &&
+                    $verification && $verification['Status'] === 'Rejected'
+                );
+
+            });
+        $this->rejectedVerificationCount = $this->rejectedVerification->count();
+        $this->issueCertificateCount = 100;
+
+        // Select first society by default
+        $firstSociety = Society::first();
+        if ($firstSociety) {
+            $this->selectSociety($firstSociety->id);
+        }
     }
 
     public function selectSociety($societyId)
     {
         $this->selectedSocietyId = $societyId;
-        $this->societyName=Society::where('id',$this->selectedSocietyId)->value('society_name');
+        $this->societyById = Society::with(['state', 'city'])->find($societyId);
+        $this->societyName = $this->societyById->society_name;
+
+        // Default to Pending Verification filter
+        $this->filterKey = $this->pendingVerificationTimelineId;
+        $this->filterId = $societyId;
+
+        // Per-society pending counts
+        $details = SocietyDetail::where('society_id', $societyId)->get();
+
+        $this->societyPendingVerificationCount = $details->filter(function ($item) {
+            $json = json_decode($item->status, true);
+            if (!isset($json['tasks']))
+                return false;
+            $tasks = collect($json['tasks']);
+            $application = $tasks->firstWhere('name', 'Application');
+            $verification = $tasks->firstWhere('name', 'Verification');
+            return $application && $application['Status'] === 'Applied'
+                && $verification && $verification['Status'] === 'Pending';
+        })->count();
+
+        $this->societyPendingApplicationCount = $details->filter(function ($item) {
+            $json = json_decode($item->status, true);
+            if (!isset($json['tasks']))
+                return false;
+            $tasks = collect($json['tasks']);
+            $verify = $tasks->firstWhere('name', 'Verify Details');
+            $application = $tasks->firstWhere('name', 'Application');
+            $verification = $tasks->firstWhere('name', 'Verification');
+            return $verify && $verify['Status'] === 'Pending'
+                && $application && $application['Status'] === 'Pending'
+                && $verification && $verification['Status'] === 'Pending';
+        })->count();
     }
 
     public function redirectToCreateSociety()
@@ -118,16 +174,16 @@ class AdminDashboard extends Component
         return redirect()->route('menus.mark_role');
     }
 
-    public function setFilter($societyId,$key)
+    public function setFilter($societyId, $key)
     {
-        $this->filterId=$societyId;
+        $this->filterId = $societyId;
         $this->filterKey = $key;
     }
 
     public function assignShareToApartment($societyId)
     {
         $this->selectedSocietyId = $societyId;
-        $this->societyById =Society::find($societyId);
+        $this->societyById = Society::find($societyId);
         if ($this->societyById && $this->societyById->no_of_shares && $this->societyById->share_value) {
             $this->step = 2; // skip to next form
         } else {
@@ -148,8 +204,8 @@ class AdminDashboard extends Component
                     'share_capital_amount' => '',
                 ])
                 ->toArray();
-        }  else {
-        $this->apartments = [];
+        } else {
+            $this->apartments = [];
         }
     }
 
@@ -182,18 +238,18 @@ class AdminDashboard extends Component
             $this->showAssignModal = false;
             return;
         }
-        $response = false; 
+        $response = false;
         $response = SocietyDetail::where('society_id', $this->selectedSocietyId)->update([
             'no_of_shares' => $this->individual_no_of_share,
             'share_capital_amount' => $this->share_capital_amount,
         ]);
 
         if ($response !== false) {
-            $this->dispatch('show-success', message:  'Shares assigned equally to all apartments!');
-            $this->reset(['individual_no_of_share','share_capital_amount']);
+            $this->dispatch('show-success', message: 'Shares assigned equally to all apartments!');
+            $this->reset(['individual_no_of_share', 'share_capital_amount']);
             $this->showAssignModal = false;
         } else {
-            $this->dispatch('show-error', message:  'Some error occurs while assign shares equally to all apartments!');
+            $this->dispatch('show-error', message: 'Some error occurs while assign shares equally to all apartments!');
             $this->showAssignModal = false;
         }
     }
@@ -202,19 +258,19 @@ class AdminDashboard extends Component
     {
         $rules = [
             'apartments.*.individual_no_of_share' => 'required|numeric|min:1',
-            'apartments.*.share_capital_amount'   => 'required|numeric|min:1',
+            'apartments.*.share_capital_amount' => 'required|numeric|min:1',
         ];
 
         $messages = [
             'required' => 'The :attribute field is required.',
-            'numeric'  => 'The :attribute must be a number.',
-            'min'      => 'The :attribute must be at least :min.',
+            'numeric' => 'The :attribute must be a number.',
+            'min' => 'The :attribute must be at least :min.',
         ];
-    
+
         $attributes = [];
         foreach ($this->apartments as $index => $apt) {
             $attributes["apartments.$index.individual_no_of_share"] = "Shares for {$apt['name']}";
-            $attributes["apartments.$index.share_capital_amount"]   = "Share Amount for {$apt['name']}";
+            $attributes["apartments.$index.share_capital_amount"] = "Share Amount for {$apt['name']}";
         }
 
         $this->validate($rules, $messages, $attributes);
@@ -237,7 +293,7 @@ class AdminDashboard extends Component
             $this->showAssignModal = false;
             return;
         }
-        $response = false; 
+        $response = false;
         foreach ($this->apartments as $apartment) {
             $response = SocietyDetail::where('id', $apartment['id'])->update([
                 'no_of_shares' => $apartment['individual_no_of_share'],
@@ -246,12 +302,12 @@ class AdminDashboard extends Component
         }
 
         if ($response !== false) {
-            $this->dispatch('show-success', message:  'Individual shares assigned to all apartments successfully!');
+            $this->dispatch('show-success', message: 'Individual shares assigned to all apartments successfully!');
             $this->showAssignModal = false;
             $this->reset(['apartments']);
             $this->resetErrorBag();
         } else {
-            $this->dispatch('show-error', message:  'Some error occurs while assign shares equally to all apartments!');
+            $this->dispatch('show-error', message: 'Some error occurs while assign shares equally to all apartments!');
             $this->showAssignModal = false;
         }
     }

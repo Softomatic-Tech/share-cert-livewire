@@ -4,7 +4,7 @@
         <flux:breadcrumbs.item href="#">Super Admin</flux:breadcrumbs.item>
         <flux:breadcrumbs.item href="#">Create Society</flux:breadcrumbs.item>
     </flux:breadcrumbs>
-        <flux:separator variant="subtle" />
+        <flux:separator />
     </div>
     
     <div class="rounded-lg shadow-lg px-6 py-2">
@@ -34,9 +34,10 @@
                         <div class="card-body">
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
                                 <flux:input type="text" :label="__('Society Name :')" wire:model="formData.society_name" />
-                                <flux:input type="number" :label="__('Total Flats :')" wire:model="formData.total_flats" />
-                                <flux:input type="text"  :label="__('Address Line 1 :')" wire:model="formData.address_1" />
-                                <flux:input type="text"  :label="__('Address Line 2 :')" wire:model="formData.address_2" />
+                                <flux:input type="text" :label="__('Total No Of Building :')" wire:model="formData.total_building" />
+                                <flux:input type="number" :label="__('Total No Of Units :')" wire:model="formData.total_flats" />
+                                <flux:textarea :label="__('Address Line 1 :')" wire:model="formData.address_1" />
+                                <flux:textarea type="text"  :label="__('Address Line 2 :')" wire:model="formData.address_2" />
                                 <flux:select wire:model.live="formData.state_id" placeholder="Choose State..." :label="__('State')">
                                     <flux:select.option value="">Choose State...</flux:select.option>
                                     @foreach($states  as $st)
@@ -50,9 +51,17 @@
                                     @endforeach
                                 </flux:select>
                                 <flux:input type="text" :label="__('Pincode :')" wire:model="formData.pincode" />
-                                <flux:input type="text"  :label="__('Registration No :')" wire:model="formData.registration_no" />
+                                <flux:input type="text"  :label="__('Registration Certificate No :')" wire:model="formData.registration_no" />
                                 <flux:input type="number"  :label="__('Total No of Shares :')" wire:model="formData.no_of_shares" />
                                 <flux:input type="number"  :label="__('Each Share Value :')" wire:model="formData.share_value" />
+                                <flux:input type="text" :label="__('I Register :')" wire:model="formData.i_register" />
+                                <flux:input type="text" :label="__('J Register :')" wire:model="formData.j_register" />
+                                <flux:select wire:model="formData.admin_id" placeholder="Choose Admin..." :label="__('Assigned Admin')">
+                                    <flux:select.option value="">Choose Admin...</flux:select.option>
+                                    @foreach($admins as $admin)
+                                        <flux:select.option value="{{ $admin->id }}">{{ $admin->name }}</flux:select.option>
+                                    @endforeach
+                                </flux:select>
                             </div>
                             <div class="flex justify-end mt-4">
                                 <flux:button variant="primary" type="button" wire:click="nextStep">{{ __('Next') }}</flux:button>
@@ -119,8 +128,11 @@
                             <h4><strong>{{ $this->societyDetails->society_name}}</strong></h4>
                             <p><strong>Total Flats:</strong> {{ $this->societyDetails->total_flats}}</p>
                             <p><strong>Registration No:</strong> {{ $this->societyDetails->registration_no }}</p>
+                            <p><strong>I Register:</strong> {{ $this->societyDetails->i_register ?? 'N/A' }}</p>
+                            <p><strong>J Register:</strong> {{ $this->societyDetails->j_register ?? 'N/A' }}</p>
                             <p><strong>Total No of Shares:</strong> {{ $this->societyDetails->no_of_shares }}</p>
                             <p><strong>Each Share Value:</strong> {{ $this->societyDetails->share_value }}</p>
+                            <p><strong>Assigned Admin:</strong> {{ $this->societyDetails->admin->name ?? 'None' }}</p>
                             <p><strong>Address:</strong> 
                                 @if($this->societyDetails->address_1){{ $this->societyDetails->address_1 }},@endif
                                 @if($this->societyDetails->address_2){{ $this->societyDetails->address_2 }},@endif

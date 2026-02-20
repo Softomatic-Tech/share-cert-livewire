@@ -1,6 +1,6 @@
 
 <div>
-    <div class="w-full">
+    <div class="w-full px-2">
         <div class="flex justify-between items-center">
             <flux:breadcrumbs>
                 <flux:breadcrumbs.item href="{{ route('admin.dashboard') }}">Admin Dashboard</flux:breadcrumbs.item>
@@ -20,22 +20,70 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2 min-h-screen">
             <!-- Sidebar -->
-            <aside class="border-r flex flex-col md:flex-row p-2 space-y-4">
-                <h2 class="text-xl font-bold text-gray-800 dark:text-white">SOCIETIES</h2>
+            <aside class="col-span-1 border-r p-2">
+                <div class="mb-2 flex-shrink-0">
+                    <flux:input type="text" placeholder="Search Society..." wire:model.live="search" size="sm">
+                        <x-slot name="iconTrailing">
+                            @if ($search)
+                            <flux:button size="sm" variant="subtle" icon="x-mark" class="-mr-1" wire:click="$set('search', '')" />
+                            @endif
+                            <flux:icon.magnifying-glass variant="outline" class="size-4 text-gray-400" />
+                        </x-slot>
+                    </flux:input>
+                </div>
+
                 <div class="space-y-4">
-                    @foreach($societies as $index => $society)
+                    @forelse($societies as $index => $society)
                         <div wire:click="selectSociety({{ $society->id }})"
-                            class="p-4 rounded-lg border hover:shadow-md transition-shadow cursor-pointer">
-                            <div class="flex flex-col gap-3">
-                                <p class="text-gray-900 dark:text-white text-base font-bold">{{ $society->society_name }}</p>
-                                <p class="text-gray-500 dark:text-white text-sm">
-                                    @if($society->address_1){{ $society->address_1 }},@endif
-                                    @if($society->city?->name){{ $society->city?->name  }},@endif
-                                    @if($society->state?->name){{ $society->state?->name  }},@endif
-                                    @if($society->pincode){{ $society->pincode }}@endif</p>
+                                wire:key="society-{{ $society->id }}" 
+                                class="p-2 rounded-lg border hover:shadow-md transition-all cursor-pointer @if($selectedSocietyId == $society->id) active-society @endif">
+                            {{-- Society name (left) & Reg No (right) on same line --}}
+                            <div class="flex items-start justify-between gap-1 mb-0.5">
+                                <p class="text-blue-800 dark:text-white text-sm font-bold leading-tight">
+                                    {{ $society->society_name }}
+                                </p>
+                                <p class="text-gray-400 dark:text-gray-500 text-[10px] font-mono shrink-0 mt-0.5">
+                                    {{ $society->registration_no ?? 'N/A' }}
+                                </p>
+                            </div>
+
+                            {{-- Address — wraps fully --}}
+                            <p class="text-gray-500 dark:text-gray-400 text-[11px] leading-snug mb-2 whitespace-normal">
+                                {{ $society->address_1 }}@if($society->city?->name), {{ $society->city->name }}@endif
+                            </p>
+
+                            {{-- Stats — all 4 in one row --}}
+                            <div class="flex items-center gap-2 flex-wrap border-t pt-1 mt-1">
+                                <div class="flex items-center gap-1 text-[10px] text-gray-500">
+                                    <flux:icon.building-office-2 variant="outline" class="size-5 shrink-0" />
+                                    <span>{{ $society->total_flats }}</span>
+                                </div>
+                                <div class="flex items-center gap-1 text-[10px] text-gray-500">
+                                    <flux:icon.squares-2x2 variant="outline" class="size-5 shrink-0" />
+                                    <span>{{ $society->no_of_shares ?? 0 }}</span>
+                                </div>
+                                <div
+                                    class="flex items-center gap-1 text-[10px] {{ $society->i_register ? 'text-green-600' : 'text-gray-400' }}">
+                                    <flux:icon.document-check variant="outline" class="size-5 shrink-0" />
+                                    <span>I</span>
+                                </div>
+                                <div
+                                    class="flex items-center gap-1 text-[10px] {{ $society->j_register ? 'text-green-600' : 'text-gray-400' }}">
+                                    <flux:icon.document-check variant="outline" class="size-5 shrink-0" />
+                                    <span>J</span>
+                                </div>
+                                <div class="flex items-center gap-1 text-[10px] text-gray-400 italic ml-auto">
+                                    <flux:icon.user-circle variant="outline" class="size-5 shrink-0" />
+                                    <span class="truncate max-w-[80px]">{{ $society->admin->name ?? 'None' }}</span>
+                                </div>
                             </div>
                         </div>
-                    @endforeach
+
+                    @empty
+                        <div class="p-8 text-center border-2 border-dashed border-gray-200 rounded-lg">
+                            <p class="text-gray-500 text-sm">No societies found matching "{{ $search }}"</p>
+                        </div>
+                    @endforelse
                 </div>
             </aside>
             <div wire:loading.flex wire:target="selectSociety" class="justify-center items-center py-4 px-4">
@@ -44,34 +92,156 @@
             </div>
             <!-- Main -->
             <main class="col-span-2 p-2" wire:loading.remove wire:target="selectSociety">
-                @if($selectedSocietyId)
-                <header class="mb-2">
-                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white"> {{ $societyName }}
-                        Flats</h1>
-                </header>
+                @if($selectedSocietyId && $societyById)
+                    {{-- HEADER --}}
+                    <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm mx-1 mt-1 mb-2 p-4 md:p-5">
+                        {{-- Title + badges --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
+                            {{-- Society name --}}
+                            <div>
+                                <h1 class="text-xl md:text-2xl font-bold text-blue-900 dark:text-white uppercase tracking-tight">
+                                    {{ $societyById->society_name }}
+                                </h1>
+                            </div>
 
-                <!-- Filters -->
-                <div class="flex items-center gap-4 mb-4">
-                    @php $startKey=0; @endphp
-                    <button class="border items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium cursor-pointer" wire:click="setFilter({{ $selectedSocietyId }},{{ $startKey }})">
-                        All
-                    </button>
-                    @foreach($timelines as $label)
-                        <button class="border items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium cursor-pointer" wire:click="setFilter({{ $selectedSocietyId }},{{ $label->id }})">
-                            Pending {{ $label->name }}
+                            {{-- Badges --}}
+                            <div class="flex gap-2 overflow-x-auto sm:justify-end whitespace-nowrap pb-1">
+                                <flux:badge color="blue" size="sm">
+                                    Reg No: {{ $societyById->registration_no ?? 'N/A' }}
+                                </flux:badge>
+
+                                <flux:badge color="green" size="sm">
+                                    Flats: {{ $societyById->total_flats }}
+                                </flux:badge>
+
+                                <flux:badge color="purple" size="sm">
+                                    Shares: {{ $societyById->no_of_shares ?? '0' }}
+                                </flux:badge>
+
+                                @if($societyPendingVerificationCount > 0)
+                                    <flux:badge color="red" size="sm">⚠ {{ $societyPendingVerificationCount }} PendingVerification</flux:badge>
+                                @endif
+
+                                @if($societyPendingApplicationCount > 0)
+                                    <flux:badge color="yellow" size="sm">📋 {{ $societyPendingApplicationCount }} Pending
+                                        Application</flux:badge>
+                                @endif
+
+                                @if($societyPendingVerificationCount === 0 && $societyPendingApplicationCount === 0)
+                                    <flux:badge color="green" size="sm">✓ Nothing Pending</flux:badge>
+                                @endif
+                            </div>
+                        </div>
+
+                        {{-- DETAILS GRID --}}
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 text-sm mb-3">
+                            <div class="space-y-1 col-span-2">
+                                <p class="text-gray-400 font-medium uppercase text-[10px]">Location</p>
+                                <p class="text-gray-700 dark:text-gray-300 leading-tight">
+                                    {{ $societyById->address_1 }}<br>
+                                    {{ $societyById->city?->name }}, {{ $societyById->state?->name }}<br>
+                                    {{ $societyById->pincode }}
+                                </p>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-gray-400 font-medium uppercase text-[10px]">Registers</p>
+                                <p class="text-gray-700 dark:text-gray-300"><strong>I Register:</strong>
+                                    {{ $societyById->i_register ?? 'N/A' }}</p>
+                                <p class="text-gray-700 dark:text-gray-300"><strong>J Register:</strong>
+                                    {{ $societyById->j_register ?? 'N/A' }}</p>
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-gray-400 font-medium uppercase text-[10px]">Society Admin</p>
+                                <p class="text-gray-700 dark:text-gray-300 font-semibold">
+                                    {{ $societyById->admin->name ?? 'Unassigned' }}</p>
+                                @if($societyById->admin)
+                                    <p class="text-gray-500 text-xs">{{ $societyById->admin->email }}</p>
+                                @endif
+                            </div>
+                            <div class="space-y-1">
+                                <p class="text-gray-400 font-medium uppercase text-[10px]">Management</p>
+                                <flux:button size="xs" wire:click="assignShareToApartment({{ $societyById->id }})">Assign
+                                    Shares</flux:button>
+                            </div>
+                        </div>
+                    </div>
+                    {{-- FILTER TABS --}}
+                    <div class="flex gap-2 overflow-x-auto border-t py-2">
+                        {{-- 1. Pending Verification --}}
+                        @if($pendingVerificationTimelineId)
+                            @php 
+                                $pendingVerification = $timelines->firstWhere('id', $pendingVerificationTimelineId);
+                            @endphp
+                            @if($pendingVerification)
+                                <button
+                                    class="whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium cursor-pointer border transition-colors {{ $filterKey == $pendingVerificationTimelineId ? 'bg-blue-500 text-white border-blue-500' : 'border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
+                                    wire:click="setFilter({{ $selectedSocietyId }}, {{ $pendingVerificationTimelineId }})">
+                                    Pending {{ $pendingVerification->name }}
+                                </button>
+                            @endif
+                        @endif
+
+                        {{-- 2. All --}}
+                        @php $startKey = 0; @endphp
+                        <button
+                            class="whitespace-nowrap  rounded-md px-3 py-1 text-xs font-medium cursor-pointer border transition-colors {{ $filterKey == 0 ? 'bg-blue-500 text-white border-blue-500' : 'border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
+                            wire:click="setFilter({{ $selectedSocietyId }}, {{ $startKey }})">
+                            All
                         </button>
-                    @endforeach
-                    <button type="button" class="border items-center justify-center gap-2 rounded-md px-4 py-2 text-xs font-medium cursor-pointer" wire:click="assignShareToApartment({{ $selectedSocietyId }})">Assign Shares</button>
-                </div>
-                <!-- Loader -->
-                <div wire:loading.flex wire:target="setFilter" class="justify-center items-center py-4">
-                    <div class="animate-spin rounded-full h-6 w-6 border-2 border-t-transparent border-green-500"></div>
-                    <span class="ml-2 text-sm text-gray-600">Loading...</span>
-                </div>
-                <!-- Flats -->
-                <div class="flex flex-col gap-4" wire:loading.remove wire:target="setFilter">
-                        @livewire('menus.society-stepper', ['id' => $selectedSocietyId,'key'=>$filterKey],key($selectedSocietyId.'-'.$filterKey))
-                </div>
+
+                        {{-- 3. Remaining Timelines --}}
+                        @foreach($timelines as $label)
+                            @if($label->id != $pendingVerificationTimelineId)
+                                <button
+                                    class="whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium cursor-pointer border transition-colors {{ $filterKey == $label->id ? 'bg-blue-500 text-white border-blue-500' : 'border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
+                                    wire:click="setFilter({{ $selectedSocietyId }}, {{ $label->id }})">
+                                    Pending {{ $label->name }}
+                                </button>
+                            @endif
+                        @endforeach
+
+                    </div>
+
+                    
+                    {{-- SCROLLABLE LIST --}}
+                    <div class="flex-1 overflow-y-auto px-1 pb-2">
+                        {{-- Loader --}}
+                        <div wire:loading.flex wire:target="setFilter"
+                            class="justify-center items-center py-8">
+
+                            <div class="animate-spin rounded-full h-6 w-6 border-2 border-t-transparent border-blue-500"></div>
+
+                            <span class="ml-2 text-sm text-gray-600">
+                                Loading...
+                            </span>
+
+                        </div>
+
+
+                        {{-- Apartment list --}}
+                        <div class="flex flex-col gap-3 sm:gap-4"
+                            wire:loading.remove wire:target="setFilter">
+
+                            @livewire('menus.society-stepper',
+                                ['id' => $selectedSocietyId, 'key' => $filterKey],
+                                key($selectedSocietyId . '-' . $filterKey)
+                            )
+
+                        </div>
+
+                    </div>
+                @else
+                    {{-- Empty state --}}
+                    <div class="flex flex-col items-center justify-center h-full text-gray-400 p-4 text-center">
+
+                        <flux:icon.building-office-2 variant="outline"
+                            class="size-12 sm:size-16 mb-3 opacity-30" />
+
+                        <p class="text-sm">
+                            Select a society from the left to view details
+                        </p>
+
+                    </div>
                 @endif
             </main>
         </div>

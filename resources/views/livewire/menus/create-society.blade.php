@@ -16,10 +16,12 @@
             <div class="card">
                 <div class="card-body">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
-                        <flux:input type="text" :label="__('Society Name')" wire:model="society_name" />
-                        <flux:input type="text" :label="__('Total Flats')" wire:model="total_flats" />
-                        <flux:input type="text"  :label="__('Address Line 1')" wire:model="address_1" />
-                        <flux:input type="text"  :label="__('Address Line 2')" wire:model="address_2" />
+                        <flux:input type="text" :label="__('Society Name :')" wire:model="society_name" />
+                        <flux:input type="text"  :label="__('Registration Certificate No :')" wire:model="registration_no" />
+                        <flux:input type="text" :label="__('Total No Of Building :')" wire:model="total_building" />
+                        <flux:input type="text" :label="__('Total No Of Units :')" wire:model="total_flats" />
+                        <flux:textarea :label="__('Address Line 1 :')" wire:model="address_1" />
+                        <flux:textarea :label="__('Address Line 2 :')" wire:model="address_2" />
                         <flux:select wire:model.live="state_id" placeholder="Choose State..." :label="__('State')">
                             <flux:select.option value="">Choose State...</flux:select.option>
                             @foreach($states  as $st)
@@ -32,10 +34,11 @@
                                 <flux:select.option value="{{ $ct->id }}">{{ $ct->name }}</flux:select.option>
                             @endforeach
                         </flux:select>
-                        <flux:input type="text" :label="__('Pincode')" wire:model="pincode" />
-                        <flux:input type="text"  :label="__('Registration No :')" wire:model="registration_no" />
+                        <flux:input type="text" :label="__('Pincode :')" wire:model="pincode" />
                         <flux:input type="number"  :label="__('Total No of Shares :')" wire:model="no_of_shares" />
                         <flux:input type="number"  :label="__('Each Share Value :')" wire:model="share_value" />
+                        <flux:input type="text" :label="__('I Register :')" wire:model="i_register" />
+                        <flux:input type="text" :label="__('J Register :')" wire:model="j_register" />
                     </div>
                     <div class="flex justify-end mt-4">
                         <flux:button variant="primary" type="submit">{{ __('Save') }}</flux:button>

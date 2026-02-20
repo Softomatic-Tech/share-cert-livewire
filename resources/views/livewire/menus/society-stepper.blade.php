@@ -21,6 +21,43 @@
     <div class="rounded-lg border shadow-sm hover:shadow-lg transition-shadow my-4">
         <div class="grid grid-cols-1 md:grid-cols-2 border-b relative">
             <div class="p-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl dark:bg-blue-900/20">
+                        <i class="fa-solid fa-building text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold text-blue-900 dark:text-white leading-tight">
+                            {{ $details->building_name }} - {{ $details->apartment_number }}
+                        </h3>
+                        <div class="flex flex-wrap gap-2 mt-1">
+                            @if($details->no_of_shares)
+                                <span class="bg-gray-50 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-full dark:bg-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-600">
+                                    {{ $details->no_of_shares }} Shares
+                                </span>
+                            @endif
+                            @if($details->share_capital_amount)
+                                <span class="bg-gray-50 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-full dark:bg-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-600">
+                                    ₹{{ number_format($details->share_capital_amount) }}
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                {{-- Owners Info --}}
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-gray-50 dark:border-gray-700">
+                    @for($i=1; $i<=3; $i++)
+                        @php $name = "owner{$i}_name"; $phone = "owner{$i}_mobile"; @endphp
+                        @if($details->$name)
+                        <div class="p-2 rounded-lg bg-gray-50/50 dark:bg-gray-700/30">
+                            <p class="text-[9px] uppercase font-bold text-gray-400 mb-0.5 tracking-wider">Owner {{ $i }}</p>
+                            <p class="text-sm font-bold text-gray-700 dark:text-gray-300 truncate">{{ $details->$name }}</p>
+                            <p class="text-[10px] text-gray-500 font-medium">{{ $details->$phone }}</p>
+                        </div>
+                        @endif
+                    @endfor
+                </div>
+            </div>
+            {{-- <div class="p-4">
                 <p class="text-lg font-bold text-gray-900 dark:text-white">{{ $details->building_name }} - {{ $details->apartment_number }}</p>
                 @if($details->no_of_shares)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Individual No of Shares: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->no_of_shares }}</span></p>@endif
                 @if($details->share_capital_amount)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Share Capital Amount: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->share_capital_amount }}</span></p>@endif
@@ -32,7 +69,7 @@
                 <p class="mb-1"></span></p>
                 @if($details->owner3_mobile)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Owner3 Phone: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->owner3_mobile }}</span></p>@endif
                 @if($details->owner3_email)<p><span class="text-sm font-bold text-gray-500 dark:text-white">Email: </span><span class="text-sm text-gray-500 dark:text-white">{{ $details->owner3_email }}</span></p>@endif
-            </div>
+            </div> --}}
             <div class="p-4">
                 @php
                 $statusData = json_decode($details->status, true);

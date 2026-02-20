@@ -64,6 +64,10 @@ class UserService
             'owner3_mobile' => 'nullable|digits:10',
             'certificate_no' => 'nullable|numeric',
             'individual_no_of_share' => 'nullable|numeric',
+            'share_capital_amount' => 'nullable|numeric',
+            'is_registration_no_available' => 'nullable|string',
+            'is_byelaws_available' => 'nullable|string',
+            'membership_case' => 'nullable|string',
                 
         ]);
 
@@ -119,7 +123,10 @@ class UserService
             'owner2_email'      => $validated['owner2_email'] ?? null,
             'owner3_name'       => $validated['owner3_name'] ?? null,
             'owner3_mobile'     => $validated['owner3_mobile'] ?? null,
-            'owner3_email'      => $validated['owner3_email'] ?? null
+            'owner3_email'      => $validated['owner3_email'] ?? null,
+            'is_registration_no_available' => $validated['is_registration_no_available'] ?? 'no',
+            'is_byelaws_available' => $validated['is_byelaws_available'] ?? 'no',
+            'membership_case' => $validated['membership_case'] ?? null,
         ]);
 
         return [

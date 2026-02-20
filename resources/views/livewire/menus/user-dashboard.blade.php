@@ -5,7 +5,6 @@
                 <flux:breadcrumbs.item href="{{ route('user.dashboard') }}">{{ __('Welcome') }} {{ Auth::user()->name }} !</flux:breadcrumbs.item>
             </flux:breadcrumbs>
         </div>
-        
     </div>
     <flux:separator variant="subtle" />
     <div class="mb-2">
@@ -13,27 +12,44 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-2 min-h-screen">
         <!-- Sidebar -->
-        <aside class="border-r flex flex-col md:flex-row p-2 space-y-4">
-            <h2 class="text-xl font-bold text-gray-800 dark:text-white">APARTMENTS</h2>
-            <div class="space-y-4">
-                @foreach($apartmentList as $index => $apartment)
+        <aside class="col-span-1 border-r p-2">
+            <!-- Search Box -->
+            <div class="mb-2 flex-shrink-0">
+                    <flux:input type="text" placeholder="Search Apartment..." wire:model.live="search" size="sm">
+                        <x-slot name="iconTrailing">
+                            @if ($search)
+                            <flux:button size="sm" variant="subtle" icon="x-mark" class="-mr-1" wire:click="$set('search', '')" />
+                            @endif
+                            <flux:icon.magnifying-glass variant="outline" class="size-4 text-gray-400" />
+                        </x-slot>
+                    </flux:input>
+                </div>
+
+            <!-- Apartment List with Scrollbar -->
+            <div class="flex-1 overflow-y-auto pr-1 space-y-3 custom-scrollbar" style="max-height: calc(100vh - 250px);">
+                @forelse($apartmentList as $index => $apartment)
                     <div wire:click="selectApartment({{ $apartment->id }})"
-                        class="p-4 rounded-lg border hover:shadow-md transition-shadow cursor-pointer">
-                        <div class="flex flex-col gap-3">
-                            <p class="text-gray-900 dark:text-white text-base font-bold">{{ $apartment->building_name }} -{{ $apartment->apartment_number }}</p>
+                        class="p-2 rounded-lg border hover:shadow-md transition-all cursor-pointer @if($selectedApartmentId == $apartment->id) active-society @endif">
+                        <div class="flex flex-col gap-1">
+                            <p class="text-gray-900 dark:text-white text-base font-bold truncate">{{ $apartment->building_name }} - {{ $apartment->apartment_number }}</p>
+                            <p class="text-gray-500 dark:text-gray-400 text-xs truncate">{{ $apartment->society->society_name }}</p>
                         </div>
                     </div>
-                @endforeach
+                @empty
+                    <div class="p-8 text-center border-2 border-dashed border-gray-200 rounded-lg">
+                        <p class="text-gray-500 text-sm">No apartments found matching "{{ $search }}"</p>
+                    </div>
+                @endforelse
             </div>
         </aside>
         <!-- Main -->
-        <main class="col-span-2 p-2">
-            <div wire:loading.flex wire:target="selectApartment" class="justify-center items-center py-4">
-                <div class="animate-spin rounded-full h-6 w-6 border-2 border-t-transparent border-green-500"></div>
-                <span class="ml-2 text-sm text-gray-600">Loading...</span>
-            </div>
+        <div wire:loading.flex wire:target="selectApartment" class="justify-center items-center py-4">
+            <div class="animate-spin rounded-full h-6 w-6 border-2 border-t-transparent border-green-500"></div>
+            <span class="ml-2 text-sm text-gray-600">Loading...</span>
+        </div>
+        <main class="col-span-2">
             <div class="flex flex-col gap-4" wire:loading.remove wire:target="selectApartment">
-                <div class="p-6">
+                <div class="p-2">
                     @foreach($societyDetail as $details)
                     @php
                     $statusData = json_decode($details->status, true);
@@ -49,16 +65,15 @@
                             <p class="text-sm dark:text-white"> {{ $details->comment }}</p>
                         </div>
                         @endif
-                        <header class="mb-2">
-                            <h1 class="text-xl font-bold text-gray-900 dark:text-white"> {{ $details->society->society_name }}
-                                Flats</h1>
-                        </header>
-
                         <div class="flex flex-col gap-4">
                             <div class="rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-shadow my-4">
                                 <div class="grid grid-cols-1 md:grid-cols-2 border-b border-gray-300 relative">
                                     <div class="p-4">
-                                        <p class="text-lg font-bold text-gray-900 dark:text-white">{{ $details->building_name }} - {{ $details->apartment_number }}</p>
+                                        <p class="text-lg font-bold text-gray-900 dark:text-white">{{ $details->building_name }} - {{ $details->apartment_number }}
+                                            <flux:badge color="purple" size="sm">
+                                                    {{ $details->society->society_name }}
+                                                </flux:badge>
+                                        </p>
                                         @if($details->owner1_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner1 Phone: {{ $details->owner1_mobile }}</p>@endif
                                         @if($details->owner1_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner1_email }}</p>@endif
                                         <p class="mb-1"></p>
