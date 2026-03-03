@@ -11,6 +11,7 @@ class Society extends Model
     protected $fillable = [
         'society_name',
         'total_flats',
+        'total_building',
         'address_1',
         'address_2',
         'pincode',

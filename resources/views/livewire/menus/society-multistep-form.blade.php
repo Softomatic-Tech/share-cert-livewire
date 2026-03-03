@@ -32,7 +32,7 @@
                     <div class="card">
                         <div class="card-header">Step 1: Basic Information</div>
                         <div class="card-body">
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-2">
                                 <flux:input type="text" :label="__('Society Name :')" wire:model="formData.society_name" />
                                 <flux:input type="text" :label="__('Total No Of Building :')" wire:model="formData.total_building" />
                                 <flux:input type="number" :label="__('Total No Of Units :')" wire:model="formData.total_flats" />

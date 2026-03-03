@@ -259,18 +259,142 @@
                 Possession Letter
             </div>
             @endif
-            @php
+            {{-- @php
             $allApproved = $this->areAllFourFilesApproved($statusData, [$details->agreementCopy,$details->memberShipForm,$details->allotmentLetter,$details->possessionLetter]);
             $showVerificationButton = ($allApproved && $verifyStatus === 'Approved' && $applicationStatus === 'Approved' && $verificationStatus === 'Pending');
             @endphp
             @if ($showVerificationButton) 
             <div class="flex items-center text-xs justify-center cursor-pointer" wire:click="setDocument('{{ $details->id }}')">Verify Documents</div>
+            @endif --}}
+            {{-- @php
+            $showCertificateGenerateButton = ($verifyStatus === 'Approved' && $applicationStatus === 'Approved' && $verificationStatus === 'Approved' && $generationStatus==='Pending');
+            @endphp
+            @if($showCertificateGenerateButton)
+            <div class="flex items-center text-xs justify-center cursor-pointer" wire:click="generateCertificate('{{ $details->id }}')">Generate Certificate</div>
+            @endif --}}
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-2 p-3">
+            @if($details->byeLawCase && $details->byeLawCase->membership_case=='case_a')
+                @php $fileUrl = asset('storage/society_docs/' . $details->byeLawCase->allotmentMembershipLetter);
+                $isApproved =$this->getFileStatus($statusData, $details->byeLawCase->allotmentMembershipLetter);
+                @endphp
+                <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                    @if($isApproved=='Approved')
+                    <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                    @else
+                    <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                    @endif
+                    Allotment Membership Letter
+                </div>
+            @endif
+
+            @if($details->byeLawCase && $details->byeLawCase->membership_case=='case_b')
+                @php $fileUrl = asset('storage/society_docs/' . $details->byeLawCase->stampDutyProof);
+                $isApproved =$this->getFileStatus($statusData, $details->byeLawCase->stampDutyProof);
+                @endphp
+                <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                    @if($isApproved=='Approved')
+                    <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                    @else
+                    <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                    @endif
+                    Stamp Duty Proof
+                </div>
+
+                @php $fileUrl = asset('storage/society_docs/' . $details->byeLawCase->transferorSignature);
+                $isApproved =$this->getFileStatus($statusData, $details->byeLawCase->transferorSignature);
+                @endphp
+                <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                    @if($isApproved=='Approved')
+                    <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                    @else
+                    <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                    @endif
+                    Transferor Signature
+                </div>
+            @endif
+
+            @if($details->byeLawCase && $details->byeLawCase->membership_case=='case_c')
+                @php $fileUrl = asset('storage/society_docs/' . $details->byeLawCase->deathCertificate);
+                $isApproved =$this->getFileStatus($statusData, $details->byeLawCase->deathCertificate);
+                @endphp
+                <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                    @if($isApproved=='Approved')
+                    <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                    @else
+                    <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                    @endif
+                    Death Certificate
+                </div>
+
+                @php $fileUrl = asset('storage/society_docs/' . $details->byeLawCase->nominationRecord);
+                $isApproved =$this->getFileStatus($statusData, $details->byeLawCase->nominationRecord);
+                @endphp
+                <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                    @if($isApproved=='Approved')
+                    <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                    @else
+                    <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                    @endif
+                    Nomination Record
+                </div>
+            @endif
+
+            @if($details->byeLawCase && $details->byeLawCase->membership_case=='case_d')
+                @php $fileUrl = asset('storage/society_docs/' . $details->byeLawCase->successionCertificate);
+                $isApproved =$this->getFileStatus($statusData, $details->byeLawCase->successionCertificate);
+                @endphp
+                <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                    @if($isApproved=='Approved')
+                    <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                    @else
+                    <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                    @endif
+                    Succession Certificate
+                </div>
+            @endif
+
+            <!--------Appendix PDF -------->
+            @if($details->byeLawCase && $details->byeLawCase->membership_case=='case_a')
+            <div class="flex items-center text-xs  cursor-pointer" onclick="window.open('{{ route('appendix.two', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 2</div>
+            
+            <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.three', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 3</div>
+            @endif
+            @if($details->byeLawCase &&$details->byeLawCase->membership_case=='case_c')
+            <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.fifteen', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 15</div>
+            @endif
+            @if($details->byeLawCase &&$details->byeLawCase->membership_case=='case_d')
+            <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.sixteen', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 16</div>
+            <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.nineteen', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 19</div>
+            @endif
+            @if($details->byeLawCase &&$details->byeLawCase->membership_case=='case_b')
+            <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.twenty-part-one', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 20(1)</div>
+            <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.twenty-part-two', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 20(2)</div>
+            <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.twenty-one', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 21</div>
+            @endif
+        </div>
+
+        <div class="grid grid-cols-1">
+            @php
+                if($details->byeLawCase && $details->byeLawCase->membership_case=='case_a'){
+                    $allApproved = $this->areAllFilesApproved($statusData, [$details->agreementCopy,$details->memberShipForm,$details->allotmentLetter,$details->possessionLetter,$details->byeLawCase->allotmentMembershipLetter]);
+                }else if($details->byeLawCase && $details->byeLawCase->membership_case=='case_b'){
+                    $allApproved = $this->areAllFilesApproved($statusData, [$details->agreementCopy,$details->memberShipForm,$details->allotmentLetter,$details->possessionLetter,$details->byeLawCase->stampDutyProof,$details->byeLawCase->transferorSignature]);
+                }else if($details->byeLawCase && $details->byeLawCase->membership_case=='case_c'){
+                    $allApproved = $this->areAllFilesApproved($statusData, [$details->agreementCopy,$details->memberShipForm,$details->allotmentLetter,$details->possessionLetter,$details->byeLawCase->deathCertificate,$details->byeLawCase->nominationRecord]);
+                }else if($details->byeLawCase && $details->byeLawCase->membership_case=='case_d'){
+                    $allApproved = $this->areAllFilesApproved($statusData, [$details->agreementCopy,$details->memberShipForm,$details->allotmentLetter,$details->possessionLetter,$details->byeLawCase->successionCertificate]);
+                }
+                $showVerificationButton = ($allApproved && $verifyStatus === 'Approved' && $applicationStatus === 'Approved' && $verificationStatus === 'Pending');
+            @endphp
+            @if ($showVerificationButton) 
+                <button class="rounded-md p-3 text-md font-medium cursor-pointer bg-blue-500" wire:click="setDocument('{{ $details->id }}')">Verify Documents</button>
             @endif
             @php
             $showCertificateGenerateButton = ($verifyStatus === 'Approved' && $applicationStatus === 'Approved' && $verificationStatus === 'Approved' && $generationStatus==='Pending');
             @endphp
             @if($showCertificateGenerateButton)
-            <div class="flex items-center text-xs justify-center cursor-pointer" wire:click="generateCertificate('{{ $details->id }}')">Generate Certificate</div>
+            <button class="rounded-md p-3 text-md font-medium cursor-pointer bg-green-500" wire:click="generateCertificate('{{ $details->id }}')">Generate Certificate</button>
             @endif
         </div>
     </div>

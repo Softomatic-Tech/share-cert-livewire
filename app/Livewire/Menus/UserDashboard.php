@@ -6,6 +6,7 @@ use App\Services\UserService;
 use App\Models\SocietyDetail;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+use Illuminate\Support\Facades\Log;
 
 class UserDashboard extends Component
 {
@@ -38,6 +39,7 @@ class UserDashboard extends Component
 
     public function selectApartment($id)
     {
+        log::info('Selected Apartment ID: ' . $id);
         $this->selectedApartmentId = $id;
         $this->societyDetail=$this->userService->getSocietyDetail($this->selectedApartmentId);
     }

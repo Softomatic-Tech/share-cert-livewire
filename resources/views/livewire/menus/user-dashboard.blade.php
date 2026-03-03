@@ -26,7 +26,7 @@
                 </div>
 
             <!-- Apartment List with Scrollbar -->
-            <div class="flex-1 overflow-y-auto pr-1 space-y-3 custom-scrollbar" style="max-height: calc(100vh - 250px);">
+            <div class="flex-1 overflow-y-auto p-1 space-y-3 custom-scrollbar" style="max-height: calc(100vh - 250px);">
                 @forelse($apartmentList as $index => $apartment)
                     <div wire:click="selectApartment({{ $apartment->id }})"
                         class="p-2 rounded-lg border hover:shadow-md transition-all cursor-pointer @if($selectedApartmentId == $apartment->id) active-society @endif">
@@ -68,7 +68,26 @@
                         <div class="flex flex-col gap-4">
                             <div class="rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-shadow my-4">
                                 <div class="grid grid-cols-1 md:grid-cols-2 border-b border-gray-300 relative">
-                                    <div class="p-4">
+                                    <div class="p-2">
+                                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-gray-50 dark:border-gray-700">
+                                            <p class="text-lg font-bold text-gray-900 dark:text-white">{{ $details->building_name }} - {{ $details->apartment_number }}
+                                                <flux:badge color="purple" size="sm">
+                                                        {{ $details->society->society_name }}
+                                                    </flux:badge>
+                                            </p>
+                                            @for($i=1; $i<=3; $i++)
+                                                @php $name = "owner{$i}_name"; $phone = "owner{$i}_mobile"; @endphp
+                                                @if($details->$name)
+                                                <div class="p-2 rounded-lg bg-gray-50/50 dark:bg-gray-700/30">
+                                                    <p class="text-[9px] uppercase font-bold text-gray-400 mb-0.5 tracking-wider">Owner {{ $i }}</p>
+                                                    <p class="text-sm font-bold text-gray-700 dark:text-gray-300 truncate">{{ $details->$name }}</p>
+                                                    <p class="text-[10px] text-gray-500 font-medium">{{ $details->$phone }}</p>
+                                                </div>
+                                                @endif
+                                            @endfor
+                                        </div>
+                                    </div>
+                                    {{-- <div class="p-4">
                                         <p class="text-lg font-bold text-gray-900 dark:text-white">{{ $details->building_name }} - {{ $details->apartment_number }}
                                             <flux:badge color="purple" size="sm">
                                                     {{ $details->society->society_name }}
@@ -82,8 +101,8 @@
                                         <p class="mb-1"></p>
                                         @if($details->owner3_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner3 Phone: {{ $details->owner3_mobile }}</p>@endif
                                         @if($details->owner3_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner3_email }}</p>@endif
-                                    </div>
-                                    <div class="p-4">
+                                    </div> --}}
+                                    <div class="p-2">
                                         @php
                                         $steps = collect($statusData['tasks'])->take(3)->values();
                                         // Global checks
@@ -258,6 +277,26 @@
                                     @if($showCertificateDownloadButton)
                                     <div class="flex items-center text-xs justify-center cursor-pointer" onclick="window.open('{{ route('menus.certificate.view', ['id' => $details->id]) }}', '_blank')">View Certificate</div>
                                     @endif
+                                </div>
+                                <!--Bye Laws Section -->
+                                <div class="grid grid-cols-2 md:grid-cols-5 gap-2 p-3">
+                                        @if($details->byeLawCase && $details->byeLawCase->membership_case=='case_a')
+                                        <div class="flex items-center text-xs  cursor-pointer" onclick="window.open('{{ route('appendix.two', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 2</div>
+                                        
+                                        <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.three', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 3</div>
+                                        @endif
+                                        @if($details->byeLawCase &&$details->byeLawCase->membership_case=='case_c')
+                                        <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.fifteen', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 15</div>
+                                        @endif
+                                        @if($details->byeLawCase &&$details->byeLawCase->membership_case=='case_d')
+                                        <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.sixteen', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 16</div>
+                                        <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.nineteen', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 19</div>
+                                        @endif
+                                        @if($details->byeLawCase &&$details->byeLawCase->membership_case=='case_b')
+                                        <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.twenty-part-one', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 20(1)</div>
+                                        <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.twenty-part-two', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 20(2)</div>
+                                        <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.twenty-one', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 21</div>
+                                        @endif
                                 </div>
                             </div>
                         </div>

@@ -8,6 +8,7 @@ use App\Models\Society;
 use App\Models\SocietyDetail;
 use App\Models\Timeline;
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\Log;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Storage;
@@ -38,13 +39,14 @@ class AdminDashboard extends Component
 
     public function render()
     {
+        $user=Auth::user();
         $societiesQuery = Society::with(['state', 'city']);
 
         if ($this->search) {
             $societiesQuery->where('society_name', 'like', '%' . $this->search . '%');
         }
 
-        $this->societies = $societiesQuery->get();
+        $this->societies = $societiesQuery->where('admin_id',$user->id)->get();
 
         return view('livewire.menus.admin-dashboard');
     }

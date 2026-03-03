@@ -15,7 +15,7 @@
         <form wire:submit.prevent="saveSociety">
             <div class="card">
                 <div class="card-body">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-2">
                         <flux:input type="text" :label="__('Society Name :')" wire:model="society_name" />
                         <flux:input type="text"  :label="__('Registration Certificate No :')" wire:model="registration_no" />
                         <flux:input type="text" :label="__('Total No Of Building :')" wire:model="total_building" />

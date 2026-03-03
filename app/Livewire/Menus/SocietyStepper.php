@@ -41,7 +41,7 @@ class SocietyStepper extends Component
     {
         $this->societyId = $id;
         $this->societyKey = $key;
-        $this->societyDetails = SocietyDetail::with('society')
+        $this->societyDetails = SocietyDetail::with('society','byeLawCase')
             ->where('society_id',$this->societyId)->get()
             ->filter(function ($item) {
             $json = json_decode($item->status, true);
@@ -74,19 +74,28 @@ class SocietyStepper extends Component
         });
     }
     
-    public function getFileStatus($statusData, $fileName)
+    public $fileType = null;
+
+    public function getFileStatus($statusData, $fileName, $fileType = null)
     {
         $applicationTask = collect($statusData['tasks'])->firstWhere('name', $this->timelineValues[0]);
         if ($applicationTask) {
-            $subtask = collect($applicationTask['subtasks'] ?? [])
-                ->firstWhere('fileName', basename(trim($fileName)));
-            return $subtask['status'] ?? null; // could be Approved / Rejected / null
+            $subtasks = collect($applicationTask['subtasks'] ?? []);
+            
+            // Search by fileType first
+            if ($fileType) {
+                $subtask = $subtasks->firstWhere('fileType', $fileType);
+                if ($subtask) return $subtask['status'] ?? null;
+            }
+
+            // Fallback to fileName
+            $subtask = $subtasks->firstWhere('fileName', basename(trim($fileName)));
+            return $subtask['status'] ?? null;
         }
         return null;
     }
 
-    
-    public function areAllFourFilesApproved($statusData, array $expectedFiles = [])
+    public function areAllFilesApproved($statusData, array $expectedFiles = [])
     {
         $applicationTask = collect($statusData['tasks'])->firstWhere('name', $this->timelineValues[0]);
         if (!$applicationTask) {
