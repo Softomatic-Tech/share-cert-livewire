@@ -182,10 +182,24 @@
                                             </div>
                                         @endif
                                     </div>
-                                    @if($needsAttention)
-                                    <flux:tooltip content="Edit Apartment">
-                                        <button class="font-bold absolute top-0 right-0 px-2 py-1 border rounded-md cursor-pointer" wire:click="verifyDetails({{ $details->id }})"><i class="fa-solid fa-edit text-sm"></i></button>
-                                    </flux:tooltip>
+                                    @php
+                                        $statusData = json_decode($details->status, true);
+                                        $tasks = collect($statusData['tasks'] ?? []);
+                                        $applicationStatus = $tasks->firstWhere('name', 'Application')['Status'] ?? null;
+                                    @endphp
+
+                                    @if($applicationStatus !== 'Approved')
+                                        <flux:tooltip content="Edit Apartment">
+                                            <button class="font-bold absolute top-0 right-0 px-2 py-1 border rounded-md cursor-pointer" wire:click="verifyDetails({{ $details->id }})">
+                                                <i class="fa-solid fa-edit text-sm"></i>
+                                            </button>
+                                        </flux:tooltip>
+                                    @else
+                                        <flux:tooltip content="View Apartment">
+                                            <button class="font-bold absolute top-0 right-0 px-2 py-1 border rounded-md cursor-pointer" wire:click="viewDetails({{ $details->id }})">
+                                                <i class="fa-solid fa-eye text-sm text-blue-500"></i>
+                                            </button>
+                                        </flux:tooltip>
                                     @endif
                                 </div>
                                 <!--Documents Section (below the grid) -->
@@ -197,18 +211,18 @@
                                         @php $fileUrl = asset('storage/society_docs/' . $details->agreementCopy);
                                         $isApproved =$this->getFileStatus($statusData, $details->agreementCopy);
                                         @endphp
-                                    <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
-                                    @if($isApproved=='Approved')
-                                    <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                        <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Copy of Agreement
+                                        </div>
                                     @else
-                                    <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
-                                    @endif
-                                        Copy of Agreement
-                                    </div>
-                                    @else
-                                    <div class="flex items-center text-xs">
-                                        Copy of Agreement
-                                    </div>
+                                        <div class="flex items-center text-xs">
+                                            Copy of Agreement
+                                        </div>
                                     @endif
                                     @if($details->memberShipForm)
                                     @php $fileUrl = asset('storage/society_docs/' . $details->memberShipForm);
@@ -280,23 +294,199 @@
                                 </div>
                                 <!--Bye Laws Section -->
                                 <div class="grid grid-cols-2 md:grid-cols-5 gap-2 p-3">
-                                        @if($details->byeLawCase && $details->byeLawCase->membership_case=='case_a')
-                                        <div class="flex items-center text-xs  cursor-pointer" onclick="window.open('{{ route('appendix.two', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 2</div>
-                                        
-                                        <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.three', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 3</div>
-                                        @endif
-                                        @if($details->byeLawCase &&$details->byeLawCase->membership_case=='case_c')
-                                        <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.fifteen', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 15</div>
-                                        @endif
-                                        @if($details->byeLawCase &&$details->byeLawCase->membership_case=='case_d')
-                                        <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.sixteen', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 16</div>
-                                        <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.nineteen', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 19</div>
-                                        @endif
-                                        @if($details->byeLawCase &&$details->byeLawCase->membership_case=='case_b')
-                                        <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.twenty-part-one', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 20(1)</div>
-                                        <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.twenty-part-two', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 20(2)</div>
-                                        <div class="flex items-center text-xs cursor-pointer" onclick="window.open('{{ route('appendix.twenty-one', ['byelaws_id' => $details->byeLawCase->id]) }}', '_blank')">Appendix 21</div>
-                                        @endif
+                                    @if($details->byeLawCase && $details->byeLawCase->membership_case=='case_a')
+                                        @php $fileUrl = asset('storage/society_docs/' . $details->byeLawCase->allotmentMembershipLetter);
+                                        $isApproved =$this->getFileStatus($statusData, $details->byeLawCase->allotmentMembershipLetter);
+                                        @endphp
+                                        <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Allotment Membership Letter
+                                        </div>
+                                    @endif
+
+                                    @if($details->byeLawCase && $details->byeLawCase->membership_case=='case_b')
+                                        @php $fileUrl = asset('storage/society_docs/' . $details->byeLawCase->stampDutyProof);
+                                        $isApproved =$this->getFileStatus($statusData, $details->byeLawCase->stampDutyProof);
+                                        @endphp
+                                        <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Stamp Duty Proof
+                                        </div>
+
+                                        @php $fileUrl = asset('storage/society_docs/' . $details->byeLawCase->transferorSignature);
+                                        $isApproved =$this->getFileStatus($statusData, $details->byeLawCase->transferorSignature);
+                                        @endphp
+                                        <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Transferor Signature
+                                        </div>
+                                    @endif
+
+                                    @if($details->byeLawCase && $details->byeLawCase->membership_case=='case_c')
+                                        @php $fileUrl = asset('storage/society_docs/' . $details->byeLawCase->deathCertificate);
+                                        $isApproved =$this->getFileStatus($statusData, $details->byeLawCase->deathCertificate);
+                                        @endphp
+                                        <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Death Certificate
+                                        </div>
+
+                                        @php $fileUrl = asset('storage/society_docs/' . $details->byeLawCase->nominationRecord);
+                                        $isApproved =$this->getFileStatus($statusData, $details->byeLawCase->nominationRecord);
+                                        @endphp
+                                        <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Nomination Record
+                                        </div>
+                                    @endif
+
+                                    @if($details->byeLawCase && $details->byeLawCase->membership_case=='case_d')
+                                        @php $fileUrl = asset('storage/society_docs/' . $details->byeLawCase->successionCertificate);
+                                        $isApproved =$this->getFileStatus($statusData, $details->byeLawCase->successionCertificate);
+                                        @endphp
+                                        <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}','{{ $fileUrl }}','{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Succession Certificate
+                                        </div>
+                                    @endif
+
+                                    @if($details->byeLawCase && $details->byeLawCase->membership_case=='case_a')
+                                        @php 
+                                            $fileName = 'Appendix 2';
+                                            $fileUrl = route('appendix.two', ['byelaws_id' => $details->byeLawCase->id]);
+                                            $isApproved = $this->getFileStatus($statusData, $fileName);
+                                        @endphp
+                                        <div class="flex items-center text-xs  cursor-pointer" wire:click="viewDocument('{{ $details->id }}', '{{ $fileUrl }}', '{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Appendix 2
+                                        </div>
+                                    
+                                        @php 
+                                            $fileName = 'Appendix 3';
+                                            $fileUrl = route('appendix.three', ['byelaws_id' => $details->byeLawCase->id]);
+                                            $isApproved = $this->getFileStatus($statusData, $fileName);
+                                        @endphp
+                                        <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}', '{{ $fileUrl }}', '{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Appendix 3
+                                        </div>
+                                    @endif
+                                    @if($details->byeLawCase &&$details->byeLawCase->membership_case=='case_c')
+                                        @php 
+                                            $fileName = 'Appendix 15';
+                                            $fileUrl = route('appendix.fifteen', ['byelaws_id' => $details->byeLawCase->id]);
+                                            $isApproved = $this->getFileStatus($statusData, $fileName);
+                                        @endphp
+                                        <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}', '{{ $fileUrl }}', '{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Appendix 15
+                                        </div>
+                                    @endif
+                                    @if($details->byeLawCase &&$details->byeLawCase->membership_case=='case_d')
+                                        @php 
+                                            $fileName = 'Appendix 16';
+                                            $fileUrl = route('appendix.sixteen', ['byelaws_id' => $details->byeLawCase->id]);
+                                            $isApproved = $this->getFileStatus($statusData, $fileName);
+                                        @endphp
+                                        <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}', '{{ $fileUrl }}', '{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Appendix 16
+                                        </div>
+                                        @php 
+                                            $fileName = 'Appendix 19';
+                                            $fileUrl = route('appendix.nineteen', ['byelaws_id' => $details->byeLawCase->id]);
+                                            $isApproved = $this->getFileStatus($statusData, $fileName);
+                                        @endphp
+                                        <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}', '{{ $fileUrl }}', '{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Appendix 19
+                                        </div>
+                                    @endif
+                                    @if($details->byeLawCase &&$details->byeLawCase->membership_case=='case_b')
+                                        @php 
+                                            $fileName = 'Appendix 20(1)';
+                                            $fileUrl = route('appendix.twenty-part-one', ['byelaws_id' => $details->byeLawCase->id]);
+                                            $isApproved = $this->getFileStatus($statusData, $fileName);
+                                        @endphp
+                                        <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}', '{{ $fileUrl }}', '{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Appendix 20(1)
+                                        </div>
+                                        @php 
+                                            $fileName = 'Appendix 20(2)';
+                                            $fileUrl = route('appendix.twenty-part-two', ['byelaws_id' => $details->byeLawCase->id]);
+                                            $isApproved = $this->getFileStatus($statusData, $fileName);
+                                        @endphp
+                                        <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}', '{{ $fileUrl }}', '{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Appendix 20(2)
+                                        </div>
+                                        @php 
+                                            $fileName = 'Appendix 21';
+                                            $fileUrl = route('appendix.twenty-one', ['byelaws_id' => $details->byeLawCase->id]);
+                                            $isApproved = $this->getFileStatus($statusData, $fileName);
+                                        @endphp
+                                        <div class="flex items-center text-xs cursor-pointer" wire:click="viewDocument('{{ $details->id }}', '{{ $fileUrl }}', '{{ $isApproved }}')">
+                                            @if($isApproved=='Approved')
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-check text-green-600"></i></span>
+                                            @else
+                                            <span class="mr-2 flex items-center justify-center"><i class="fa-regular fa-circle-xmark text-red-600"></i></span>
+                                            @endif
+                                            Appendix 21
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -309,20 +499,46 @@
 
     <flux:modal  wire:model="showDocumentModal" class="!max-w-3xl w-full">
         <div class="space-y-6">
-            <div class="text-lg font-bold">
-                <flux:heading size="lg">Document View</flux:heading>
-            </div>
             @php
-                $extension = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
-                $fileName = trim(basename($url));
+                if (str_contains($url, 'appendix')) {
+                    $fileNamePart = basename(parse_url($url, PHP_URL_PATH));
+                    $fileNameMap = [
+                        'appendix-two' => 'Appendix 2',
+                        'appendix-three' => 'Appendix 3',
+                        'appendix-fifteen' => 'Appendix 15',
+                        'appendix-sixteen' => 'Appendix 16',
+                        'appendix-nineteen' => 'Appendix 19',
+                        'appendix-twenty-part-one' => 'Appendix 20(1)',
+                        'appendix-twenty-part-two' => 'Appendix 20(2)',
+                        'appendix-twenty-one' => 'Appendix 21',
+                    ];
+                    foreach($fileNameMap as $key => $value) {
+                        if (str_contains($url, $key)) {
+                            $fileName = $value;
+                            break;
+                        }
+                    }
+                    $extension = 'pdf';
+                } else {
+                    $extension = strtolower(pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION));
+                    $fileName = trim(basename($url));
+                }
             @endphp
+            <div class="flex items-center justify-between pr-8">
+                <flux:heading size="lg">Document View</flux:heading>
+                @if($url)
+                    <a href="{{ $url }}" download="{{ $fileName }}.{{ $extension }}" target="_blank" class="flex items-center gap-2 bg-blue-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors">
+                        <i class="fa-solid fa-download"></i>
+                    </a>
+                @endif
+            </div>
 
             {{-- Images --}}
             @if(in_array($extension, ['jpg','jpeg','png']))
                 <img src="{{ $url }}" alt="preview" class="w-full rounded" />
 
             {{-- PDF --}}
-            @elseif($extension === 'pdf')
+            @elseif($extension === 'pdf' || str_contains($url, 'appendix'))
                 <iframe src="{{ $url }}#toolbar=0" class="w-full h-[70vh]" frameborder="0"></iframe>
             @endif
         </div>

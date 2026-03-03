@@ -45,6 +45,11 @@
                                 <p class="text-gray-400 dark:text-gray-500 text-[10px] font-mono shrink-0 mt-0.5">
                                     {{ $society->registration_no ?? 'N/A' }}
                                 </p>
+                                @if($society->changes_required_count > 0)
+                                    <flux:badge color="red" size="xs" variant="solid" class="ml-1">
+                                        {{ $society->changes_required_count }} Changes
+                                    </flux:badge>
+                                @endif
                             </div>
 
                             {{-- Address — wraps fully --}}
@@ -118,18 +123,6 @@
                                     Shares: {{ $societyById->no_of_shares ?? '0' }}
                                 </flux:badge>
 
-                                @if($societyPendingVerificationCount > 0)
-                                    <flux:badge color="red" size="sm">⚠ {{ $societyPendingVerificationCount }} PendingVerification</flux:badge>
-                                @endif
-
-                                @if($societyPendingApplicationCount > 0)
-                                    <flux:badge color="yellow" size="sm">📋 {{ $societyPendingApplicationCount }} Pending
-                                        Application</flux:badge>
-                                @endif
-
-                                @if($societyPendingVerificationCount === 0 && $societyPendingApplicationCount === 0)
-                                    <flux:badge color="green" size="sm">✓ Nothing Pending</flux:badge>
-                                @endif
                             </div>
                         </div>
 
@@ -171,34 +164,41 @@
                         @if($pendingVerificationTimelineId)
                             @php 
                                 $pendingVerification = $timelines->firstWhere('id', $pendingVerificationTimelineId);
+                                $pvCount = $filterCounts[$pendingVerificationTimelineId] ?? 0;
                             @endphp
                             @if($pendingVerification)
                                 <button
                                     class="whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium cursor-pointer border transition-colors {{ $filterKey == $pendingVerificationTimelineId ? 'bg-blue-500 text-white border-blue-500' : 'border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
                                     wire:click="setFilter({{ $selectedSocietyId }}, {{ $pendingVerificationTimelineId }})">
-                                    Pending {{ $pendingVerification->name }}
+                                    Pending {{ $pendingVerification->name }} ({{ $pvCount }})
                                 </button>
                             @endif
                         @endif
-
                         {{-- 2. All --}}
-                        @php $startKey = 0; @endphp
                         <button
                             class="whitespace-nowrap  rounded-md px-3 py-1 text-xs font-medium cursor-pointer border transition-colors {{ $filterKey == 0 ? 'bg-blue-500 text-white border-blue-500' : 'border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
-                            wire:click="setFilter({{ $selectedSocietyId }}, {{ $startKey }})">
-                            All
+                            wire:click="setFilter({{ $selectedSocietyId }}, 0)">
+                            All ({{ $filterCounts[0] ?? 0 }})
                         </button>
 
                         {{-- 3. Remaining Timelines --}}
                         @foreach($timelines as $label)
                             @if($label->id != $pendingVerificationTimelineId)
+                                @php $count = $filterCounts[$label->id] ?? 0; @endphp
                                 <button
                                     class="whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium cursor-pointer border transition-colors {{ $filterKey == $label->id ? 'bg-blue-500 text-white border-blue-500' : 'border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700' }}"
                                     wire:click="setFilter({{ $selectedSocietyId }}, {{ $label->id }})">
-                                    Pending {{ $label->name }}
+                                    Pending {{ $label->name }} ({{ $count }})
                                 </button>
                             @endif
                         @endforeach
+
+                        @php $count = $filterCounts['changes_required'] ?? 0; @endphp
+                        <button
+                            class="whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium cursor-pointer border transition-colors {{ $filterKey === 'changes_required' ? 'bg-red-500 text-white border-red-500' : 'border-red-300 text-red-600 hover:bg-red-50' }}"
+                            wire:click="setFilter({{ $selectedSocietyId }}, 'changes_required')">
+                            Changes Required ({{ $count }})
+                        </button>
 
                     </div>
 

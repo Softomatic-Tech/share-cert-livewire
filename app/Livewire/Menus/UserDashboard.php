@@ -14,7 +14,7 @@ class UserDashboard extends Component
     public $apartmentList = [];
     public $search = '';
     public $selectedApartmentId;
-    protected $detailId,$userService,$checkApproved;
+    public $detailId, $checkApproved;
     public $url=null;
     public $showDocumentModal = false;
 
@@ -49,13 +49,18 @@ class UserDashboard extends Component
         return redirect()->route('menus.update_society_status',['apartmentId'=>$apartmentId]);
     }
 
+    public function viewDetails($apartmentId)
+    {
+        return redirect()->route('menus.view_society_status',['apartmentId'=>$apartmentId]);
+    }
+
     public function getFileStatus($statusData, $fileName)
     {
         $applicationTask = collect($statusData['tasks'])->firstWhere('name', 'Application');
         if ($applicationTask) {
             $subtask = collect($applicationTask['subtasks'] ?? [])
-                ->firstWhere('fileName', basename(trim($fileName)));
-            return $subtask['status'] ?? null; // could be Approved / Rejected / null
+                ->firstWhere('fileName', trim((string)$fileName));
+            return $subtask['status'] ?? null;
         }
         return null;
     }
@@ -66,5 +71,41 @@ class UserDashboard extends Component
         $this->showDocumentModal = true;
         $this->url = $fileUrl;
         $this->checkApproved = $isApproved;
+    }
+
+    public function updateFileStatus($detailId,$fileName,$fileStatus)
+    {
+        $this->detailId=$detailId;
+        $society = SocietyDetail::find($this->detailId); 
+        $societyData = json_decode($society->status, true);
+        foreach ($societyData['tasks'] as &$task) {
+            if ($task['name'] === 'Application') {
+                if (!isset($task['subtasks']) || !is_array($task['subtasks'])) {
+                    $task['subtasks'] = [];
+                }
+
+                $index = collect($task['subtasks'])->search(function ($sub) use ($fileName) {
+                    return trim((string) $sub['fileName']) === trim((string) $fileName);
+                });
+
+                if ($index !== false) {
+                    $task['subtasks'][$index]['status'] = $fileStatus;
+                } else {
+                    $task['subtasks'][] = [
+                        "fileName" => trim((string) $fileName),
+                        "status"   => $fileStatus];
+                }
+            }
+        }
+
+        $society->status = json_encode($societyData);
+        $society->save();
+        if($society){
+            $this->dispatch('show-success', message: 'Document '.$fileStatus.' successfully!');
+            $this->selectApartment($this->selectedApartmentId);
+            $this->showDocumentModal = false;
+        }else{
+            $this->dispatch('show-error', message: 'Something went wrong to approve document!');
+        }
     }
 }

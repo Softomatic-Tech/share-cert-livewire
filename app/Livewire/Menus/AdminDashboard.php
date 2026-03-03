@@ -12,26 +12,22 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\On; 
+
 class AdminDashboard extends Component
 {
     use WithPagination;
     public $societies, $societyDetails = [];
     public $apartments = [];
     public $userRole;
-    public $pendingApplication, $pendingApplicationCount, $pendingVerification, $pendingVerificationCount, $rejectedVerification, $rejectedVerificationCount;
-    public $pendingVerificationStatus, $approvedVerificationStatus, $rejectedVerificationStatus;
-    public $pendingVerificationStatusCount = 0;
-    public $approvedVerificationStatusCount = 0;
-    public $rejectedVerificationStatusCount = 0;
-    public $issueCertificateCount, $usersCount;
+    public $filterCounts = [];
     public $selectedSocietyId, $societyName, $filterId, $societyById;
     public $societyId = 0;
     public $filterKey = 0;
     public $search = '';
     public $timelines;
-    public $societyPendingVerificationCount = 0;
-    public $societyPendingApplicationCount = 0;
     public $pendingVerificationTimelineId = 0;
+    public $pendingApplicationTimelineId = 0;
     public $showAssignModal = false;
     public $step = 1;
     public $no_of_shares, $share_value, $individual_no_of_share, $share_capital_amount;
@@ -46,7 +42,12 @@ class AdminDashboard extends Component
             $societiesQuery->where('society_name', 'like', '%' . $this->search . '%');
         }
 
-        $this->societies = $societiesQuery->where('admin_id',$user->id)->get();
+        $this->societies = $societiesQuery->where('admin_id',$user->id)->get()->map(function($society) {
+            $society->changes_required_count = SocietyDetail::where('society_id', $society->id)
+                ->where('certificate_status', 'changes_required')
+                ->count();
+            return $society;
+        });
 
         return view('livewire.menus.admin-dashboard');
     }
@@ -57,67 +58,17 @@ class AdminDashboard extends Component
         // Store the Pending Verification timeline id for default filter
         $verificationTimeline = Timeline::where('name', 'like', '%Verification%')->first();
         $this->pendingVerificationTimelineId = $verificationTimeline ? $verificationTimeline->id : 0;
+        
+        $applicationTimeline = Timeline::where('name', 'like', '%Application%')->first();
+        $this->pendingApplicationTimelineId = $applicationTimeline ? $applicationTimeline->id : 0;
+        
         $this->usersCount = User::where('role_id', '!=', 1)->count();
         $this->userRole = Role::where('role', 'Society User')->value('id');
 
-        $this->pendingApplication = SocietyDetail::get()
-            ->filter(function ($item) {
-                $json = json_decode($item->status, true);
-                if (!isset($json['tasks']))
-                    return false;
-                $tasks = collect($json['tasks']);
-                $verify = $tasks->firstWhere('name', 'Verify Details');
-                $application = $tasks->firstWhere('name', 'Application');
-                $verification = $tasks->firstWhere('name', 'Verification');
-                return (
-                    ($verify && $verify['Status'] === 'Pending') &&
-                    ($application && $application['Status'] === 'Pending') &&
-                    ($verification && $verification['Status'] === 'Pending')
-                );
-
-                return false;
-            });
-        $this->pendingApplicationCount = $this->pendingApplication->count();
-
-        $this->pendingVerification = SocietyDetail::get()
-            ->filter(function ($item) {
-                $json = json_decode($item->status, true);
-                if (!isset($json['tasks']))
-                    return false;
-                $tasks = collect($json['tasks']);
-                $verify = $tasks->firstWhere('name', 'Verify Details');
-                $application = $tasks->firstWhere('name', 'Application');
-                $verification = $tasks->firstWhere('name', 'Verification');
-                return (
-                    $verify && $verify['Status'] === 'Applied' &&
-                    $application && $application['Status'] === 'Applied' &&
-                    $verification && $verification['Status'] === 'Pending'
-                );
-
-            });
-        $this->pendingVerificationCount = $this->pendingVerification->count();
-
-        $this->rejectedVerification = SocietyDetail::get()
-            ->filter(function ($item) {
-                $json = json_decode($item->status, true);
-                if (!isset($json['tasks']))
-                    return false;
-                $tasks = collect($json['tasks']);
-                $verify = $tasks->firstWhere('name', 'Verify Details');
-                $application = $tasks->firstWhere('name', 'Application');
-                $verification = $tasks->firstWhere('name', 'Verification');
-                return (
-                    $verify && $verify['Status'] === 'Pending' &&
-                    $application && $application['Status'] === 'Pending' &&
-                    $verification && $verification['Status'] === 'Rejected'
-                );
-
-            });
-        $this->rejectedVerificationCount = $this->rejectedVerification->count();
         $this->issueCertificateCount = 100;
 
-        // Select first society by default
-        $firstSociety = Society::first();
+        // Select first assigned society by default
+        $firstSociety = Society::where('admin_id', Auth::id())->first();
         if ($firstSociety) {
             $this->selectSociety($firstSociety->id);
         }
@@ -126,39 +77,75 @@ class AdminDashboard extends Component
     public function selectSociety($societyId)
     {
         $this->selectedSocietyId = $societyId;
-        $this->societyById = Society::with(['state', 'city'])->find($societyId);
+        $this->societyById = Society::with(['state', 'city','admin'])->find($societyId);
         $this->societyName = $this->societyById->society_name;
 
         // Default to Pending Verification filter
         $this->filterKey = $this->pendingVerificationTimelineId;
         $this->filterId = $societyId;
 
-        // Per-society pending counts
+        $this->calculateFilterCounts($societyId);
+    }
+
+    #[On('status-updated')]
+    public function refreshCounts()
+    {
+        if ($this->selectedSocietyId) {
+            $this->calculateFilterCounts($this->selectedSocietyId);
+        }
+    }
+
+    public function calculateFilterCounts($societyId)
+    {
         $details = SocietyDetail::where('society_id', $societyId)->get();
+        $this->filterCounts = [];
 
-        $this->societyPendingVerificationCount = $details->filter(function ($item) {
+        // Fetch timelines for dependency logic (matching SocietyStepper)
+        $timelines = Timeline::where('id', '!=', 1)->orderBy('id')->get();
+        $dependencies = [];
+        $previousSteps = [];
+        $idToName = [];
+        foreach ($timelines as $timeline) {
+            $idToName[$timeline->id] = $timeline->name;
+            $dependencies[$timeline->name] = $previousSteps;
+            $previousSteps[] = $timeline->name;
+        }
+
+        // Count for "All" (Pending any task)
+        $this->filterCounts[0] = $details->filter(function ($item) {
             $json = json_decode($item->status, true);
-            if (!isset($json['tasks']))
-                return false;
-            $tasks = collect($json['tasks']);
-            $application = $tasks->firstWhere('name', 'Application');
-            $verification = $tasks->firstWhere('name', 'Verification');
-            return $application && $application['Status'] === 'Applied'
-                && $verification && $verification['Status'] === 'Pending';
+            if (!isset($json['tasks'])) return false;
+            return collect($json['tasks'])->contains(fn($t) => ($t['Status'] ?? null) === 'Pending');
         })->count();
 
-        $this->societyPendingApplicationCount = $details->filter(function ($item) {
-            $json = json_decode($item->status, true);
-            if (!isset($json['tasks']))
-                return false;
-            $tasks = collect($json['tasks']);
-            $verify = $tasks->firstWhere('name', 'Verify Details');
-            $application = $tasks->firstWhere('name', 'Application');
-            $verification = $tasks->firstWhere('name', 'Verification');
-            return $verify && $verify['Status'] === 'Pending'
-                && $application && $application['Status'] === 'Pending'
-                && $verification && $verification['Status'] === 'Pending';
-        })->count();
+        // Count for "Changes Required"
+        $this->filterCounts['changes_required'] = $details->where('certificate_status', 'changes_required')->count();
+
+        // Count for each timeline
+        foreach ($timelines as $timeline) {
+            $currentStep = $timeline->name;
+            $this->filterCounts[$timeline->id] = $details->filter(function ($item) use ($currentStep, $dependencies) {
+                
+                // NEW: Specialized logic for "Certificate Delivered"
+                if ($currentStep === 'Certificate Delivered') {
+                    if ($item->certificate_status !== 'approved') {
+                        return false;
+                    }
+                }
+
+                $json = json_decode($item->status, true);
+                if (!isset($json['tasks'])) return false;
+                $tasks = collect($json['tasks'])->keyBy('name');
+
+                // Dependency check (matching SocietyStepper)
+                foreach ($dependencies[$currentStep] ?? [] as $dep) {
+                    if (($tasks[$dep]['Status'] ?? null) !== 'Approved') {
+                        return false;
+                    }
+                }
+                return ($tasks[$currentStep]['Status'] ?? null) === 'Pending';
+            })->count();
+        }
     }
 
     public function redirectToCreateSociety()

@@ -17,6 +17,7 @@ use App\Livewire\Menus\ViewAllApartments;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Livewire\Menus\UpdateSocietyStatus;
+use App\Livewire\Menus\ViewSocietyStatus;
 use App\Livewire\Menus\markRole;
 use App\Livewire\Menus\DownloadCertificate;
 use App\Http\Controllers\PdfController;
@@ -51,6 +52,7 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 Route::middleware(['auth', 'role:Society User'])->group(function () {
     Route::get('/user/dashboard', UserDashboard::class)->name('user.dashboard');
     Route::get('/user/update-society-status/{apartmentId}', UpdateSocietyStatus::class)->name('menus.update_society_status');
+    Route::get('/user/view-society-status/{apartmentId}', ViewSocietyStatus::class)->name('menus.view_society_status');
 });
 
 Route::middleware(['auth'])->group(function () {
