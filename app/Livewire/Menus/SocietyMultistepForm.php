@@ -8,6 +8,7 @@ use App\Models\Society;
 use App\Models\SocietyDetail;
 use App\Models\State;
 use App\Models\City;
+use App\Models\User;
 use App\Models\Timeline;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -22,32 +23,40 @@ class SocietyMultistepForm extends Component
     public $societyId = null;
     public $csvUploaded = false;
     public $timelines,$timelineValues,$timelineMap;
-    public $states, $cities=[];
+    public $states, $cities=[],$admins = [];
     public $formData = [
         'society_name' => '',
         'total_flats'=>'',
         'address_1' => '',
         'address_2' => '',
         'pincode' => '',
-        'state_id' => '',
+        'state_id' => 32,
         'city_id' => '',
         'registration_no'=>'',
         'no_of_shares'=>'',
         'share_value'=>'',
+        'i_register' => '',
+        'j_register' => '',
+        'admin_id' => '',
     ];
 
     // Validation rules for each step
     protected $rules = [
         1 => [
             'formData.society_name' => 'required|string|max:255',
-            'formData.address_1' => 'required|string|max:255',
+            'formData.total_building' => 'required|numeric',
+            'formData.total_flats' => 'required|numeric|min:1',
+            'formData.address_1' => 'required|string|max:1000',
             'formData.address_2' => 'nullable|string|max:255',
             'formData.pincode' => 'required|numeric|digits:6',
             'formData.state_id' => 'required|exists:states,id',
             'formData.city_id' => 'required|exists:cities,id',
-            'formData.registration_no' => 'required|string',
-            'formData.no_of_shares' => 'required|numeric',
+            'formData.registration_no' => 'required|string|max:255',
+            'formData.no_of_shares' => 'required|numeric|min:1',
             'formData.share_value' => 'required|numeric|decimal:0,2',
+            'formData.i_register' => 'nullable|string|max:255',
+            'formData.j_register' => 'nullable|string|max:255',
+            'formData.admin_id' => 'required|exists:users,id',
         ],
         2=>[],
         3=>[]
@@ -64,6 +73,9 @@ class SocietyMultistepForm extends Component
         'formData.registration_no'  => 'registration no',
         'formData.no_of_shares'  => 'no of shares',
         'formData.share_value'  => 'share value',
+        'formData.i_register'   => 'I register',
+        'formData.j_register'   => 'J register',
+        'formData.admin_id'     => 'assigned admin',
     ];
     public function render()
     {
@@ -71,7 +83,14 @@ class SocietyMultistepForm extends Component
     }
 
     public function mount(){
-        $this->states=State::all();
+        $this->states = State::orderBy('name', 'asc')->get();
+        // Set default state to Maharashtra (ID 32)
+        $this->formData['state_id'] = 32;
+        $this->cities = City::where('state_id', 32)->get();
+
+        $this->admins = User::whereHas('role', function ($query) {
+            $query->where('role', 'Admin');
+        })->get();
     }
 
     public function updatedFormDataStateID($stateId)

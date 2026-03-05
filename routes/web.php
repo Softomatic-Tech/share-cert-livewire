@@ -17,9 +17,10 @@ use App\Livewire\Menus\ViewAllApartments;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
 use App\Livewire\Menus\UpdateSocietyStatus;
+use App\Livewire\Menus\ViewSocietyStatus;
 use App\Livewire\Menus\markRole;
 use App\Livewire\Menus\DownloadCertificate;
-
+use App\Http\Controllers\PdfController;
 
 Route::get('/', function () {
     return redirect()->route('login');
@@ -51,6 +52,7 @@ Route::middleware(['auth', 'role:Admin'])->group(function () {
 Route::middleware(['auth', 'role:Society User'])->group(function () {
     Route::get('/user/dashboard', UserDashboard::class)->name('user.dashboard');
     Route::get('/user/update-society-status/{apartmentId}', UpdateSocietyStatus::class)->name('menus.update_society_status');
+    Route::get('/user/view-society-status/{apartmentId}', ViewSocietyStatus::class)->name('menus.view_society_status');
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -60,6 +62,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
     Route::get('/issue-certificate/{id}', IssueCertificate::class)->name('menus.issue-certificate');
     Route::get('/certificate/{id}', DownloadCertificate::class)->name('menus.certificate.view');
+
+    //Appendix Routes
+    Route::get('/appendix-two/{byelaws_id}', [PdfController::class, 'appendixTwo'])->name('appendix.two');
+    Route::get('/appendix-three/{byelaws_id}', [PdfController::class, 'appendixThree'])->name('appendix.three');
+    Route::get('/appendix-fifteen/{byelaws_id}', [PdfController::class, 'appendixFifteen'])->name('appendix.fifteen');
+    Route::get('/appendix-sixteen/{byelaws_id}', [PdfController::class, 'appendixSixteen'])->name('appendix.sixteen');
+    Route::get('/appendix-nineteen/{byelaws_id}', [PdfController::class, 'appendixNineteen'])->name('appendix.nineteen');
+    Route::get('/appendix-twenty-part-one/{byelaws_id}', [PdfController::class, 'appendixTwentyPartOne'])->name('appendix.twenty-part-one');
+    Route::get('/appendix-twenty-part-two/{byelaws_id}', [PdfController::class, 'appendixTwentyPartTwo'])->name('appendix.twenty-part-two');
+    Route::get('/appendix-twenty-one/{byelaws_id}', [PdfController::class, 'appendixTwentyOne'])->name('appendix.twenty-one');
 });
 
 require __DIR__.'/auth.php';

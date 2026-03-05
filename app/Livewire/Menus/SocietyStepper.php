@@ -41,12 +41,28 @@ class SocietyStepper extends Component
     {
         $this->societyId = $id;
         $this->societyKey = $key;
-        $this->societyDetails = SocietyDetail::with('society')
+        $this->societyDetails = SocietyDetail::with('society','byeLawCase')
             ->where('society_id',$this->societyId)->get()
             ->filter(function ($item) {
+            
+            if ($this->societyKey == 'changes_required') {
+                return $item->certificate_status == 'changes_required';
+            }
+
             $json = json_decode($item->status, true);
             if (!isset($json['tasks'])) return false;
             $tasks = collect($json['tasks'])->keyBy('name');
+
+            if ($this->societyKey == 'certificate_pending') {
+                if ($item->certificate_status != 'pending') {
+                    return false;
+                }
+                $taskStatuses = collect($tasks)->pluck('Status')->values();
+                if ($taskStatuses->last() != 'Pending') {
+                    return false;
+                }
+                return $taskStatuses->slice(0, -1)->every(fn($s) => $s === 'Approved');
+            }
 
             if ($this->societyKey == 0) {
                 return $tasks->contains(fn($task) => ($task['Status'] ?? null) === 'Pending');
@@ -63,6 +79,14 @@ class SocietyStepper extends Component
             }
             $currentStep = $idToName[$this->societyKey] ?? null;
             if (!$currentStep) return false;
+
+            // NEW: Specialized logic for "Certificate Delivered"
+            if ($currentStep === 'Certificate Delivered') {
+                if ($item->certificate_status !== 'approved') {
+                    return false;
+                }
+            }
+
             // Ensure all dependencies are Approved
             foreach ($dependencies[$currentStep] ?? [] as $dep) {
                 if (($tasks[$dep]['Status'] ?? null) !== 'Approved') {
@@ -74,19 +98,28 @@ class SocietyStepper extends Component
         });
     }
     
-    public function getFileStatus($statusData, $fileName)
+    public $fileType = null;
+
+    public function getFileStatus($statusData, $fileName, $fileType = null)
     {
         $applicationTask = collect($statusData['tasks'])->firstWhere('name', $this->timelineValues[0]);
         if ($applicationTask) {
-            $subtask = collect($applicationTask['subtasks'] ?? [])
-                ->firstWhere('fileName', basename(trim($fileName)));
-            return $subtask['status'] ?? null; // could be Approved / Rejected / null
+            $subtasks = collect($applicationTask['subtasks'] ?? []);
+            
+            // Search by fileType first
+            if ($fileType) {
+                $subtask = $subtasks->firstWhere('fileType', $fileType);
+                if ($subtask) return $subtask['status'] ?? null;
+            }
+
+            // Fallback to fileName
+            $subtask = $subtasks->firstWhere('fileName', basename(trim($fileName)));
+            return $subtask['status'] ?? null;
         }
         return null;
     }
 
-    
-    public function areAllFourFilesApproved($statusData, array $expectedFiles = [])
+    public function areAllFilesApproved($statusData, array $expectedFiles = [])
     {
         $applicationTask = collect($statusData['tasks'])->firstWhere('name', $this->timelineValues[0]);
         if (!$applicationTask) {
@@ -248,6 +281,7 @@ class SocietyStepper extends Component
         $society->save();
         if($society){
             $this->dispatch('show-success', message: 'Document with society details have been approved successfully!');
+            $this->dispatch('status-updated');
             $this->mount($this->societyId,$this->societyKey);
         }else{
             $this->dispatch('show-error', message: 'Something went wrong to approve document!');
@@ -276,6 +310,7 @@ class SocietyStepper extends Component
         $society->save();
         if($society){
             $this->dispatch('show-success', message: 'Document rejected successfully!');
+            $this->dispatch('status-updated');
             $this->mount($this->societyId,$this->societyKey);
         }else{
             $this->dispatch('show-error', message: 'Something went wrong to reject document!');
@@ -315,7 +350,9 @@ class SocietyStepper extends Component
         $society->save();
         if($society){
             $this->dispatch('show-success', message: 'Document '.$fileStatus.' successfully!');
+            $this->dispatch('status-updated');
             $this->mount($this->societyId,$this->societyKey);
+            $this->showDocumentModal = false;
         }else{
             $this->dispatch('show-error', message: 'Something went wrong to approve document!');
         }
@@ -339,6 +376,7 @@ class SocietyStepper extends Component
         $society->save();
         if($society){
             $this->dispatch('show-success', message: 'All details have verified and certificate have been generated successfully!');
+            $this->dispatch('status-updated');
             $this->mount($this->societyId,$this->societyKey);
         }else{
             $this->dispatch('show-error', message: 'Something went wrong to approve document!');
