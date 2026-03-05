@@ -96,8 +96,8 @@
                                         @if($details->owner1_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner1 Phone: {{ $details->owner1_mobile }}</p>@endif
                                         @if($details->owner1_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner1_email }}</p>@endif
                                         <p class="mb-1"></p>
-                                        @if($details->owner2_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner2 Phone: {{ $details->owner2_mobile }}</p>@endif
-                                        @if($details->owner2_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner2_email }}</p>@endif
+                                        @if($details->owner2_mobile)<p><span class="text-sm font-bold dark:text-white">Owner2 Phone :  </span><span class="text-sm dark:text-white">{{ $details->owner2_mobile }}</span></p>@endif
+                                        @if($details->owner2_email)<p><span class="text-sm font-bold dark:text-white">Email :  </span><span class="text-sm dark:text-white">{{ $details->owner2_email }}</span></p>@endif
                                         <p class="mb-1"></p>
                                         @if($details->owner3_mobile)<p class="text-sm text-gray-500 dark:text-white">Owner3 Phone: {{ $details->owner3_mobile }}</p>@endif
                                         @if($details->owner3_email)<p class="text-sm text-gray-500 dark:text-white">Email: {{ $details->owner3_email }}</p>@endif

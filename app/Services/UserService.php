@@ -4,23 +4,18 @@ namespace App\Services;
 use App\Models\Society;
 use App\Models\SocietyDetail;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
 class UserService
 {
     protected $societyDetail = [];
-    protected $search;   
-    public function getAuthenticatedUser()
-    {
-        return Auth::user();
-    }
+    protected $search;  
+    protected $userMobile; 
 
-    public function getSocietyDetail($search=null){
-        $query = SocietyDetail::with('society','byeLawCase')
-            ->where(function ($query) {
-                $userMobile = Auth::user()->phone;
+    public function getSocietyDetail($search=null,$userMobile){
+        $query = SocietyDetail::with(['society.state', 'society.city'])
+            ->where(function ($query) use ($userMobile) {
                 $query->where('owner1_mobile', $userMobile)
                     ->orWhere('owner2_mobile', $userMobile)
                     ->orWhere('owner3_mobile', $userMobile);
@@ -323,9 +318,8 @@ class UserService
     }
     }
 
-    public function updateStatus($apartmentId)
+    public function updateStatus($apartmentId,$user_id)
     {
-        $user = Auth::user();
         $society = SocietyDetail::findOrFail($apartmentId);
         
         $byeLawCase = $society->byeLawCase;
@@ -371,7 +365,7 @@ class UserService
             if ($task['name'] === 'Verify Details') {
                 if ($oldTaskStatus !== 'Approved') {
                     $task['Status'] = 'Approved';
-                    $task['updatedBy'] = $user->id ?? 'System';
+                    $task['updatedBy'] = $user_id ?? 'System';
                     $task['updateDateTime'] = now();
                     $anyStatusChanged = true;
                 }

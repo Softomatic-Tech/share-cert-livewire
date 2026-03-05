@@ -7,6 +7,7 @@ use App\Models\Society;
 use App\Models\SocietyDetail; 
 use App\Models\State;
 use App\Models\City;
+use Illuminate\Support\Facades\Auth;
 use App\Models\ByeLawCase;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Log;
@@ -725,7 +726,8 @@ class UpdateSocietyStatus extends Component
 
     public function done()
     {
-        $response=$this->userService->updateStatus($this->apartment_id); 
+        $user=Auth::user();
+        $response=$this->userService->updateStatus($this->apartment_id,$user->id); 
         if ($response['status']) {
         // $this->dispatch('show-success', message:  $response['message']);
         return redirect()->route('user.dashboard');

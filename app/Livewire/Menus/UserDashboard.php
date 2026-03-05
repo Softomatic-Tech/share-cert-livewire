@@ -31,7 +31,9 @@ class UserDashboard extends Component
 
     public function mount()
     {
-        $apartments = $this->userService->getSocietyDetail();
+        $search ='';
+        $userMobile = Auth::user()->phone;
+        $apartments=$this->userService->getSocietyDetail($search,$userMobile);
         if ($apartments->isNotEmpty()) {
             $this->selectApartment($apartments->first()->id);
         }
@@ -41,7 +43,8 @@ class UserDashboard extends Component
     {
         log::info('Selected Apartment ID: ' . $id);
         $this->selectedApartmentId = $id;
-        $this->societyDetail=$this->userService->getSocietyDetail($this->selectedApartmentId);
+        $userMobile = Auth::user()->phone;
+        $this->societyDetail=$this->userService->getSocietyDetail($this->selectedApartmentId,$userMobile);
     }
 
     public function verifyDetails($apartmentId)

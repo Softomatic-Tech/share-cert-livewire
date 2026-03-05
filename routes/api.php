@@ -12,6 +12,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/society-details', [SocietyController::class, 'societyDetails']);
+    Route::get('society-details/{id}', [SocietyController::class, 'societyDetailsById']);
     Route::post('/update-society', [SocietyController::class, 'updateSociety']);
     Route::post('/update-status', [SocietyController::class, 'updateStatus']);
     Route::post('/upload-agreement-copy', [SocietyController::class, 'uploadAgreementCopy']);

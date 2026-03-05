@@ -18,7 +18,7 @@
         <div class="my-2">
             <livewire:menus.alerts />
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-2 min-h-screen">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
             <!-- Sidebar -->
             <aside class="col-span-1 border-r p-2">
                 <div class="mb-2 flex-shrink-0">
