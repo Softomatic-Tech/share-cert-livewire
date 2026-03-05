@@ -118,8 +118,23 @@ class AdminDashboard extends Component
             return collect($json['tasks'])->contains(fn($t) => ($t['Status'] ?? null) === 'Pending');
         })->count();
 
+        // Count for "Pending"
+        $this->filterCounts['pendingCertificateStatus'] = $details->where('certificate_status', 'pending')->filter(function ($item) {
+            $json = json_decode($item->status, true);
+            if (!isset($json['tasks'])) {
+                return false;
+            }
+            $tasks = collect($json['tasks']);
+            return $tasks->every(function ($task) {
+                if (($task['name'] ?? '') === 'Certificate Delivered') {
+                    return ($task['Status'] ?? '') === 'Pending';
+                }
+                return ($task['Status'] ?? '') === 'Approved';
+            });
+        })->count();
+
         // Count for "Changes Required"
-        $this->filterCounts['changes_required'] = $details->where('certificate_status', 'changes_required')->count();
+        $this->filterCounts['changedCertificateStatus'] = $details->where('certificate_status', 'changes_required')->count();
 
         // Count for each timeline
         foreach ($timelines as $timeline) {

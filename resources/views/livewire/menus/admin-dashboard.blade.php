@@ -193,13 +193,19 @@
                             @endif
                         @endforeach
 
-                        @php $count = $filterCounts['changes_required'] ?? 0; @endphp
+                        @php $pendingCount = $filterCounts['pendingCertificateStatus'] ?? 0; @endphp
+                        <button
+                            class="whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium cursor-pointer border transition-colors {{ $filterKey === 'certificate_pending' ? 'bg-red-500 text-white border-red-500' : 'border-red-300 text-red-600 hover:bg-red-50' }}"
+                            wire:click="setFilter({{ $selectedSocietyId }}, 'certificate_pending')">
+                            Certificate Status Pending ({{ $pendingCount }})
+                        </button>
+
+                        @php $changedCount = $filterCounts['changedCertificateStatus'] ?? 0; @endphp
                         <button
                             class="whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium cursor-pointer border transition-colors {{ $filterKey === 'changes_required' ? 'bg-red-500 text-white border-red-500' : 'border-red-300 text-red-600 hover:bg-red-50' }}"
                             wire:click="setFilter({{ $selectedSocietyId }}, 'changes_required')">
-                            Changes Required ({{ $count }})
+                            Certificate Status Required Changes ({{ $changedCount }})
                         </button>
-
                     </div>
 
                     

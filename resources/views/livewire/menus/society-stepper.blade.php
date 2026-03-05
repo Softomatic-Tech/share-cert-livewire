@@ -514,12 +514,16 @@
         @endphp
         <div class="flex items-center justify-between pr-8">
             <flux:heading size="lg">Document View</flux:heading>
-            @if($url)
-                <a href="{{ $url }}" download="{{ $fileName }}.{{ $extension }}" target="_blank" class="flex items-center gap-2 bg-blue-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors">
-                    <i class="fa-solid fa-download"></i>
-                    Download
-                </a>
-            @endif
+            <div class="flex items-center gap-2 mr-10">
+                @if($url)
+                    <a href="{{ $url }}" 
+                    download="{{ $fileName }}.{{ $extension }}" 
+                    target="_blank"
+                    class="flex items-center gap-2 bg-blue-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-600">
+                        <i class="fa-solid fa-download"></i>
+                    </a>
+                @endif
+            </div>
         </div>
 
         {{-- Images --}}

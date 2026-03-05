@@ -289,7 +289,12 @@
                                     $showCertificateDownloadButton = ($verifyStatus === 'Approved' && $applicationStatus === 'Approved' && $verificationStatus === 'Approved' && $generationStatus==='Approved');
                                     @endphp
                                     @if($showCertificateDownloadButton)
-                                    <div class="flex items-center text-xs justify-center cursor-pointer" onclick="window.open('{{ route('menus.certificate.view', ['id' => $details->id]) }}', '_blank')">View Certificate</div>
+                                    <div class="flex items-center text-xs justify-center cursor-pointer"
+                                    onclick="window.open('{{ route('menus.certificate.view', ['id' => $details->id]) }}', '_blank')">
+                                        <flux:badge color="blue" size="sm">
+                                        View Certificate
+                                        </flux:badge>
+                                    </div>
                                     @endif
                                 </div>
                                 <!--Bye Laws Section -->
@@ -524,13 +529,18 @@
                     $fileName = trim(basename($url));
                 }
             @endphp
-            <div class="flex items-center justify-between pr-8">
+            <div class="flex items-center justify-between">
                 <flux:heading size="lg">Document View</flux:heading>
-                @if($url)
-                    <a href="{{ $url }}" download="{{ $fileName }}.{{ $extension }}" target="_blank" class="flex items-center gap-2 bg-blue-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-600 transition-colors">
-                        <i class="fa-solid fa-download"></i>
-                    </a>
-                @endif
+                <div class="flex items-center gap-2 mr-10">
+                    @if($url)
+                        <a href="{{ $url }}" 
+                        download="{{ $fileName }}.{{ $extension }}" 
+                        target="_blank"
+                        class="flex items-center gap-2 bg-blue-500 text-white px-3 py-1.5 rounded-md text-sm font-medium hover:bg-blue-600">
+                            <i class="fa-solid fa-download"></i>
+                        </a>
+                    @endif
+                </div>
             </div>
 
             {{-- Images --}}
@@ -541,6 +551,11 @@
             @elseif($extension === 'pdf' || str_contains($url, 'appendix'))
                 <iframe src="{{ $url }}#toolbar=0" class="w-full h-[70vh]" frameborder="0"></iframe>
             @endif
+            <div class="flex justify-end gap-2">
+                <flux:modal.close>
+                    <flux:button variant="ghost">Close</flux:button>
+                </flux:modal.close>
+            </div>
         </div>
     </flux:modal>
 </div>

@@ -53,6 +53,17 @@ class SocietyStepper extends Component
             if (!isset($json['tasks'])) return false;
             $tasks = collect($json['tasks'])->keyBy('name');
 
+            if ($this->societyKey == 'certificate_pending') {
+                if ($item->certificate_status != 'pending') {
+                    return false;
+                }
+                $taskStatuses = collect($tasks)->pluck('Status')->values();
+                if ($taskStatuses->last() != 'Pending') {
+                    return false;
+                }
+                return $taskStatuses->slice(0, -1)->every(fn($s) => $s === 'Approved');
+            }
+
             if ($this->societyKey == 0) {
                 return $tasks->contains(fn($task) => ($task['Status'] ?? null) === 'Pending');
             } 
