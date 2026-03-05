@@ -34,33 +34,45 @@
                 Need Changes
             </button>
         </div>
-        @endif
-        {{-- Remark Input Box (appears only when needed) --}}
-        @if($showRemarkBox)
-            <div id="remark-section"
-                x-data
-                x-init="$el.scrollIntoView({behavior: 'smooth', block: 'center'}); $el.querySelector('textarea')?.focus()"
-                class="mt-6 border-t pt-4">
-                
-                <label for="remarks" class="block text-sm font-medium text-gray-700 mb-1">
-                    Remarks for changes
-                </label>
-                <textarea wire:model="certificate_remark" 
-                    placeholder="Enter remarks for changes..."
-                    class="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-yellow-300 focus:outline-none"></textarea>
+            {{-- Remark Input Box (appears only when needed) --}}
+            @if($showRemarkBox)
+                <div id="remark-section"
+                    x-data
+                    x-init="$el.scrollIntoView({behavior: 'smooth', block: 'center'}); $el.querySelector('textarea')?.focus()"
+                    class="mt-6 border-t pt-4">
+                    
+                    <label for="remarks" class="block text-sm font-medium text-gray-700 mb-1">
+                        Remarks for changes
+                    </label>
+                    <textarea wire:model="certificate_remark" 
+                        placeholder="Enter remarks for changes..."
+                        class="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-yellow-300 focus:outline-none"></textarea>
 
-                <div class="mt-3 text-right">
-                    <button
-                        wire:click="submitRemarks"
-                        class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md shadow">
-                        Submit Remarks
-                    </button>
+                    <div class="mt-3 text-right">
+                        <button
+                            wire:click="submitRemarks"
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md shadow">
+                            Submit Remarks
+                        </button>
+                    </div>
                 </div>
+            @endif
+            <div class="mt-2">
+            <livewire:menus.alerts />
             </div>
+            @endif
         @endif
-        <div class="mt-2">
-        <livewire:menus.alerts />
-        </div>
-        @endif
+
+        {{-- @if(auth()->user()->role->id === 2)
+            @if($details->certificate_status == 'changes_required')
+            <div class="mt-6 flex justify-center space-x-4">
+                <button 
+                    wire:click="approveCertificate"
+                    class="bg-green-500 text-white font-semibold px-6 py-2 rounded-md shadow">
+                    Approve
+                </button>
+            </div>
+            @endif
+        @endif --}}
     </div>
 </div>

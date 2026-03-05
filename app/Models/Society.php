@@ -11,6 +11,7 @@ class Society extends Model
     protected $fillable = [
         'society_name',
         'total_flats',
+        'total_building',
         'address_1',
         'address_2',
         'pincode',
@@ -18,7 +19,10 @@ class Society extends Model
         'city_id',
         'registration_no',
         'no_of_shares',
-        'share_value'
+        'share_value',
+        'i_register',
+        'j_register',
+        'admin_id'
     ];
 
     public function details()
@@ -34,5 +38,10 @@ class Society extends Model
     public function city()
     {
         return $this->belongsTo(City::class, 'city_id');
+    }
+
+    public function admin()
+    {
+        return $this->belongsTo(User::class, 'admin_id');
     }
 }

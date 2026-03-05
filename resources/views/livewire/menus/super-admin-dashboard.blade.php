@@ -1,5 +1,5 @@
 <div>
-    <div class="w-full">
+    <div class="w-full px-2">
         <div class="flex justify-between items-center">
             <div>
                 <flux:heading size="xl" level="1">{{ __('Dashboard') }}</flux:heading>
