@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Log;
 class UserDashboard extends Component
 {
     public $societyDetail = [];
-    public $apartmentList = [];
+    public $apartmentList;
     public $search = '';
     public $selectedApartmentId;
     public $detailId, $checkApproved;
@@ -25,7 +25,6 @@ class UserDashboard extends Component
 
     public function render()
     {
-        $this->apartmentList = $this->userService->getSocietyDetail($this->search);
         return view('livewire.menus.user-dashboard');
     }
 
@@ -33,9 +32,9 @@ class UserDashboard extends Component
     {
         $search ='';
         $userMobile = Auth::user()->phone;
-        $apartments=$this->userService->getSocietyDetail($search,$userMobile);
-        if ($apartments->isNotEmpty()) {
-            $this->selectApartment($apartments->first()->id);
+        $this->apartmentList=$this->userService->getSocietyDetail($search,$userMobile);
+        if ($this->apartmentList->isNotEmpty()) {
+            $this->selectApartment($this->apartmentList->first()->id);
         }
     }
 
