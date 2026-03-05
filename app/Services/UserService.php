@@ -32,7 +32,7 @@ class UserService
             } else {
                 $query->orderBy('id', 'desc');
             }
-            $societyDetail = $search ? collect([$query->first()]) : $query->get();
+            $societyDetail = $search ? collect($query->first() ? [$query->first()] : []) : $query->get();
             return $societyDetail;
     }
 
