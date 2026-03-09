@@ -725,15 +725,15 @@ class UpdateSocietyStatus extends Component
         } 
     }
 
-    public function done()
-    {
-        $user=Auth::user();
-        $response=$this->userService->updateStatus($this->apartment_id,$user->id); 
-        if ($response['status']) {
-        // $this->dispatch('show-success', message:  $response['message']);
-        return redirect()->route('user.dashboard');
-        } else {
-            $this->dispatch('show-error', message:  $response['message'] ?? 'Error updating society status');
-        }
-    }
+    // public function done()
+    // {
+    //     $user=Auth::user();
+    //     $response=$this->userService->updateStatus($this->apartment_id,$user->id); 
+    //     if ($response['status']) {
+    //     // $this->dispatch('show-success', message:  $response['message']);
+    //     return redirect()->route('user.dashboard');
+    //     } else {
+    //         $this->dispatch('show-error', message:  $response['message'] ?? 'Error updating society status');
+    //     }
+    // }
 }
