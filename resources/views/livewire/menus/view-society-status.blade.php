@@ -65,10 +65,10 @@
                             <flux:label>No of Each Share</flux:label>
                             <flux:text>{{ $individual_no_of_share }}</flux:text>
                         </flux:field>
-                        <flux:field>
+                        {{-- <flux:field>
                             <flux:label>Each Share Amount</flux:label>
                             <flux:text>₹{{ number_format($share_capital_amount) }}</flux:text>
-                        </flux:field>
+                        </flux:field> --}}
                         <flux:field>
                             <flux:label>Registration Certificate No</flux:label>
                             <flux:text>{{ $certificate_no }}</flux:text>

@@ -71,7 +71,7 @@
                                     <div class="p-2">
                                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 border-t border-gray-50 dark:border-gray-700">
                                             <p class="text-lg font-bold text-gray-900 dark:text-white">{{ $details->building_name }} - {{ $details->apartment_number }}
-                                                <flux:badge color="purple" size="sm">
+                                                <flux:badge color="blue" icon="building-office" size="md">
                                                         {{ $details->society->society_name }}
                                                     </flux:badge>
                                             </p>

@@ -9,6 +9,16 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class PdfController extends Controller
 {
+    // public function mount($id)
+    // {
+
+    //     $this->societyDetails = SocietyDetail::with('society')->where('id', $id)->first();
+    // }
+
+    public function appendix()
+    {
+        return view('livewire.menus.appendix-pdf');
+    }
 
     public function appendixTwo($byelaws_id)
     {

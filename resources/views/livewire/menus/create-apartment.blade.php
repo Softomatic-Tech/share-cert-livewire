@@ -16,7 +16,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
                         <div>
                         <label for="csv_file">Society Name:</label>
-                        <flux:select wire:model="society_id" placeholder="Choose Society...">
+                        <flux:select wire:model="society_id">
                             <flux:select.option value="">Choose Society...</flux:select.option>
                             @foreach($society  as $row)
                                 <flux:select.option value="{{ $row->id }}">{{ $row->society_name }} , (Total Flats: {{ $row->total_flats }})</flux:select.option>

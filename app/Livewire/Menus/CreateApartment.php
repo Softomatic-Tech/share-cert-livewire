@@ -45,7 +45,7 @@ class CreateApartment extends Component
             'apartment_number',
             'certificate_no',
             'individual_no_of_share',
-            'share_capital_amount',
+            // 'share_capital_amount',
             'owner1_first_name', 'owner1_middle_name', 'owner1_last_name',
             'owner1_mobile', 'owner1_email',
             'owner2_first_name', 'owner2_middle_name', 'owner2_last_name',
@@ -77,7 +77,7 @@ class CreateApartment extends Component
             return;
         }
         $header = fgetcsv($file); 
-        $requiredHeaders = ['building_name', 'apartment_number','certificate_no','individual_no_of_share','share_capital_amount','owner1_first_name', 'owner1_mobile'];   
+        $requiredHeaders = ['building_name', 'apartment_number','certificate_no','individual_no_of_share','owner1_first_name', 'owner1_mobile'];   
         $headerMap = array_map('trim', $header);
         foreach ($requiredHeaders as $required) {
             if (!in_array($required, $headerMap)) {
@@ -93,7 +93,7 @@ class CreateApartment extends Component
         $rowNumber = 2;
         $shareMismatchError ='';
         $uploadedShares = 0;
-        $uploadedAmount = 0;
+        // $uploadedAmount = 0;
         $society = Society::find($this->society_id);
         $expectedFlats = (int) $society->total_flats;
         $expectedShares = (float) $society->no_of_shares;
@@ -103,18 +103,18 @@ class CreateApartment extends Component
             $apartmentNumber = $data[$indexes['apartment_number']] ?? null;
             $certificateNo = $data[$indexes['certificate_no']] ?? null;
             $noOfShares = $data[$indexes['individual_no_of_share']] ?? null;
-            $shareCapitalAmount = $data[$indexes['share_capital_amount']] ?? null;
+            // $shareCapitalAmount = $data[$indexes['share_capital_amount']] ?? null;
             $owner1First = $data[$indexes['owner1_first_name']] ?? null;
             $owner1Mobile = $data[$indexes['owner1_mobile']] ?? null;
 
-            if (empty($buildingName) || empty($apartmentNumber) || empty($certificateNo) || empty($noOfShares) || empty($shareCapitalAmount) || empty($owner1First) || empty($owner1Mobile)) {
+            if (empty($buildingName) || empty($apartmentNumber) || empty($certificateNo) || empty($noOfShares) || empty($owner1First) || empty($owner1Mobile)) {
                 $invalidRows[] = $rowNumber;
             } else {
                 if (!is_numeric($noOfShares)) {
                     $invalidRows[] = $rowNumber;
                 } else {
                     $uploadedShares += (float) $noOfShares;
-                    $uploadedAmount += (float) $shareCapitalAmount;
+                    // $uploadedAmount += (float) $shareCapitalAmount;
                     $validRows[] = $data;
                 }
             }
@@ -129,28 +129,29 @@ class CreateApartment extends Component
         }
         if ($uploadedShares != $expectedShares) {
             $diffOfShare = (float)$uploadedShares - (float)$expectedShares;
-                if($uploadedAmount != $expectedAmount){
-                    $diffOfAmount = (float)$uploadedAmount - (float)$expectedAmount;
-                    $status1 = $diffOfShare > 0 ? 'more' : 'less';
-                    $status2 = $diffOfAmount > 0 ? 'more' : 'less';
-                    $shareMismatchError = "Total shares and amount mismatch! Expected shares {$expectedShares}, but found {$uploadedShares} ({$status1} by " . abs($diffOfShare) .") and expected amount {$expectedAmount}, but found {$uploadedAmount} ({$status2} by " . abs($diffOfAmount). ") in CSV.";
-                    $this->dispatch('show-error', message:  $shareMismatchError);
-                    return;
-                }else{
+                // if($uploadedAmount != $expectedAmount){
+                //     $diffOfAmount = (float)$uploadedAmount - (float)$expectedAmount;
+                //     $status1 = $diffOfShare > 0 ? 'more' : 'less';
+                //     $status2 = $diffOfAmount > 0 ? 'more' : 'less';
+                //     $shareMismatchError = "Total shares and amount mismatch! Expected shares {$expectedShares}, but found {$uploadedShares} ({$status1} by " . abs($diffOfShare) .") and expected amount {$expectedAmount}, but found {$uploadedAmount} ({$status2} by " . abs($diffOfAmount). ") in CSV.";
+                //     $this->dispatch('show-error', message:  $shareMismatchError);
+                //     return;
+                // }else{
                     $status1 = $diffOfShare > 0 ? 'more' : 'less';
                     $shareMismatchError = "Total shares mismatch! Expected shares {$expectedShares}, but found {$uploadedShares} in CSV ({$status1} by " . abs($diffOfShare) . ").";
                     $this->dispatch('show-error', message:  $shareMismatchError);
                     return;
-                }
-        }else{
-                if($uploadedAmount != $expectedAmount){
-                    $diffOfAmount = (float)$uploadedAmount - (float)$expectedAmount;
-                    $status2 = $diffOfAmount > 0 ? 'more' : 'less';
-                    $shareMismatchError = "Total shares amount mismatch! Expected amount {$expectedAmount}, but found {$uploadedAmount} ({$status2} by " . abs($diffOfAmount). ") in CSV.";
-                    $this->dispatch('show-error', message:  $shareMismatchError);
-                    return;
-                }
+                //}
         }
+        // else{
+        //         if($uploadedAmount != $expectedAmount){
+        //             $diffOfAmount = (float)$uploadedAmount - (float)$expectedAmount;
+        //             $status2 = $diffOfAmount > 0 ? 'more' : 'less';
+        //             $shareMismatchError = "Total shares amount mismatch! Expected amount {$expectedAmount}, but found {$uploadedAmount} ({$status2} by " . abs($diffOfAmount). ") in CSV.";
+        //             $this->dispatch('show-error', message:  $shareMismatchError);
+        //             return;
+        //         }
+        // }
 
         $this->timelines =Timeline::orderBy('id')->get();
         $this->timelineMap = $this->timelines->pluck('name', 'id')->toArray();
@@ -218,7 +219,7 @@ class CreateApartment extends Component
                 'user_id'=>Auth::id(),
                 'certificate_no' => $data[$indexes['certificate_no']],
                 'no_of_shares' => $data[$indexes['individual_no_of_share']],
-                'share_capital_amount' => $data[$indexes['share_capital_amount']],
+                // 'share_capital_amount' => $data[$indexes['share_capital_amount']],
                 'owner1_name' => $owner1_name,
                 'owner1_mobile' => $data[$indexes['owner1_mobile']] ?? null,
                 'owner1_email' => $data[$indexes['owner1_email']] ?? null,

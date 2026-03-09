@@ -258,7 +258,7 @@
             <div class="text-lg font-bold">
                 <flux:heading size="lg">Assign Shares</flux:heading>
             </div>
-            @if ($step === 1)
+            {{-- @if ($step === 1) --}}
                 <!-- STEP 1: Basic Share Details Form -->
                 <div>
                     <div class="mb-3">
@@ -270,12 +270,13 @@
                     </div>
 
                     <div class="flex justify-end mt-4">
-                        <flux:button variant="primary" wire:click="saveShares">Save & Next</flux:button>
+                        <flux:button variant="primary" wire:click="saveShares">Save</flux:button>
+                        <button wire:click="closeModal" class="px-3 py-1 border rounded-md text-sm">Close</button>
                     </div>
                 </div>
-            @endif
+            {{-- @endif --}}
 
-            @if ($step === 2)
+            {{-- @if ($step === 2)
                 <!-- STEP 2: Apartment-level Share Form -->
                 <div>
                     <h3 class="text-base font-semibold mb-3">Choose Share Assignment Type</h3>
@@ -344,11 +345,8 @@
                         @endif
                     </div>
                 </div>
-            @endif
+            @endif --}}
 
-            <div class="flex justify-end mt-4">
-                <button wire:click="closeModal" class="px-3 py-1 border rounded-md text-sm">Close</button>
-            </div>
         </div>
     </flux:modal>
     </div>

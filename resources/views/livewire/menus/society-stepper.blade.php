@@ -32,11 +32,11 @@
                                     {{ $details->no_of_shares }} Shares
                                 </span>
                             @endif
-                            @if($details->share_capital_amount)
+                            {{-- @if($details->share_capital_amount)
                                 <span class="bg-gray-50 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-full dark:bg-gray-700 dark:text-gray-300 border border-gray-100 dark:border-gray-600">
                                     ₹{{ number_format($details->share_capital_amount) }}
                                 </span>
-                            @endif
+                            @endif --}}
                         </div>
                     </div>
                 </div>
@@ -603,7 +603,7 @@
                 <flux:input type="text" :label="__('Apartment Number :')" wire:model="apartment_number" />
                 <flux:input type="text"  :label="__('Certificate No :')" wire:model="certificate_no" />
                 <flux:input type="number"  :label="__('No of Each Share :')" wire:model="individual_no_of_share" />
-                <flux:input type="number"  :label="__('Each Share Amount :')" wire:model="share_capital_amount" />
+                {{-- <flux:input type="number"  :label="__('Each Share Amount :')" wire:model="share_capital_amount" /> --}}
                 <flux:input type="text" :label="__('Owner 1 Name :')" wire:model="owner1_name" />
                 <flux:input type="text" :label="__('Owner 1 Email :')" wire:model="owner1_email" />
                 <flux:input type="text" :label="__('Owner 1 Mobile :')" wire:model="owner1_mobile" />

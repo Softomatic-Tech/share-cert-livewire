@@ -60,7 +60,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
-    Route::get('/issue-certificate/{id}', IssueCertificate::class)->name('menus.issue-certificate');
+    // Route::get('/issue-certificate/{id}', IssueCertificate::class)->name('menus.issue-certificate');
     Route::get('/certificate/{id}', DownloadCertificate::class)->name('menus.certificate.view');
 
     //Appendix Routes
@@ -72,6 +72,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/appendix-twenty-part-one/{byelaws_id}', [PdfController::class, 'appendixTwentyPartOne'])->name('appendix.twenty-part-one');
     Route::get('/appendix-twenty-part-two/{byelaws_id}', [PdfController::class, 'appendixTwentyPartTwo'])->name('appendix.twenty-part-two');
     Route::get('/appendix-twenty-one/{byelaws_id}', [PdfController::class, 'appendixTwentyOne'])->name('appendix.twenty-one');
+
+    Route::get('/appendix-pdf', [PdfController::class, 'appendix'])->name('appendix.appendix-pdf');
 });
 
 require __DIR__.'/auth.php';

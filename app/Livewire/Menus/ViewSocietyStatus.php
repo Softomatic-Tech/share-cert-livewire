@@ -15,7 +15,7 @@ class ViewSocietyStatus extends Component
 {
     public $apartment,$state,$city;
     public $states, $cities=[];
-    public $society_id,$society_name, $total_building, $total_flats, $address_1, $address_2, $pincode, $city_id, $state_id,$no_of_shares,$share_value,$apartment_id,$building_name, $apartment_number,$certificate_no,$individual_no_of_share, $share_capital_amount,$owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
+    public $society_id,$society_name, $total_building, $total_flats, $address_1, $address_2, $pincode, $city_id, $state_id,$no_of_shares,$share_value,$apartment_id,$building_name, $apartment_number,$certificate_no,$individual_no_of_share,$owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
     public $agreementCopy,$memberShipForm,$allotmentLetter,$possessionLetter;
     public $membership_case;
     protected $userService;
@@ -76,7 +76,7 @@ class ViewSocietyStatus extends Component
             $this->apartment_number = $apartment->apartment_number;
             $this->certificate_no = $apartment->certificate_no;
             $this->individual_no_of_share = $apartment->no_of_shares;
-            $this->share_capital_amount = $apartment->share_capital_amount;
+            // $this->share_capital_amount = $apartment->share_capital_amount;
             $this->owner1_name = $apartment->owner1_name;
             $this->owner1_mobile = $apartment->owner1_mobile;
             $this->owner1_email = $apartment->owner1_email;

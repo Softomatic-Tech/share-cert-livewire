@@ -62,11 +62,7 @@ class AdminDashboard extends Component
         $applicationTimeline = Timeline::where('name', 'like', '%Application%')->first();
         $this->pendingApplicationTimelineId = $applicationTimeline ? $applicationTimeline->id : 0;
         
-        $this->usersCount = User::where('role_id', '!=', 1)->count();
         $this->userRole = Role::where('role', 'Society User')->value('id');
-
-        $this->issueCertificateCount = 100;
-
         // Select first assigned society by default
         $firstSociety = Society::where('admin_id', Auth::id())->first();
         if ($firstSociety) {
@@ -87,7 +83,6 @@ class AdminDashboard extends Component
         $this->calculateFilterCounts($societyId);
     }
 
-    #[On('status-updated')]
     public function refreshCounts()
     {
         if ($this->selectedSocietyId) {
@@ -188,36 +183,21 @@ class AdminDashboard extends Component
     {
         $this->selectedSocietyId = $societyId;
         $this->societyById = Society::find($societyId);
-        if ($this->societyById && $this->societyById->no_of_shares && $this->societyById->share_value) {
-            $this->step = 2; // skip to next form
-        } else {
-            $this->step = 1; // show initial form
-        }
+        $this->no_of_shares = $this->societyById->no_of_shares;
+        $this->share_value = $this->societyById->share_value;
+        // if ($this->societyById && $this->societyById->no_of_shares && $this->societyById->share_value) {
+        //     $this->step = 2; // skip to next form
+        // } else {
+        //     $this->step = 1; // show initial form
+        // }
         $this->showAssignModal = true;
     }
 
-    public function updatedAssignType($value)
-    {
-        if ($value === 'individual') {
-            $this->apartments = SocietyDetail::where('society_id', $this->selectedSocietyId)
-                ->get()
-                ->map(fn($a) => [
-                    'id' => $a->id,
-                    'name' => $a->building_name,
-                    'individual_no_of_share' => '',
-                    'share_capital_amount' => '',
-                ])
-                ->toArray();
-        } else {
-            $this->apartments = [];
-        }
-    }
-
-    public function saveEqualShares()
+    public function saveShares()
     {
         $this->validate([
-            'individual_no_of_share' => 'required|numeric|min:1',
-            'share_capital_amount' => 'required|numeric|min:1',
+            'no_of_shares' => 'required|numeric|min:1',
+            'share_value' => 'required|numeric|min:1',
         ]);
 
         $society = Society::find($this->selectedSocietyId);
@@ -226,95 +206,143 @@ class AdminDashboard extends Component
             $this->dispatch('show-error', message: 'Society not found.');
             return;
         }
-        $totalApartments = SocietyDetail::where('society_id', $this->selectedSocietyId)->count();
-        $totalAssignedShares = $this->individual_no_of_share * $totalApartments;
-        $totalAssignedCapital = $this->share_capital_amount * $totalApartments;
-        $expectedTotalShares = $society->no_of_shares;
-        $expectedTotalCapital = $society->no_of_shares * $society->share_value;
-        if ($totalAssignedShares != $expectedTotalShares) {
-            $this->dispatch('show-error', message: "Total assigned shares ($totalAssignedShares) do not match society's total shares ($expectedTotalShares).");
-            $this->showAssignModal = false;
-            return;
+
+        // Check if shares already exist
+        if (empty($society->no_of_shares) && empty($society->share_value)) {
+            $message = 'Shares assigned successfully!';
+        } else {
+            $message = 'Shares updated successfully!';
         }
 
-        if ($totalAssignedCapital != $expectedTotalCapital) {
-            $this->dispatch('show-error', message: "Total share capital ($totalAssignedCapital) does not match expected capital ($expectedTotalCapital).");
-            $this->showAssignModal = false;
-            return;
-        }
-        $response = false;
-        $response = SocietyDetail::where('society_id', $this->selectedSocietyId)->update([
-            'no_of_shares' => $this->individual_no_of_share,
-            'share_capital_amount' => $this->share_capital_amount,
+        $society->update([
+            'no_of_shares' => $this->no_of_shares,
+            'share_value' => $this->share_value,
         ]);
 
-        if ($response !== false) {
-            $this->dispatch('show-success', message: 'Shares assigned equally to all apartments!');
-            $this->reset(['individual_no_of_share', 'share_capital_amount']);
-            $this->showAssignModal = false;
-        } else {
-            $this->dispatch('show-error', message: 'Some error occurs while assign shares equally to all apartments!');
-            $this->showAssignModal = false;
-        }
+        $this->dispatch('show-success', message: $message);
+
+        $this->showAssignModal = false;
     }
 
-    public function saveIndividualShares()
-    {
-        $rules = [
-            'apartments.*.individual_no_of_share' => 'required|numeric|min:1',
-            'apartments.*.share_capital_amount' => 'required|numeric|min:1',
-        ];
+    // public function updatedAssignType($value)
+    // {
+    //     if ($value === 'individual') {
+    //         $this->apartments = SocietyDetail::where('society_id', $this->selectedSocietyId)
+    //             ->get()
+    //             ->map(fn($a) => [
+    //                 'id' => $a->id,
+    //                 'name' => $a->building_name,
+    //                 'individual_no_of_share' => '',
+    //                 'share_capital_amount' => '',
+    //             ])
+    //             ->toArray();
+    //     } else {
+    //         $this->apartments = [];
+    //     }
+    // }
 
-        $messages = [
-            'required' => 'The :attribute field is required.',
-            'numeric' => 'The :attribute must be a number.',
-            'min' => 'The :attribute must be at least :min.',
-        ];
+    // public function saveEqualShares()
+    // {
+    //     $this->validate([
+    //         'individual_no_of_share' => 'required|numeric|min:1',
+    //         'share_capital_amount' => 'required|numeric|min:1',
+    //     ]);
 
-        $attributes = [];
-        foreach ($this->apartments as $index => $apt) {
-            $attributes["apartments.$index.individual_no_of_share"] = "Shares for {$apt['name']}";
-            $attributes["apartments.$index.share_capital_amount"] = "Share Amount for {$apt['name']}";
-        }
+    //     $society = Society::find($this->selectedSocietyId);
 
-        $this->validate($rules, $messages, $attributes);
-        $totalIndividualShares = collect($this->apartments)->sum('individual_no_of_share');
-        $totalShareCapital = collect($this->apartments)->sum('share_capital_amount');
-        $society = Society::find($this->selectedSocietyId); // or however you link it
-        if (!$society) {
-            $this->dispatch('show-error', message: 'Society record not found.');
-            return;
-        }
-        $expectedShareCapital = $society->no_of_shares * $society->share_value;
-        if ($totalIndividualShares != $society->no_of_shares) {
-            $this->dispatch('show-error', message: "Total individual shares ($totalIndividualShares) do not match society's total shares ({$society->no_of_shares}).");
-            $this->showAssignModal = false;
-            return;
-        }
+    //     if (!$society) {
+    //         $this->dispatch('show-error', message: 'Society not found.');
+    //         return;
+    //     }
+    //     $totalApartments = SocietyDetail::where('society_id', $this->selectedSocietyId)->count();
+    //     $totalAssignedShares = $this->individual_no_of_share * $totalApartments;
+    //     $totalAssignedCapital = $this->share_capital_amount * $totalApartments;
+    //     $expectedTotalShares = $society->no_of_shares;
+    //     $expectedTotalCapital = $society->no_of_shares * $society->share_value;
+    //     if ($totalAssignedShares != $expectedTotalShares) {
+    //         $this->dispatch('show-error', message: "Total assigned shares ($totalAssignedShares) do not match society's total shares ($expectedTotalShares).");
+    //         $this->showAssignModal = false;
+    //         return;
+    //     }
 
-        if ($totalShareCapital != $expectedShareCapital) {
-            $this->dispatch('show-error', message: "Total share capital ({$totalShareCapital}) does not match society's expected capital ({$expectedShareCapital}).");
-            $this->showAssignModal = false;
-            return;
-        }
-        $response = false;
-        foreach ($this->apartments as $apartment) {
-            $response = SocietyDetail::where('id', $apartment['id'])->update([
-                'no_of_shares' => $apartment['individual_no_of_share'],
-                'share_capital_amount' => $apartment['share_capital_amount'],
-            ]);
-        }
+    //     if ($totalAssignedCapital != $expectedTotalCapital) {
+    //         $this->dispatch('show-error', message: "Total share capital ($totalAssignedCapital) does not match expected capital ($expectedTotalCapital).");
+    //         $this->showAssignModal = false;
+    //         return;
+    //     }
+    //     $response = false;
+    //     $response = SocietyDetail::where('society_id', $this->selectedSocietyId)->update([
+    //         'no_of_shares' => $this->individual_no_of_share,
+    //         'share_capital_amount' => $this->share_capital_amount,
+    //     ]);
 
-        if ($response !== false) {
-            $this->dispatch('show-success', message: 'Individual shares assigned to all apartments successfully!');
-            $this->showAssignModal = false;
-            $this->reset(['apartments']);
-            $this->resetErrorBag();
-        } else {
-            $this->dispatch('show-error', message: 'Some error occurs while assign shares equally to all apartments!');
-            $this->showAssignModal = false;
-        }
-    }
+    //     if ($response !== false) {
+    //         $this->dispatch('show-success', message: 'Shares assigned equally to all apartments!');
+    //         $this->reset(['individual_no_of_share', 'share_capital_amount']);
+    //         $this->showAssignModal = false;
+    //     } else {
+    //         $this->dispatch('show-error', message: 'Some error occurs while assign shares equally to all apartments!');
+    //         $this->showAssignModal = false;
+    //     }
+    // }
+
+    // public function saveIndividualShares()
+    // {
+    //     $rules = [
+    //         'apartments.*.individual_no_of_share' => 'required|numeric|min:1',
+    //         'apartments.*.share_capital_amount' => 'required|numeric|min:1',
+    //     ];
+
+    //     $messages = [
+    //         'required' => 'The :attribute field is required.',
+    //         'numeric' => 'The :attribute must be a number.',
+    //         'min' => 'The :attribute must be at least :min.',
+    //     ];
+
+    //     $attributes = [];
+    //     foreach ($this->apartments as $index => $apt) {
+    //         $attributes["apartments.$index.individual_no_of_share"] = "Shares for {$apt['name']}";
+    //         $attributes["apartments.$index.share_capital_amount"] = "Share Amount for {$apt['name']}";
+    //     }
+
+    //     $this->validate($rules, $messages, $attributes);
+    //     $totalIndividualShares = collect($this->apartments)->sum('individual_no_of_share');
+    //     $totalShareCapital = collect($this->apartments)->sum('share_capital_amount');
+    //     $society = Society::find($this->selectedSocietyId); // or however you link it
+    //     if (!$society) {
+    //         $this->dispatch('show-error', message: 'Society record not found.');
+    //         return;
+    //     }
+    //     $expectedShareCapital = $society->no_of_shares * $society->share_value;
+    //     if ($totalIndividualShares != $society->no_of_shares) {
+    //         $this->dispatch('show-error', message: "Total individual shares ($totalIndividualShares) do not match society's total shares ({$society->no_of_shares}).");
+    //         $this->showAssignModal = false;
+    //         return;
+    //     }
+
+    //     if ($totalShareCapital != $expectedShareCapital) {
+    //         $this->dispatch('show-error', message: "Total share capital ({$totalShareCapital}) does not match society's expected capital ({$expectedShareCapital}).");
+    //         $this->showAssignModal = false;
+    //         return;
+    //     }
+    //     $response = false;
+    //     foreach ($this->apartments as $apartment) {
+    //         $response = SocietyDetail::where('id', $apartment['id'])->update([
+    //             'no_of_shares' => $apartment['individual_no_of_share'],
+    //             'share_capital_amount' => $apartment['share_capital_amount'],
+    //         ]);
+    //     }
+
+    //     if ($response !== false) {
+    //         $this->dispatch('show-success', message: 'Individual shares assigned to all apartments successfully!');
+    //         $this->showAssignModal = false;
+    //         $this->reset(['apartments']);
+    //         $this->resetErrorBag();
+    //     } else {
+    //         $this->dispatch('show-error', message: 'Some error occurs while assign shares equally to all apartments!');
+    //         $this->showAssignModal = false;
+    //     }
+    // }
 
     public function closeModal()
     {
