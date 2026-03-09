@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB; 
 use App\Models\User;
 use App\Models\Role; 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use App\Models\SocietyDetail;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
@@ -40,7 +42,7 @@ class AuthController extends Controller
         }
 
         if($request->phone){
-            $existsInSociety = \App\Models\SocietyDetail::where('owner1_mobile', $request->phone)
+            $existsInSociety =SocietyDetail::where('owner1_mobile', $request->phone)
                     ->orWhere('owner2_mobile', $request->phone)
                     ->orWhere('owner3_mobile', $request->phone)
                     ->exists();
@@ -92,9 +94,9 @@ class AuthController extends Controller
         }
 
         if($field=='phone'){
-        $userRole = \App\Models\User::where('phone',$request->identifier)->value('role_id');
+        $userRole = User::where('phone',$request->identifier)->value('role_id');
             if($userRole==3){
-            $existsInSociety = \App\Models\SocietyDetail::where('owner1_mobile', $request->identifier)
+            $existsInSociety = SocietyDetail::where('owner1_mobile', $request->identifier)
                 ->orWhere('owner2_mobile', $request->identifier)
                 ->orWhere('owner3_mobile', $request->identifier)
                 ->exists();
@@ -109,9 +111,80 @@ class AuthController extends Controller
         return response()->json(['token' => $token, 'user' => $user],200);
     }
 
+    public function mobile_login(Request $request)
+    {
+        Log::info('Login API Data', $request->all());
+        // 1. Check API Secret Key from Header
+        $secretKey = $request->header('X-API-KEY');
+        Log::info('secretKey '.$secretKey);
+        Log::info('secretKey '.config('app.api_secret_key'));
+        if (!$secretKey){
+            return response()->json([
+                'status' => false,
+                'message' => 'API secret key missing'
+            ], 401);
+        }
+        if ($secretKey !== config('app.api_secret_key')) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid API access key'
+            ], 401);
+        }
+
+        // 2. Validate Request
+        $validator = Validator::make($request->all(), [
+            'phone' => 'required|digits:10'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'message' => $validator->errors()
+            ], 400);
+        }
+
+        // 3. Check User
+        $user1 = DB::connection('mysql_second')
+        ->table('users')
+        ->where('mobile_no', $request->phone)
+        ->first();
+
+        // $user = User::where('phone', $request->phone)->first();
+        if (!$user1) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Mobile number not registered'
+            ], 404);
+        }
+
+        // 4. Check Role
+        $user2 = User::where('phone', $request->phone)->first();
+        if ($user2->role_id == 3) {
+            $existsInSociety = SocietyDetail::where('owner1_mobile', $request->phone)
+                ->orWhere('owner2_mobile', $request->phone)
+                ->orWhere('owner3_mobile', $request->phone)
+                ->exists();
+
+            if (!$existsInSociety) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'This mobile number is not registered as an owner in any society.'
+                ], 401);
+            }
+        }
+
+        // 5. Generate Token
+        $token = $user2->createToken('auth_token')->plainTextToken;
+        return response()->json([
+            'status' => true,
+            'token' => $token,
+            'user' => $user1
+        ], 200);
+    }
+
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        // $request->user()->tokens()->delete();
         return response()->json(['message' => 'Logged out successfully']);
     }
 

@@ -11,12 +11,13 @@ use Illuminate\Support\Facades\Log;
 class UserDashboard extends Component
 {
     public $societyDetail = [];
-    public $apartmentList;
+    public $apartmentList,$apartments;
     public $search = '';
     public $selectedApartmentId;
     public $detailId, $checkApproved;
     public $url=null;
     public $showDocumentModal = false;
+    protected $userService;
 
     public function boot(UserService $userService)
     {
@@ -25,16 +26,17 @@ class UserDashboard extends Component
 
     public function render()
     {
+      $userMobile = Auth::user()->phone;
+        $this->apartmentList = $this->userService->getSocietyDetail($this->search,$userMobile);
         return view('livewire.menus.user-dashboard');
     }
 
     public function mount()
     {
-        $search ='';
         $userMobile = Auth::user()->phone;
-        $this->apartmentList=$this->userService->getSocietyDetail($search,$userMobile);
-        if ($this->apartmentList->isNotEmpty()) {
-            $this->selectApartment($this->apartmentList->first()->id);
+        $this->apartments=$this->userService->getSocietyDetail($this->search,$userMobile);
+        if ($this->apartments->isNotEmpty()) {
+            $this->selectApartment($this->apartments->first()->id);
         }
     }
 

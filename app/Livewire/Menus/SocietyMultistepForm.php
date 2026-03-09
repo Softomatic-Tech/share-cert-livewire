@@ -166,7 +166,7 @@ class SocietyMultistepForm extends Component
             'apartment_number',
             'certificate_no',
             'individual_no_of_share',
-            'share_capital_amount',
+            // 'share_capital_amount',
             'owner1_first_name', 'owner1_middle_name', 'owner1_last_name',
             'owner1_mobile', 'owner1_email',
             'owner2_first_name', 'owner2_middle_name', 'owner2_last_name',
@@ -193,7 +193,7 @@ class SocietyMultistepForm extends Component
         $fullPath = Storage::path($path);
         $file = fopen($fullPath, 'r');  
         $header = fgetcsv($file); 
-        $requiredHeaders = ['building_name','apartment_number','certificate_no','individual_no_of_share','share_capital_amount','owner1_first_name', 'owner1_mobile'];   
+        $requiredHeaders = ['building_name','apartment_number','certificate_no','individual_no_of_share','owner1_first_name', 'owner1_mobile'];   
         $headerMap = array_map('trim', $header);
         foreach ($requiredHeaders as $required) {
             if (!in_array($required, $headerMap)) {
@@ -216,11 +216,11 @@ class SocietyMultistepForm extends Component
             $apartmentNumber = $data[$indexes['apartment_number']] ?? null;
             $certificateNo = $data[$indexes['certificate_no']] ?? null;
             $noOfShares = $data[$indexes['individual_no_of_share']] ?? null;
-            $shareCapitalAmount = $data[$indexes['share_capital_amount']] ?? null;
+            // $shareCapitalAmount = $data[$indexes['share_capital_amount']] ?? null;
             $owner1First = $data[$indexes['owner1_first_name']] ?? null;
             $owner1Mobile = $data[$indexes['owner1_mobile']] ?? null;
 
-            if (empty($buildingName) || empty($apartmentNumber) || empty($certificateNo) || empty($noOfShares) || empty($shareCapitalAmount) || empty($owner1First) || empty($owner1Mobile)) {
+            if (empty($buildingName) || empty($apartmentNumber) || empty($certificateNo) || empty($noOfShares) || empty($owner1First) || empty($owner1Mobile)) {
                 $invalidRows[] = $rowNumber;
             } else {
                 if (!is_numeric($noOfShares)) {
@@ -308,7 +308,7 @@ class SocietyMultistepForm extends Component
                 'user_id'=>Auth::id(),
                 'certificate_no' => $data[$indexes['certificate_no']],
                 'no_of_shares' => $data[$indexes['individual_no_of_share']],
-                'share_capital_amount' => $data[$indexes['share_capital_amount']],
+                // 'share_capital_amount' => $data[$indexes['share_capital_amount']],
                 'owner1_name' => $owner1_name,
                 'owner1_mobile' => $data[$indexes['owner1_mobile']] ?? null,
                 'owner1_email' => $data[$indexes['owner1_email']] ?? null,

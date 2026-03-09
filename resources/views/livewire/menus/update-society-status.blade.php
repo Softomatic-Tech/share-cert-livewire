@@ -39,7 +39,7 @@
                             <flux:input type="text" :label="__('Building Name :')" wire:model="building_name" />
                             <flux:input type="text" :label="__('Apartment Number :')" wire:model="apartment_number" />
                             <flux:input type="number" :label="__('No of Each Share :')" wire:model="individual_no_of_share" />
-                            <flux:input type="number" :label="__('Each Share Amount :')" wire:model="share_capital_amount" />
+                            {{-- <flux:input type="number" :label="__('Each Share Amount :')" wire:model="share_capital_amount" /> --}}
                             <flux:input type="text" :label="__('Registration Certificate No :')" wire:model="certificate_no" placeholder="Enter registration number" />
                         </div>
 

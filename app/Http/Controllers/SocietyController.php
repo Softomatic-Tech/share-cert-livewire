@@ -80,7 +80,55 @@ class SocietyController extends Controller
             $request->apartment_id
         );
 
-        return response()->json($response);
+        $fileFields = [
+            'agreementCopy',
+            'memberShipForm',
+            'allotmentLetter',
+            'possessionLetter',
+            'stampDutyProof',
+            'transferorSignature',
+            'deathCertificate',
+            'nominationRecord',
+            'successionCertificate',
+            'allotmentMembershipLetter',
+        ];
+
+        $uploadedFiles = [];
+        foreach ($fileFields as $field) {
+            if ($request->hasFile($field)) {
+                $uploadResult = $userService->uploadSocietyDocument(
+                    $request->apartment_id,
+                    $request->file($field),
+                    $field
+                );
+
+                if (!empty($uploadResult['status'])) {
+                    $uploadedFiles[] = $field;
+                }
+            }
+        }
+
+        if ($response['status'] || !empty($uploadedFiles)) {
+            // update task status
+            $statusResponse = $userService->updateStatus($request->apartment_id,$request->user_id);
+
+            $message = $response['message'] ?? 'Society details updated.';
+            if (!empty($uploadedFiles)) {
+                $message .= ' Files updated: ' . implode(', ', $uploadedFiles) . '.';
+            }
+            if (!empty($statusResponse['message'])) {
+                $message .= ' ' . $statusResponse['message'];
+            }
+            return response()->json([
+                'status' => true,
+                'message' => $message
+            ]);
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => $response['message'] ?? 'Update failed'
+        ]);
     }
 
     public function uploadAgreementCopy(Request $request)

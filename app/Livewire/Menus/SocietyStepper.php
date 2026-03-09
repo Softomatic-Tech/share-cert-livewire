@@ -149,7 +149,7 @@ class SocietyStepper extends Component
             $this->apartment_number = $apartment->apartment_number;
             $this->certificate_no = $apartment->certificate_no;
             $this->individual_no_of_share = $apartment->no_of_shares;
-            $this->share_capital_amount = $apartment->share_capital_amount;
+            // $this->share_capital_amount = $apartment->share_capital_amount;
             $this->owner1_name = $apartment->owner1_name;
             $this->owner1_mobile = $apartment->owner1_mobile;
             $this->owner1_email = $apartment->owner1_email;
@@ -195,16 +195,16 @@ class SocietyStepper extends Component
         $expectedShares = (float) $society->no_of_shares;
         $expectedAmount = (float) ($society->no_of_shares * $society->share_value ?? 0);
         $givenShares = $this->individual_no_of_share;
-        $givenAmount = $this->share_capital_amount;
+        // $givenAmount = $this->share_capital_amount;
         $existingShares = SocietyDetail::where('society_id', $this->societyId)
             ->when($this->detailId, fn($q) => $q->where('id', '!=', $this->detailId))
             ->sum('no_of_shares');
 
-        $existingAmount = SocietyDetail::where('society_id', $this->societyId)
-            ->when($this->detailId, fn($q) => $q->where('id', '!=', $this->detailId))
-            ->sum('share_capital_amount');
+        // $existingAmount = SocietyDetail::where('society_id', $this->societyId)
+        //     ->when($this->detailId, fn($q) => $q->where('id', '!=', $this->detailId))
+        //     ->sum('share_capital_amount');
         $totalSharesAfter = $existingShares + $givenShares;
-        $totalAmountAfter = $existingAmount + $givenAmount;
+        // $totalAmountAfter = $existingAmount + $givenAmount;
         if ($totalSharesAfter > $expectedShares) {
             $excess = $totalSharesAfter - $expectedShares;
             $this->dispatch('show-error', message: "Total allocated shares cannot exceed {$expectedShares}. Current total = {$existingShares}, entered = {$givenShares} (exceeds by {$excess}).");
@@ -212,18 +212,18 @@ class SocietyStepper extends Component
             return;
         }
 
-        if ($totalAmountAfter  > $expectedAmount) {
-            $excess = $totalAmountAfter - $expectedAmount;
-            $this->dispatch('show-error', message: "Total allocated share capital cannot exceed {$expectedAmount}. Current total = {$existingAmount}, entered = {$givenAmount} (exceeds by {$excess}).");
-            $this->editOwnersModal = false;
-            return;
-        }
+        // if ($totalAmountAfter  > $expectedAmount) {
+        //     $excess = $totalAmountAfter - $expectedAmount;
+        //     $this->dispatch('show-error', message: "Total allocated share capital cannot exceed {$expectedAmount}. Current total = {$existingAmount}, entered = {$givenAmount} (exceeds by {$excess}).");
+        //     $this->editOwnersModal = false;
+        //     return;
+        // }
         $response=$apartment->update([
             'building_name'     => $this->building_name,
             'apartment_number'  => $this->apartment_number,
             'certificate_no' => $this->certificate_no,
             'no_of_shares' => $this->individual_no_of_share,
-            'share_capital_amount' => $this->share_capital_amount,
+            // 'share_capital_amount' => $this->share_capital_amount,
             'owner1_name'       => $this->owner1_name,
             'owner1_mobile'     => $this->owner1_mobile,
             'owner1_email'      => $this->owner1_email ?? null,
@@ -362,8 +362,8 @@ class SocietyStepper extends Component
     {
         $this->detailId = $id;
         $society = SocietyDetail::find($this->detailId);
-        if(!$society->no_of_shares || !$society->share_capital_amount){
-            $this->dispatch('show-error', message: 'Individual no of shares or share amount is empty. Please update to generate certificate!');
+        if(!$society->no_of_shares){
+            $this->dispatch('show-error', message: 'Individual no of shares is empty. Please update to generate certificate!');
             return;
         }
         $data = json_decode($society->status, true);

@@ -3,6 +3,7 @@
 namespace App\Livewire\Menus;
 
 use Livewire\Component;
+use Illuminate\Support\Facades\Auth; 
 use App\Models\Society; 
 use App\Models\SocietyDetail; 
 use App\Models\State;
@@ -18,7 +19,7 @@ class UpdateSocietyStatus extends Component
     use WithFileUploads;
     public $apartment,$state,$city;
     public $states, $cities=[];
-    public $society_id,$society_name, $total_building, $total_flats, $address_1, $address_2, $pincode, $city_id, $state_id,$no_of_shares,$share_value,$apartment_id,$building_name, $apartment_number,$certificate_no,$individual_no_of_share, $share_capital_amount,$owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
+    public $society_id,$society_name, $total_building, $total_flats, $address_1, $address_2, $pincode, $city_id, $state_id,$no_of_shares,$share_value,$apartment_id,$building_name, $apartment_number,$certificate_no,$individual_no_of_share,$owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
     public $agreementCopy,$memberShipForm,$allotmentLetter,$possessionLetter;
     public $newAgreementCopy, $newMemberShipForm, $newAllotmentLetter, $newPossessionLetter, $newStampDutyProof, $newAllotmentMembershipLetter, $newTransferorSignature;
     public $membership_case;
@@ -92,7 +93,7 @@ class UpdateSocietyStatus extends Component
             $this->apartment_number = $apartment->apartment_number;
             $this->certificate_no = $apartment->certificate_no;
             $this->individual_no_of_share = $apartment->no_of_shares;
-            $this->share_capital_amount = $apartment->share_capital_amount;
+            // $this->share_capital_amount = $apartment->share_capital_amount;
             $this->owner1_name = $apartment->owner1_name;
             $this->owner1_mobile = $apartment->owner1_mobile;
             $this->owner1_email = $apartment->owner1_email;
@@ -315,7 +316,7 @@ class UpdateSocietyStatus extends Component
             'building_name' => 'required|string|max:255',
             'apartment_number' => 'required|string|max:50',
             'individual_no_of_share' => 'required|numeric',
-            'share_capital_amount' => 'required|numeric',
+            // 'share_capital_amount' => 'required|numeric',
             'certificate_no' => 'required|string|max:255',
             'owner1_name' => 'required|string|max:255',
             'owner1_email' => 'nullable|string|email|max:255',
@@ -341,7 +342,7 @@ class UpdateSocietyStatus extends Component
                 'apartment_number' => $this->apartment_number,
                 'certificate_no' => $this->certificate_no,
                 'individual_no_of_share' => $this->individual_no_of_share,
-                'share_capital_amount' => $this->share_capital_amount,
+                // 'share_capital_amount' => $this->share_capital_amount,
                 'owner1_name' => $this->owner1_name,
                 'owner1_email' => $this->owner1_email,
                 'owner1_mobile' => $this->owner1_mobile,
@@ -429,7 +430,8 @@ class UpdateSocietyStatus extends Component
         if ($response['status'] || !empty($uploadedFiles)) {
             $this->loadSocietyData($this->apartment_id);
             // Automatically update status based on uploaded documents
-            $statusResponse = $this->userService->updateStatus($this->apartment_id);
+            $user=Auth::user();
+            $statusResponse = $this->userService->updateStatus($this->apartment_id,$user->id);
             $message = $response['message'] ?? 'Society details updated.';
             if (!empty($uploadedFiles)) {
                 $message .= ' Files updated: ' . implode(', ', $uploadedFiles) . '.';
@@ -724,15 +726,16 @@ class UpdateSocietyStatus extends Component
         } 
     }
 
-    public function done()
-    {
-        $user=Auth::user();
-        $response=$this->userService->updateStatus($this->apartment_id,$user->id); 
-        if ($response['status']) {
-        // $this->dispatch('show-success', message:  $response['message']);
-        return redirect()->route('user.dashboard');
-        } else {
-            $this->dispatch('show-error', message:  $response['message'] ?? 'Error updating society status');
-        }
-    }
+    // public function done()
+    // {
+    //     $user=Auth::user();
+    //     $response=$this->userService->updateStatus($this->apartment_id,$user->id); 
+    //     if ($response['status']) {
+    //     // $this->dispatch('show-success', message:  $response['message']);
+    //     return redirect()->route('user.dashboard');
+    //     } else {
+    //         $this->dispatch('show-error', message:  $response['message'] ?? 'Error updating society status');
+    //     }
+    // }
+
 }

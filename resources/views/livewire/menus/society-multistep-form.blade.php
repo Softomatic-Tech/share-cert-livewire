@@ -154,29 +154,15 @@
                                     $uploadedShares = (float) $this->uploadedDetails->sum('no_of_shares');
                                     $diffShares = (float)$uploadedShares - (float)$expectedShares;
                                     $expectedAmount = (float) ($society->no_of_shares * $society->share_value ?? 0);
-                                    $uploadedAmount = (float) $this->uploadedDetails->sum('share_capital_amount');
-                                    $diffAmount = (float)$uploadedAmount - (float)$expectedAmount;
                                 @endphp
                                 @if ($diffShares != 0)
-                                    @if($diffAmount != 0)
-                                        <div class="bg-red-100 text-red-800 p-2 mb-3 rounded">
-                                            Total shares and amount mismatch! Expected {{ $expectedShares }}, but found {{ $uploadedShares }} ({{ $diffShares > 0 ? 'more' : 'less' }} by {{ abs($diffShares) }}) and Expected {{ $expectedAmount }}, but found {{ $uploadedAmount }} ({{ $diffAmount > 0 ? 'more' : 'less' }} by {{ abs($diffAmount) }}).
-                                        </div>
-                                    @else
                                         <div class="bg-red-100 text-red-800 p-2 mb-3 rounded">
                                         Total shares mismatch! Expected {{ $expectedShares }}, but found {{ $uploadedShares }} ({{ $diffShares > 0 ? 'more' : 'less' }} by {{ abs($diffShares) }}).
                                     </div>
-                                    @endif
                                 @else
-                                    @if($diffAmount != 0)
-                                        <div class="bg-red-100 text-red-800 p-2 mb-3 rounded">
-                                            Total shares amount mismatch! Expected {{ $expectedAmount }}, but found {{ $uploadedAmount }} ({{ $diffAmount > 0 ? 'more' : 'less' }} by {{ abs($diffAmount) }}).
-                                        </div>
-                                    @else
                                     <div class="bg-green-100 text-green-800 p-2 mb-3 rounded">
                                         Total shares ({{ $expectedShares }}) and amount ({{ $expectedAmount }}) perfectly match.
                                     </div>
-                                    @endif
                                 @endif
 
                                 <table class="min-w-full text-start text-sm font-light text-surface dark:text-white">
@@ -186,7 +172,7 @@
                                             <th scope="col" class="px-6 py-4">Building Name</th>
                                             <th scope="col" class="px-6 py-4">Apartment Number</th>
                                             <th scope="col" class="px-6 py-4">Certificate No</th>
-                                            <th scope="col" class="px-6 py-4">No of Shares/Each Share Amount</th>
+                                            <th scope="col" class="px-6 py-4">No of Shares</th>
                                             <th scope="col" class="px-6 py-4">Owner 1 Details</th>
                                             <th scope="col" class="px-6 py-4">Owner 2 Details</th>
                                             <th scope="col" class="px-6 py-4">Owner 3 Details</th>
@@ -199,7 +185,7 @@
                                             <td class="whitespace-nowrap px-6 py-4">{{ $detail->building_name }}</td>
                                             <td class="whitespace-nowrap px-6 py-4">{{ $detail->apartment_number }}</td>
                                             <td class="whitespace-nowrap px-6 py-4">{{ $detail->certificate_no }}</td>
-                                            <td class="whitespace-nowrap px-6 py-4">{{ $detail->no_of_shares }}/{{ $detail->share_capital_amount }}</td>
+                                            <td class="whitespace-nowrap px-6 py-4">{{ $detail->no_of_shares }}</td>
                                             <td class="whitespace-nowrap px-6 py-4">
                                                 {{ $detail->owner1_name }} 
                                                 <br />@if($detail->owner1_mobile)<i class="fa-solid fa-phone"></i> {{ $detail->owner1_mobile }} @endif

@@ -7,6 +7,8 @@ use App\Http\Controllers\CertificateController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/mobile-login', [AuthController::class, 'mobile_login']);
+
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
