@@ -11,6 +11,7 @@
             <tr>
                 <th class="px-4 py-2 border">#</th>
                 <th class="px-4 py-2 border">Name</th>
+                <th class="px-4 py-2 border">Email</th>
                 <th class="px-4 py-2 border">Phone</th>
                 <th class="px-4 py-2 border">Action</th>
             </tr>
@@ -21,6 +22,7 @@
             <tr>
                 <td class="px-4 py-2 border">{{ ($users->currentPage() - 1) * $users->perPage() + $loop->iteration }}</td>
                 <td class="px-4 py-2 border">{{ $user->name }}</td>
+                <td class="px-4 py-2 border">{{ $user->email }}</td>
                 <td class="px-4 py-2 border text-center">{{ $user->phone }}</td>
                 <td class="px-4 py-2 border text-center">
                 @if($user->role_id==3)

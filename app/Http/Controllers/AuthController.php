@@ -11,16 +11,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use App\Models\SocietyDetail;
 use Illuminate\Support\Facades\Validator;
-use App\Services\UserService;
 
 class AuthController extends Controller
 {
-    protected $userService;
-    public function __construct(UserService $userService)
-    {
-        $this->userService = $userService;
-    }
-
     public function register(Request $request)
     {
         Log::info('Request Api Data:', $request->all());
@@ -195,12 +188,12 @@ class AuthController extends Controller
         return response()->json(['message' => 'Logged out successfully']);
     }
 
-    public function user()
-    {
-        $user = $this->userService->getAuthenticatedUser();
-        return response()->json([
-            'success' => true,
-            'data'    => $user
-        ]);
-    }
+    // public function user()
+    // {
+    //     $user = Auth::user();
+    //     return response()->json([
+    //         'success' => true,
+    //         'data'    => $user
+    //     ]);
+    // }
 }

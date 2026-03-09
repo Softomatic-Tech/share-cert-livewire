@@ -8,6 +8,7 @@ use App\Models\Society;
 use App\Models\SocietyDetail; 
 use App\Models\State;
 use App\Models\City;
+use Illuminate\Support\Facades\Auth;
 use App\Models\ByeLawCase;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Log;
@@ -736,4 +737,5 @@ class UpdateSocietyStatus extends Component
     //         $this->dispatch('show-error', message:  $response['message'] ?? 'Error updating society status');
     //     }
     // }
+
 }

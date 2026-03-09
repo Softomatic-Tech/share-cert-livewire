@@ -26,7 +26,7 @@ class UserDashboard extends Component
 
     public function render()
     {
-        $userMobile = Auth::user()->phone;
+      $userMobile = Auth::user()->phone;
         $this->apartmentList = $this->userService->getSocietyDetail($this->search,$userMobile);
         return view('livewire.menus.user-dashboard');
     }
@@ -44,7 +44,8 @@ class UserDashboard extends Component
     {
         log::info('Selected Apartment ID: ' . $id);
         $this->selectedApartmentId = $id;
-        $this->societyDetail=$this->userService->getSocietyDetail($this->selectedApartmentId);
+        $userMobile = Auth::user()->phone;
+        $this->societyDetail=$this->userService->getSocietyDetail($this->selectedApartmentId,$userMobile);
     }
 
     public function verifyDetails($apartmentId)

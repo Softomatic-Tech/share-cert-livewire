@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use App\Services\UserService;
 use Illuminate\Http\Request;
+use App\Models\SocietyDetail;
+use Illuminate\Support\Facades\Log;
 
 class SocietyController extends Controller
 {
@@ -16,7 +18,8 @@ class SocietyController extends Controller
     public function societyDetails(Request $request)
     {
         $search = $request->search;
-        $societies = $this->userService->getSocietyDetail($search);
+        $userMobile = $request->mobile;
+        $societies = $this->userService->getSocietyDetail($search,$userMobile);
 
         if ($search && $societies->count() === 1) {
             return response()->json([
@@ -32,10 +35,29 @@ class SocietyController extends Controller
         ]);
     }
 
-    public function show($search)
+    public function societyDetailsById($id)
+    {
+        $societies=SocietyDetail::with(['society.state','society.city'])->find($id);
+
+        if (!$societies) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Society not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $societies
+        ]);
+    }
+
+    public function show(Request $request)
     {
         // Force numeric id; return 404 if not found or not owned by this user
-        $society = $this->userService->getSocietyDetail($search);
+        $search = $request->search;
+        $userMobile = $request->mobile;
+        $society = $this->userService->getSocietyDetail($search,$userMobile);
 
         if (!$society) {
             return response()->json([
@@ -179,7 +201,8 @@ class SocietyController extends Controller
 
     public function updateStatus(Request $request)
     {
-        $response=$this->userService->updateStatus($request->apartment_id); 
+        $user_id=$request->user_id;
+        $response=$this->userService->updateStatus($request->apartment_id,$user_id); 
         return response()->json($response);
     }
 
