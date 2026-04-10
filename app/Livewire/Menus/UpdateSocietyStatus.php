@@ -3,12 +3,11 @@
 namespace App\Livewire\Menus;
 
 use Livewire\Component;
-use Illuminate\Support\Facades\Auth; 
-use App\Models\Society; 
-use App\Models\SocietyDetail; 
+use Illuminate\Support\Facades\Auth;
+use App\Models\Society;
+use App\Models\SocietyDetail;
 use App\Models\State;
 use App\Models\City;
-use Illuminate\Support\Facades\Auth;
 use App\Models\ByeLawCase;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Log;
@@ -17,23 +16,22 @@ use Livewire\Features\SupportFileUploads\WithFileUploads;
 class UpdateSocietyStatus extends Component
 {
     use WithFileUploads;
-    public $apartment,$state,$city;
-    public $states, $cities=[];
-    public $society_id,$society_name, $total_building, $total_flats, $address_1, $address_2, $pincode, $city_id, $state_id,$no_of_shares,$share_value,$apartment_id,$building_name, $apartment_number,$certificate_no,$individual_no_of_share,$owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
-    public $agreementCopy,$memberShipForm,$allotmentLetter,$possessionLetter;
+    public $apartment, $state, $city;
+    public $states, $cities = [];
+    public $society_id, $society_name, $total_building, $total_flats, $address_1, $address_2, $pincode, $city_id, $state_id, $no_of_shares, $share_value, $is_byelaws_available, $apartment_id, $building_name, $apartment_number, $certificate_no, $owner1_name, $owner1_mobile, $owner1_email, $owner2_name, $owner2_mobile, $owner2_email, $owner3_name, $owner3_mobile, $owner3_email;
+    public $agreementCopy, $memberShipForm, $allotmentLetter, $possessionLetter;
     public $newAgreementCopy, $newMemberShipForm, $newAllotmentLetter, $newPossessionLetter, $newStampDutyProof, $newAllotmentMembershipLetter, $newTransferorSignature;
     public $membership_case;
     protected $userService;
     public $fileKey;
-    public $agreementUploaded =false;
-    public $membershipUploaded=false;
-    public $allotmentUploaded=false;
-    public $possessionUploaded= false;
+    public $agreementUploaded = false;
+    public $membershipUploaded = false;
+    public $allotmentUploaded = false;
+    public $possessionUploaded = false;
     public $approvedFiles;
-    public $is_byelaws_available='no';
     public $byelaws_id;
     // Case A (Appendix 2 & 3) fields
-    public $applicant_name, $father_husband_name, $age, $monthly_income, $occupation, $office_addr, $residential_addr, $flat_area_sq_meters, $builder_name, $other_person_name1, $other_property_particulars1, $other_property_location1, $reason_for_flat1,$other_person_name2, $other_property_particulars2, $other_property_location2, $reason_for_flat2, $deceased_member_name;
+    public $applicant_name, $father_husband_name, $age, $monthly_income, $occupation, $office_addr, $residential_addr, $flat_area_sq_meters, $builder_name, $other_person_name1, $other_property_particulars1, $other_property_location1, $reason_for_flat1, $other_person_name2, $other_property_particulars2, $other_property_location2, $reason_for_flat2, $deceased_member_name;
     public $allotmentMembershipLetter;
 
     // Case B (Appendix 20(1) & 20(2) & 21) fields
@@ -58,7 +56,7 @@ class UpdateSocietyStatus extends Component
 
     public function mount($apartmentId)
     {
-        $this->states=State::all();
+        $this->states = State::all();
         $this->fileKey = now()->timestamp;
         $this->loadSocietyData($apartmentId);
     }
@@ -70,7 +68,7 @@ class UpdateSocietyStatus extends Component
 
     public function loadSocietyData($apartmentId)
     {
-        $apartment = SocietyDetail::with(['society.state','society.city'])->findOrFail($apartmentId);
+        $apartment = SocietyDetail::with(['society.state', 'society.city'])->findOrFail($apartmentId);
         if ($apartment) {
             if ($apartment->society) {
                 $this->society_id = $apartment->society->id;
@@ -92,7 +90,7 @@ class UpdateSocietyStatus extends Component
             $this->building_name = $apartment->building_name;
             $this->apartment_number = $apartment->apartment_number;
             $this->certificate_no = $apartment->certificate_no;
-            $this->individual_no_of_share = $apartment->no_of_shares;
+            // $this->individual_no_of_share = $apartment->no_of_shares;
             // $this->share_capital_amount = $apartment->share_capital_amount;
             $this->owner1_name = $apartment->owner1_name;
             $this->owner1_mobile = $apartment->owner1_mobile;
@@ -103,17 +101,17 @@ class UpdateSocietyStatus extends Component
             $this->owner3_name = $apartment->owner3_name;
             $this->owner3_mobile = $apartment->owner3_mobile;
             $this->owner3_email = $apartment->owner3_email;
-            $this->agreementCopy=$apartment->agreementCopy;
-            $this->memberShipForm=$apartment->memberShipForm;
-            $this->allotmentLetter=$apartment->allotmentLetter;
-            $this->possessionLetter=$apartment->possessionLetter;
-            $this->is_byelaws_available = $apartment->is_byelaws_available ?? 'no';
-            if($this->is_byelaws_available=='yes'){
-                $byelaws = ByeLawCase::where('society_detail_id',$apartmentId)->first();
-                $this->byelaws_id = $byelaws->id ?? null;    
-                $this->membership_case = $byelaws->membership_case ?? null;            
+            $this->agreementCopy = $apartment->agreementCopy;
+            $this->memberShipForm = $apartment->memberShipForm;
+            $this->allotmentLetter = $apartment->allotmentLetter;
+            $this->possessionLetter = $apartment->possessionLetter;
+            $this->is_byelaws_available = strtolower($apartment->society->is_byelaws_available ?? 'no');
+            if ($this->is_byelaws_available == 'yes') {
+                $byelaws = ByeLawCase::where('society_detail_id', $apartmentId)->first();
+                $this->byelaws_id = $byelaws->id ?? null;
+                $this->membership_case = $byelaws->membership_case ?? null;
                 // Load Case A fields
-                if($this->membership_case=='case_a'){
+                if ($this->membership_case == 'case_a') {
                     $this->applicant_name = $byelaws->applicant_name ?? null;
                     $this->father_husband_name = $byelaws->father_husband_name ?? null;
                     $this->deceased_member_name = $byelaws->deceased_member_name ?? null;
@@ -134,10 +132,10 @@ class UpdateSocietyStatus extends Component
                     $this->reason_for_flat2 = $byelaws->reason_for_flat2 ?? null;
                     $this->allotmentMembershipLetter = $byelaws->allotmentMembershipLetter ?? null;
                 }
-                
+
 
                 // Load Case B fields
-                if($this->membership_case=='case_b'){
+                if ($this->membership_case == 'case_b') {
                     $this->distinctive_no_from = $byelaws->distinctive_no_from ?? null;
                     $this->distinctive_no_to = $byelaws->distinctive_no_to ?? null;
                     $this->transferor_name = $byelaws->transferor_name ?? null;
@@ -154,16 +152,16 @@ class UpdateSocietyStatus extends Component
                 }
                 // Load Case C fields
                 if ($this->membership_case === 'case_c') {
-                $this->deceased_member_name = $byelaws->deceased_member_name ?? null;
-                $this->date_of_death = $byelaws->date_of_death ?? null;
-                $this->society_shares = $byelaws->society_shares ?? null;
-                $this->age = $byelaws->age ?? null;
-                $this->monthly_income = $byelaws->monthly_income ?? null;
-                $this->occupation = $byelaws->occupation ?? null;
-                $this->office_addr = $byelaws->office_addr ?? null;
-                $this->residential_addr = $byelaws->residential_addr ?? null;
-                $this->deathCertificate = $byelaws->deathCertificate ?? null;
-                $this->nominationRecord = $byelaws->nominationRecord ?? null;
+                    $this->deceased_member_name = $byelaws->deceased_member_name ?? null;
+                    $this->date_of_death = $byelaws->date_of_death ?? null;
+                    $this->society_shares = $byelaws->society_shares ?? null;
+                    $this->age = $byelaws->age ?? null;
+                    $this->monthly_income = $byelaws->monthly_income ?? null;
+                    $this->occupation = $byelaws->occupation ?? null;
+                    $this->office_addr = $byelaws->office_addr ?? null;
+                    $this->residential_addr = $byelaws->residential_addr ?? null;
+                    $this->deathCertificate = $byelaws->deathCertificate ?? null;
+                    $this->nominationRecord = $byelaws->nominationRecord ?? null;
                 }
 
                 // Load Case C fields
@@ -210,13 +208,13 @@ class UpdateSocietyStatus extends Component
             'statusData' => $statusData,
             'fileName' => $fileName,
         ];
-        $response=$this->userService->checkFileApproval($data);
+        $response = $this->userService->checkFileApproval($data);
         return $response;
     }
 
     public function updateSocietyDetails()
     {
-        Log::info('Updating society details for apartment ID: '.$this->apartment_id);
+        Log::info('Updating society details for apartment ID: ' . $this->apartment_id);
         $fileFields = [
             'agreementCopy' => 'newAgreementCopy',
             'memberShipForm' => 'newMemberShipForm',
@@ -236,11 +234,7 @@ class UpdateSocietyStatus extends Component
             }
         }
 
-        $rules = [
-            'is_byelaws_available' => 'required',
-        ];
-
-        if ($this->is_byelaws_available === 'yes') {
+        if ($this->is_byelaws_available === 'Yes') {
             $rules['membership_case'] = 'required';
             if ($this->membership_case === 'case_a') {
                 $rules['applicant_name'] = 'required|string';
@@ -315,17 +309,21 @@ class UpdateSocietyStatus extends Component
             'share_value' => 'required|numeric',
             'building_name' => 'required|string|max:255',
             'apartment_number' => 'required|string|max:50',
-            'individual_no_of_share' => 'required|numeric',
+            // 'individual_no_of_share' => 'required|numeric',
             // 'share_capital_amount' => 'required|numeric',
             'certificate_no' => 'required|string|max:255',
             'owner1_name' => 'required|string|max:255',
             'owner1_email' => 'nullable|string|email|max:255',
             'owner1_mobile' => 'required|digits:10',
         ];
-        
-        $rules = array_merge($baseRules, $rules, $fileRules);
+
+        if ($this->is_byelaws_available === 'Yes') {
+            $rules = array_merge($baseRules, $rules, $fileRules);
+        } else {
+            $rules = array_merge($baseRules, $fileRules);
+        }
         $this->validate($rules);
-        Log::info('Validation passed for apartment ID: '.$this->apartment_id);
+        Log::info('Validation passed for apartment ID: ' . $this->apartment_id);
         $response = $this->userService->updateSocietyDetails(
             [
                 'society_name' => $this->society_name,
@@ -341,7 +339,7 @@ class UpdateSocietyStatus extends Component
                 'building_name' => $this->building_name,
                 'apartment_number' => $this->apartment_number,
                 'certificate_no' => $this->certificate_no,
-                'individual_no_of_share' => $this->individual_no_of_share,
+                // 'individual_no_of_share' => $this->individual_no_of_share,
                 // 'share_capital_amount' => $this->share_capital_amount,
                 'owner1_name' => $this->owner1_name,
                 'owner1_email' => $this->owner1_email,
@@ -398,7 +396,7 @@ class UpdateSocietyStatus extends Component
             $this->society_id,
             $this->apartment_id
         );
-        Log::info('Society details update response for apartment ID: '.$this->apartment_id);
+        Log::info('Society details update response for apartment ID: ' . $this->apartment_id);
         $uploadedFiles = [];
         $fieldLabels = [
             'agreementCopy' => 'Agreement Copy',
@@ -412,7 +410,7 @@ class UpdateSocietyStatus extends Component
             'successionCertificate' => 'Succession Certificate',
             'allotmentMembershipLetter' => 'Allotment Membership Letter',
         ];
-        Log::info('File upload results for apartment ID: '.$this->apartment_id);
+        Log::info('File upload results for apartment ID: ' . $this->apartment_id);
         foreach ($fileFields as $dbField => $livewireField) {
             if ($this->$livewireField) {
                 $uploadResult = $this->userService->uploadSocietyDocument(
@@ -420,7 +418,7 @@ class UpdateSocietyStatus extends Component
                     $this->$livewireField,
                     $dbField
                 );
-                
+
                 if ($uploadResult['status']) {
                     $uploadedFiles[] = $fieldLabels[$dbField] ?? $dbField;
                     $this->reset($livewireField);
@@ -430,17 +428,17 @@ class UpdateSocietyStatus extends Component
         if ($response['status'] || !empty($uploadedFiles)) {
             $this->loadSocietyData($this->apartment_id);
             // Automatically update status based on uploaded documents
-            $user=Auth::user();
-            $statusResponse = $this->userService->updateStatus($this->apartment_id,$user->id);
+            $user = Auth::user();
+            $statusResponse = $this->userService->updateStatus($this->apartment_id, $user->id);
             $message = $response['message'] ?? 'Society details updated.';
             if (!empty($uploadedFiles)) {
                 $message .= ' Files updated: ' . implode(', ', $uploadedFiles) . '.';
             }
-            
+
             if (isset($statusResponse['message'])) {
                 $message .= ' ' . $statusResponse['message'];
             }
-            
+
             $this->dispatch('show-success', message: $message);
             $this->dispatch('scroll-to-top');
             $this->fileKey = now()->timestamp;
@@ -511,231 +509,4 @@ class UpdateSocietyStatus extends Component
             $this->updatedMembershipCase(); // reuse reset logic
         }
     }
-
-    // public function uploadAgreementCopy()
-    // {
-    //     $this->validate([
-    //         'newAgreementCopy' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
-    //     ]);
-
-    //     try {
-    //         $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newAgreementCopy,'agreementCopy');
-    //         if($result['status']){
-    //             $this->dispatch('show-success', message:  $result['message']);
-    //             $this->agreementUploaded = true;
-    //             $this->reset('newAgreementCopy');
-    //             $this->fileKey = now()->timestamp;
-    //             $this->loadSocietyData($this->apartment_id);
-    //         }else{
-    //             $this->dispatch('show-error', message:  $result['message']);
-    //         }
-    //     } catch (\Exception $e) {
-    //     $this->dispatch('show-error', message: 'Something went wrong while uploading the Agreement Copy');
-    //     } 
-    // }
-
-    public function uploadMemberShipForm()
-    {
-        $this->validate([
-            'newMemberShipForm' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
-        ]);
-        try {
-            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newMemberShipForm,'memberShipForm');
-            if($result['status']){
-                $this->dispatch('show-success', message:  $result['message']);
-                $this->membershipUploaded = true;
-                $this->reset('newMemberShipForm');
-                $this->fileKey = now()->timestamp;
-                $this->loadSocietyData($this->apartment_id);
-            }else{
-                $this->dispatch('show-error', message:  $result['message']);
-            }
-        } catch (\Exception $e) {
-        $this->dispatch('show-error', message: 'Something went wrong while uploading the Membership Form');
-        } 
-    }
-
-    public function uploadAllotmentLetter()
-    {
-        $this->validate([
-            'newAllotmentLetter' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
-        ]);
-
-        try {
-            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newAllotmentLetter, 'allotmentLetter');
-            if($result['status']){
-                $this->dispatch('show-success', message:  $result['message']);
-                $this->allotmentUploaded = true;
-                $this->reset('newAllotmentLetter');
-                $this->fileKey = now()->timestamp;
-                $this->loadSocietyData($this->apartment_id);
-            }else{
-                $this->dispatch('show-error', message:  $result['message']);
-            }
-        } catch (\Exception $e) {
-        $this->dispatch('show-error', message: 'Something went wrong while uploading the Allotment Letter');
-        } 
-    }
-
-    public function uploadPossessionLetter()
-    {
-        $this->validate([
-            'newPossessionLetter' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
-            ]);
-        try {
-            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newPossessionLetter, 'possessionLetter');
-            if($result['status']){
-                $this->dispatch('show-success', message:  $result['message']);
-                $this->possessionUploaded = true;
-                $this->reset('newPossessionLetter');
-                $this->fileKey = now()->timestamp;
-                $this->loadSocietyData($this->apartment_id);
-            }else{
-                $this->dispatch('show-error', message:  $result['message']);
-            }
-        } catch (\Exception $e) {
-        $this->dispatch('show-error', message: 'Something went wrong while uploading the Possession Letter');
-        } 
-    }
-
-    public function uploadAllotmentMembershipLetter()
-    {
-        $this->validate([
-            'newAllotmentMembershipLetter' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
-        ]);
-
-        try {
-            Log::info("Uploading new Allotment Membership Letter for Apartment ID: " . $this->apartment_id);
-            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newAllotmentMembershipLetter, 'allotmentMembershipLetter');
-            if ($result['status']) {
-                Log::info($result['message']);
-                $this->dispatch('show-success', message: $result['message']);
-                $this->reset('newAllotmentMembershipLetter');
-                $this->fileKey = now()->timestamp;
-                $this->loadSocietyData($this->apartment_id);
-            }else{
-                $this->dispatch('show-error', message: $result['message']);
-            }
-        } catch (\Exception $e) {
-            $this->dispatch('show-error', message: 'Something went wrong while uploading the Allotment Membership Letter');
-        } 
-    }
-    
-    public function uploadStampDutyProof()
-    {
-        $this->validate([
-            'newStampDutyProof' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
-        ]);
-
-        try {
-            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newStampDutyProof, 'stampDutyProof');
-            if ($result['status']) {
-                $this->dispatch('show-success', message: $result['message']);
-                $this->reset('newStampDutyProof');
-                $this->fileKey = now()->timestamp;
-                $this->loadSocietyData($this->apartment_id);
-            }else{
-                $this->dispatch('show-error', message: $result['message']);
-            }
-        } catch (\Exception $e) {
-            $this->dispatch('show-error', message: 'Something went wrong while uploading the Stamp Duty Proof');
-        } 
-    }
-
-    public function uploadTransferorSignature()
-    {
-        $this->validate([
-            'newTransferorSignature' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
-        ]);
-
-        try {
-            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newTransferorSignature, 'transferorSignature');
-            if ($result['status']) {
-                $this->dispatch('show-success', message: $result['message']);
-                $this->reset('newTransferorSignature');
-                $this->fileKey = now()->timestamp;
-                $this->loadSocietyData($this->apartment_id);
-            }else{
-                $this->dispatch('show-error', message: $result['message']);
-            }
-        } catch (\Exception $e) {
-            $this->dispatch('show-error', message: 'Something went wrong while uploading the Transferor Signature');
-        } 
-    }
-
-    public function uploadDeathCertificate()
-    {
-        $this->validate([
-            'newDeathCertificate' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
-        ]);
-
-        try {
-            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newDeathCertificate, 'deathCertificate');
-            if($result['status']){
-                $this->dispatch('show-success', message: $result['message']);
-                $this->reset('newDeathCertificate');
-                $this->fileKey = now()->timestamp;
-                $this->loadSocietyData($this->apartment_id);
-            }else{
-                $this->dispatch('show-error', message: $result['message']);
-            }
-        } catch (\Exception $e) {
-            $this->dispatch('show-error', message: 'Something went wrong while uploading the Death Certificate');
-        } 
-    }
-
-    public function uploadNominationRecord()
-    {
-        $this->validate([
-            'newNominationRecord' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
-        ]);
-
-        try {
-            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newNominationRecord, 'nominationRecord');
-            if($result['status']){
-                $this->dispatch('show-success', message:  $result['message']);
-                $this->reset('newNominationRecord');
-                $this->fileKey = now()->timestamp;
-                $this->loadSocietyData($this->apartment_id);
-            }else{
-                $this->dispatch('show-error', message: $result['message']);
-            }
-        } catch (\Exception $e) {
-            $this->dispatch('show-error', message: 'Something went wrong while uploading the Nomination Record');
-        } 
-    }
-
-    public function uploadSuccessionCertificate()
-    {
-        $this->validate([
-            'newSuccessionCertificate' => 'required|file|mimes:jpeg,png,jpg,pdf|max:2048',
-        ]);
-
-        try {
-            $result = $this->userService->uploadSocietyDocument($this->apartment_id, $this->newSuccessionCertificate, 'successionCertificate');
-            if($result['status']){
-                $this->dispatch('show-success', message:  $result['message']);
-                $this->reset('newSuccessionCertificate');
-                $this->fileKey = now()->timestamp;
-                $this->loadSocietyData($this->apartment_id);
-            }else{
-                $this->dispatch('show-error', message: $result['message']);
-            }
-        } catch (\Exception $e) {
-            $this->dispatch('show-error', message: 'Something went wrong while uploading the Succession Certificate');
-        } 
-    }
-
-    // public function done()
-    // {
-    //     $user=Auth::user();
-    //     $response=$this->userService->updateStatus($this->apartment_id,$user->id); 
-    //     if ($response['status']) {
-    //     // $this->dispatch('show-success', message:  $response['message']);
-    //     return redirect()->route('user.dashboard');
-    //     } else {
-    //         $this->dispatch('show-error', message:  $response['message'] ?? 'Error updating society status');
-    //     }
-    // }
-
 }

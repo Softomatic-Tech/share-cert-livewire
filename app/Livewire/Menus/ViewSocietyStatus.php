@@ -3,8 +3,8 @@
 namespace App\Livewire\Menus;
 
 use Livewire\Component;
-use App\Models\Society; 
-use App\Models\SocietyDetail; 
+use App\Models\Society;
+use App\Models\SocietyDetail;
 use App\Models\State;
 use App\Models\City;
 use App\Models\ByeLawCase;
@@ -13,17 +13,17 @@ use Illuminate\Support\Facades\Log;
 
 class ViewSocietyStatus extends Component
 {
-    public $apartment,$state,$city;
-    public $states, $cities=[];
-    public $society_id,$society_name, $total_building, $total_flats, $address_1, $address_2, $pincode, $city_id, $state_id,$no_of_shares,$share_value,$apartment_id,$building_name, $apartment_number,$certificate_no,$individual_no_of_share,$owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
-    public $agreementCopy,$memberShipForm,$allotmentLetter,$possessionLetter;
+    public $apartment, $state, $city;
+    public $states, $cities = [];
+    public $society_id, $society_name, $total_building, $total_flats, $address_1, $address_2, $pincode, $city_id, $state_id, $no_of_shares, $share_value, $apartment_id, $building_name, $apartment_number, $certificate_no, $individual_no_of_share, $owner1_name, $owner1_mobile, $owner1_email, $owner2_name, $owner2_mobile, $owner2_email, $owner3_name, $owner3_mobile, $owner3_email;
+    public $agreementCopy, $memberShipForm, $allotmentLetter, $possessionLetter;
     public $membership_case;
     protected $userService;
-    public $is_byelaws_available='no';
+    public $is_byelaws_available = 'No';
     public $byelaws_id;
-    
+
     // Case A fields
-    public $applicant_name, $father_husband_name, $age, $monthly_income, $occupation, $office_addr, $residential_addr, $flat_area_sq_meters, $builder_name, $other_person_name1, $other_property_particulars1, $other_property_location1, $reason_for_flat1,$other_person_name2, $other_property_particulars2, $other_property_location2, $reason_for_flat2, $deceased_member_name;
+    public $applicant_name, $father_husband_name, $age, $monthly_income, $occupation, $office_addr, $residential_addr, $flat_area_sq_meters, $builder_name, $other_person_name1, $other_property_particulars1, $other_property_location1, $reason_for_flat1, $other_person_name2, $other_property_particulars2, $other_property_location2, $reason_for_flat2, $deceased_member_name;
     public $allotmentMembershipLetter;
 
     // Case B fields
@@ -54,7 +54,7 @@ class ViewSocietyStatus extends Component
 
     public function loadSocietyData($apartmentId)
     {
-        $apartment = SocietyDetail::with(['society.state','society.city'])->findOrFail($apartmentId);
+        $apartment = SocietyDetail::with(['society.state', 'society.city'])->findOrFail($apartmentId);
         if ($apartment) {
             if ($apartment->society) {
                 $this->society_id = $apartment->society->id;
@@ -70,12 +70,13 @@ class ViewSocietyStatus extends Component
                 $this->city = $apartment->society->city->name ?? 'N/A';
                 $this->no_of_shares = $apartment->society->no_of_shares;
                 $this->share_value = $apartment->society->share_value;
+                $this->is_byelaws_available = $apartment->society->is_byelaws_available ?? 'No';
             }
             $this->apartment_id = $apartment->id;
             $this->building_name = $apartment->building_name;
             $this->apartment_number = $apartment->apartment_number;
             $this->certificate_no = $apartment->certificate_no;
-            $this->individual_no_of_share = $apartment->no_of_shares;
+            // $this->individual_no_of_share = $apartment->no_of_shares;
             // $this->share_capital_amount = $apartment->share_capital_amount;
             $this->owner1_name = $apartment->owner1_name;
             $this->owner1_mobile = $apartment->owner1_mobile;
@@ -86,19 +87,18 @@ class ViewSocietyStatus extends Component
             $this->owner3_name = $apartment->owner3_name;
             $this->owner3_mobile = $apartment->owner3_mobile;
             $this->owner3_email = $apartment->owner3_email;
-            $this->agreementCopy=$apartment->agreementCopy;
-            $this->memberShipForm=$apartment->memberShipForm;
-            $this->allotmentLetter=$apartment->allotmentLetter;
-            $this->possessionLetter=$apartment->possessionLetter;
-            $this->is_byelaws_available = $apartment->is_byelaws_available ?? 'no';
-            
-            if($this->is_byelaws_available=='yes'){
-                $byelaws = ByeLawCase::where('society_detail_id',$apartmentId)->first();
-                if($byelaws) {
+            $this->agreementCopy = $apartment->agreementCopy;
+            $this->memberShipForm = $apartment->memberShipForm;
+            $this->allotmentLetter = $apartment->allotmentLetter;
+            $this->possessionLetter = $apartment->possessionLetter;
+
+            if ($this->is_byelaws_available == 'Yes') {
+                $byelaws = ByeLawCase::where('society_detail_id', $apartmentId)->first();
+                if ($byelaws) {
                     $this->byelaws_id = $byelaws->id;
                     $this->membership_case = $byelaws->membership_case;
-                    
-                    if($this->membership_case=='case_a'){
+
+                    if ($this->membership_case == 'case_a') {
                         $this->applicant_name = $byelaws->applicant_name;
                         $this->father_husband_name = $byelaws->father_husband_name;
                         $this->deceased_member_name = $byelaws->deceased_member_name;
@@ -120,7 +120,7 @@ class ViewSocietyStatus extends Component
                         $this->allotmentMembershipLetter = $byelaws->allotmentMembershipLetter;
                     }
 
-                    if($this->membership_case=='case_b'){
+                    if ($this->membership_case == 'case_b') {
                         $this->distinctive_no_from = $byelaws->distinctive_no_from;
                         $this->distinctive_no_to = $byelaws->distinctive_no_to;
                         $this->transferor_name = $byelaws->transferor_name;

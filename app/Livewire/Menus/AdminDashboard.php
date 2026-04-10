@@ -352,9 +352,7 @@ class AdminDashboard extends Component
             'assignType',
             'societyDetails',
             'step',
-            'societyById',
         ]);
-        $this->selectedSocietyId = null;
         $this->showAssignModal = false;
     }
 }
