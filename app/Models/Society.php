@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,8 +21,10 @@ class Society extends Model
         'registration_no',
         'no_of_shares',
         'share_value',
-        'i_register',
-        'j_register',
+        // 'i_register',
+        // 'j_register',
+        'is_list_of_signed_member_available',
+        'is_byelaws_available',
         'admin_id'
     ];
 

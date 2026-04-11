@@ -1,42 +1,45 @@
 <?php
 
 namespace App\Services;
+
 use App\Models\Society;
 use App\Models\SocietyDetail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Log;
+
 class UserService
 {
     protected $societyDetail = [];
-    protected $search;  
-    protected $userMobile; 
+    protected $search;
+    protected $userMobile;
 
-    public function getSocietyDetail($search=null,$userMobile){
+    public function getSocietyDetail($search = null, $userMobile)
+    {
         $query = SocietyDetail::with(['society.state', 'society.city'])
             ->where(function ($query) use ($userMobile) {
                 $query->where('owner1_mobile', $userMobile)
                     ->orWhere('owner2_mobile', $userMobile)
                     ->orWhere('owner3_mobile', $userMobile);
             });
-            if ($search) {
-                $query->where(function ($subQuery) use ($search) {
-                    if (is_numeric($search)) {
-                        $subQuery->where('id', $search)
-                                ->orWhere('apartment_number', $search);
-                    } else {
-                        $subQuery->where('building_name', 'like', "%{$search}%");
-                    }
-                });
-            } else {
-                $query->orderBy('id', 'desc');
-            }
-            $societyDetail = $search ? collect($query->first() ? [$query->first()] : []) : $query->get();
-            return $societyDetail;
+        if ($search) {
+            $query->where(function ($subQuery) use ($search) {
+                if (is_numeric($search)) {
+                    $subQuery->where('id', $search)
+                        ->orWhere('apartment_number', $search);
+                } else {
+                    $subQuery->where('building_name', 'like', "%{$search}%");
+                }
+            });
+        } else {
+            $query->orderBy('id', 'desc');
+        }
+        $societyDetail = $search ? collect($query->first() ? [$query->first()] : []) : $query->get();
+        return $societyDetail;
     }
 
-    public function updateSocietyDetails(array $data, $society_id,$apartment_id)
+    public function updateSocietyDetails(array $data, $society_id, $apartment_id)
     {
         $rules = [
             'society_name' => 'required|string|max:255',
@@ -49,7 +52,7 @@ class UserService
             'certificate_no' => 'nullable|string',
             'no_of_shares' => 'nullable|numeric',
             // 'share_capital_amount' => 'nullable|numeric',
-            'individual_no_of_share' => 'required|numeric',
+            // 'individual_no_of_share' => 'required|numeric',
             'share_value' => 'required|numeric|decimal:0,2',
             'building_name' => 'required|string|max:255',
             'apartment_number' => 'required|string|max:50',
@@ -63,7 +66,7 @@ class UserService
             'owner3_name' => 'nullable|string|max:255',
             'owner3_email' => 'nullable|string|email|max:255',
             'owner3_mobile' => 'nullable|digits:10',
-            'is_byelaws_available' => 'required|in:yes,no',
+            // 'is_byelaws_available' => 'required|in:yes,no',
         ];
 
         if (($data['is_byelaws_available'] ?? null) === 'yes') {
@@ -168,7 +171,7 @@ class UserService
             'total_flats' => $validated['total_flats'],
             'total_building' => $validated['total_building'],
             'address_1' => $validated['address_1'],
-            'address_2' => $validated['address_2']?? null,
+            'address_2' => $validated['address_2'] ?? null,
             'pincode' => $validated['pincode'],
             'state_id' => $validated['state_id'],
             'city_id' => $validated['city_id'],
@@ -188,7 +191,7 @@ class UserService
             'building_name'     => $validated['building_name'],
             'apartment_number'  => $validated['apartment_number'],
             'certificate_no'    => $validated['certificate_no'],
-            'no_of_shares'      => $validated['individual_no_of_share'],
+            // 'no_of_shares'      => $validated['individual_no_of_share'],
             // 'share_capital_amount' => $validated['share_capital_amount'],
             'owner1_name'       => $validated['owner1_name'],
             'owner1_mobile'     => $validated['owner1_mobile'],
@@ -199,7 +202,7 @@ class UserService
             'owner3_name'       => $validated['owner3_name'] ?? null,
             'owner3_mobile'     => $validated['owner3_mobile'] ?? null,
             'owner3_email'      => $validated['owner3_email'] ?? null,
-            'is_byelaws_available' => $validated['is_byelaws_available'] ?? 'no',
+            // 'is_byelaws_available' => $validated['is_byelaws_available'] ?? 'no',
         ]);
 
         // Update Bye-Law Case Details
@@ -271,12 +274,12 @@ class UserService
                     'message' => 'Society not found.',
                 ];
             }
-            $allowedExtensions = ['jpeg', 'png', 'jpg','pdf'];
+            $allowedExtensions = ['jpeg', 'png', 'jpg', 'pdf'];
             // Validate file type
             if (!in_array(strtolower($file->getClientOriginalExtension()), $allowedExtensions)) {
                 return [
                     'status'  => false,
-                    'message' => 'Invalid file type , only '.implode(",",$allowedExtensions).' file extension are allowed.',
+                    'message' => 'Invalid file type , only ' . implode(",", $allowedExtensions) . ' file extension are allowed.',
                 ];
             }
 
@@ -289,8 +292,8 @@ class UserService
             }
 
             // Store file
-            $fileName = $columnName.'_' .$apartmentId. '.' . $file->getClientOriginalExtension();
-            $file->storeAs('society_docs', $fileName, 'public');        
+            $fileName = $columnName . '_' . $apartmentId . '.' . $file->getClientOriginalExtension();
+            $file->storeAs('society_docs', $fileName, 'public');
             log::info("File stored successfully: " . $fileName);
             // Update correct column dynamically
             // Check if ByeLawCase has the column first
@@ -311,20 +314,20 @@ class UserService
                 'file'    => $fileName,
             ];
         } catch (\Exception $e) {
-        return [
-            'status'  => false,
-            'message' => 'Upload failed: ' . $e->getMessage(),
-        ];
-    }
+            return [
+                'status'  => false,
+                'message' => 'Upload failed: ' . $e->getMessage(),
+            ];
+        }
     }
 
-    public function updateStatus($apartmentId,$user_id)
+    public function updateStatus($apartmentId, $user_id)
     {
         $society = SocietyDetail::findOrFail($apartmentId);
-        
+
         $byeLawCase = $society->byeLawCase;
         $membershipCase = optional($byeLawCase)->membership_case;
-        
+
         $requiredDocs = ['agreementCopy', 'memberShipForm', 'allotmentLetter', 'possessionLetter'];
         if ($membershipCase === 'case_a') {
             $requiredDocs[] = 'allotmentMembershipLetter';
@@ -350,8 +353,8 @@ class UserService
                 break;
             }
         }
-        
-        $status = $society->status; 
+
+        $status = $society->status;
         if (is_string($status)) {
             $status = json_decode($status, true);
         }
@@ -361,7 +364,7 @@ class UserService
 
         foreach ($status['tasks'] as &$task) {
             $oldTaskStatus = $task['Status'] ?? null;
-            
+
             if ($task['name'] === 'Verify Details') {
                 if ($oldTaskStatus !== 'Approved') {
                     $task['Status'] = 'Approved';
@@ -410,7 +413,7 @@ class UserService
     public function checkFileApproval($data)
     {
         // Validate input
-        $validator =Validator::make($data, [
+        $validator = Validator::make($data, [
             'statusData' => 'required|array',
             'fileName' => 'required|string'
         ]);
@@ -441,7 +444,6 @@ class UserService
             return true;
         } else {
             return false;
-            
         }
     }
 }

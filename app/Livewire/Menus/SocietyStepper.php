@@ -9,14 +9,16 @@ use App\Models\SocietyDetail;
 
 class SocietyStepper extends Component
 {
-    public $detailId,$societyId, $societyKey,$societyDetails; 
-    public $comment,$text,$checkApproved,$timelines,$timelineValues;
+    public $detailId, $societyId, $societyKey, $societyDetails;
+    public $comment, $text, $checkApproved, $timelines, $timelineValues;
     public $isRejecting = false;
     public $verificationModal = false;
-    public $apartment_id,$building_name, $apartment_number, $certificate_no, $individual_no_of_share, $share_capital_amount, $owner1_name, $owner1_mobile ,$owner1_email ,$owner2_name, $owner2_mobile ,$owner2_email ,$owner3_name, $owner3_mobile ,$owner3_email;
+    public $apartment_id, $building_name, $apartment_number, $certificate_no, $individual_no_of_share, $share_capital_amount, $owner1_name, $owner1_mobile, $owner1_email, $owner2_name, $owner2_mobile, $owner2_email, $owner3_name, $owner3_mobile, $owner3_email;
+    public $is_membership_application_signed, $is_membership_application_signed_by_one_of_the_current_owners, $signed_member_name;
+    public $is_society_signed_member_available = 'No';
     public $showDocumentModal = false;
-    public $editOwnersModal= false;
-    public $url=null;
+    public $editOwnersModal = false;
+    public $url = null;
     public $taskNameMap = [];
     public $timelineMap = [];
     public function render()
@@ -24,80 +26,80 @@ class SocietyStepper extends Component
         return view('livewire.menus.society-stepper');
     }
 
-    public function mount($id,$key)
+    public function mount($id, $key)
     {
         // Fetch timelines
-        $this->timelines =Timeline::where('id', '!=', 1)->orderBy('id')->get();
+        $this->timelines = Timeline::where('id', '!=', 1)->orderBy('id')->get();
         $this->timelineMap = $this->timelines->pluck('name', 'id')->toArray();
-        $this->timelineValues = array_values($this->timelineMap);  
+        $this->timelineValues = array_values($this->timelineMap);
         $this->taskNameMap = [];
         foreach ($this->timelines as $timeline) {
             $this->taskNameMap[$timeline->name] = $timeline->name;
         }
-        $this->loadSocietyDetails($id,$key);
+        $this->loadSocietyDetails($id, $key);
     }
 
-    public function loadSocietyDetails($id,$key)
+    public function loadSocietyDetails($id, $key)
     {
         $this->societyId = $id;
         $this->societyKey = $key;
-        $this->societyDetails = SocietyDetail::with('society','byeLawCase')
-            ->where('society_id',$this->societyId)->get()
+        $this->societyDetails = SocietyDetail::with('society')
+            ->where('society_id', $this->societyId)->get()
             ->filter(function ($item) {
-            
-            if ($this->societyKey == 'changes_required') {
-                return $item->certificate_status == 'changes_required';
-            }
 
-            $json = json_decode($item->status, true);
-            if (!isset($json['tasks'])) return false;
-            $tasks = collect($json['tasks'])->keyBy('name');
-
-            if ($this->societyKey == 'certificate_pending') {
-                if ($item->certificate_status != 'pending') {
-                    return false;
+                if ($this->societyKey == 'changes_required') {
+                    return $item->certificate_status == 'changes_required';
                 }
-                $taskStatuses = collect($tasks)->pluck('Status')->values();
-                if ($taskStatuses->last() != 'Pending') {
-                    return false;
+
+                $json = json_decode($item->status, true);
+                if (!isset($json['tasks'])) return false;
+                $tasks = collect($json['tasks'])->keyBy('name');
+
+                if ($this->societyKey == 'certificate_pending') {
+                    if ($item->certificate_status != 'pending') {
+                        return false;
+                    }
+                    $taskStatuses = collect($tasks)->pluck('Status')->values();
+                    if ($taskStatuses->last() != 'Pending') {
+                        return false;
+                    }
+                    return $taskStatuses->slice(0, -1)->every(fn($s) => $s === 'Approved');
                 }
-                return $taskStatuses->slice(0, -1)->every(fn($s) => $s === 'Approved');
-            }
 
-            if ($this->societyKey == 0) {
-                return $tasks->contains(fn($task) => ($task['Status'] ?? null) === 'Pending');
-            } 
-            $this->timelines =Timeline::where('id', '!=', 1)->orderBy('id')->get();
-            $dependencies = [];
-            $previousSteps = [];
-            $idToName = [];
-
-            foreach ($this->timelines as $timeline) {
-                $idToName[$timeline->id] = $timeline->name;
-                $dependencies[$timeline->name] = $previousSteps;
-                $previousSteps[] = $timeline->name;
-            }
-            $currentStep = $idToName[$this->societyKey] ?? null;
-            if (!$currentStep) return false;
-
-            // NEW: Specialized logic for "Certificate Delivered"
-            if ($currentStep === 'Certificate Delivered') {
-                if ($item->certificate_status !== 'approved') {
-                    return false;
+                if ($this->societyKey == 0) {
+                    return $tasks->contains(fn($task) => ($task['Status'] ?? null) === 'Pending');
                 }
-            }
+                $this->timelines = Timeline::where('id', '!=', 1)->orderBy('id')->get();
+                $dependencies = [];
+                $previousSteps = [];
+                $idToName = [];
 
-            // Ensure all dependencies are Approved
-            foreach ($dependencies[$currentStep] ?? [] as $dep) {
-                if (($tasks[$dep]['Status'] ?? null) !== 'Approved') {
-                    return false;
+                foreach ($this->timelines as $timeline) {
+                    $idToName[$timeline->id] = $timeline->name;
+                    $dependencies[$timeline->name] = $previousSteps;
+                    $previousSteps[] = $timeline->name;
                 }
-            }
-            // Finally, check the selected filter is Pending
-            return ($tasks[$currentStep]['Status'] ?? null) === 'Pending';
-        });
+                $currentStep = $idToName[$this->societyKey] ?? null;
+                if (!$currentStep) return false;
+
+                // NEW: Specialized logic for "Certificate Delivered"
+                if ($currentStep === 'Certificate Delivered') {
+                    if ($item->certificate_status !== 'approved') {
+                        return false;
+                    }
+                }
+
+                // Ensure all dependencies are Approved
+                foreach ($dependencies[$currentStep] ?? [] as $dep) {
+                    if (($tasks[$dep]['Status'] ?? null) !== 'Approved') {
+                        return false;
+                    }
+                }
+                // Finally, check the selected filter is Pending
+                return ($tasks[$currentStep]['Status'] ?? null) === 'Pending';
+            });
     }
-    
+
     public $fileType = null;
 
     public function getFileStatus($statusData, $fileName, $fileType = null)
@@ -105,7 +107,7 @@ class SocietyStepper extends Component
         $applicationTask = collect($statusData['tasks'])->firstWhere('name', $this->timelineValues[0]);
         if ($applicationTask) {
             $subtasks = collect($applicationTask['subtasks'] ?? []);
-            
+
             // Search by fileType first
             if ($fileType) {
                 $subtask = $subtasks->firstWhere('fileType', $fileType);
@@ -141,7 +143,7 @@ class SocietyStepper extends Component
 
     public function fetchOwnersDetail($id)
     {
-        $this->detailId=$id;
+        $this->detailId = $id;
         $apartment = SocietyDetail::findOrFail($this->detailId);
         if ($apartment) {
             $this->apartment_id = $this->detailId;
@@ -159,6 +161,12 @@ class SocietyStepper extends Component
             $this->owner3_name = $apartment->owner3_name;
             $this->owner3_mobile = $apartment->owner3_mobile;
             $this->owner3_email = $apartment->owner3_email;
+            $this->is_membership_application_signed = $apartment->is_membership_application_signed ?? 'No';
+            $this->is_membership_application_signed_by_one_of_the_current_owners = $apartment->is_membership_application_signed_by_one_of_the_current_owners ?? 'No';
+            $this->signed_member_name = $apartment->signed_member_name;
+            
+            $society = Society::find($this->societyId);
+            $this->is_society_signed_member_available = $society ? $society->is_list_of_signed_member_available : 'No';
         }
         $this->editOwnersModal = true;
     }
@@ -177,6 +185,9 @@ class SocietyStepper extends Component
             'owner3_name' => 'nullable|string|max:255',
             'owner3_email' => 'nullable|string|email|max:255',
             'owner3_mobile' => 'nullable|digits:10',
+            'is_membership_application_signed' => 'required|in:Yes,No',
+            'is_membership_application_signed_by_one_of_the_current_owners' => 'required|in:Yes,No',
+            'signed_member_name' => 'nullable|string|max:255',
         ]);
 
         $apartment = SocietyDetail::findOrFail($this->apartment_id);
@@ -218,7 +229,7 @@ class SocietyStepper extends Component
         //     $this->editOwnersModal = false;
         //     return;
         // }
-        $response=$apartment->update([
+        $response = $apartment->update([
             'building_name'     => $this->building_name,
             'apartment_number'  => $this->apartment_number,
             'certificate_no' => $this->certificate_no,
@@ -232,22 +243,25 @@ class SocietyStepper extends Component
             'owner2_email'      => $this->owner2_email ?? null,
             'owner3_name'       => $this->owner3_name ?? null,
             'owner3_mobile'     => $this->owner3_mobile ?? null,
-            'owner3_email'      => $this->owner3_email ?? null
+            'owner3_email'      => $this->owner3_email ?? null,
+            'is_membership_application_signed' => $this->is_membership_application_signed,
+            'is_membership_application_signed_by_one_of_the_current_owners' => $this->is_membership_application_signed_by_one_of_the_current_owners,
+            'signed_member_name' => $this->signed_member_name,
         ]);
 
         if ($response) {
-            $this->dispatch('show-success', message:  'Owner Details updated successfully!');
+            $this->dispatch('show-success', message: 'Owner Details updated successfully!');
             $this->fetchOwnersDetail($this->apartment_id);
             $this->editOwnersModal = false;
         } else {
-            $this->dispatch('show-error', message:  'Some error occurs while update owner details');
+            $this->dispatch('show-error', message: 'Some error occurs while update owner details');
             $this->editOwnersModal = false;
         }
     }
 
-    public function viewDocument($id,$fileUrl,$isApproved)
+    public function viewDocument($id, $fileUrl, $isApproved)
     {
-        $this->detailId=$id;
+        $this->detailId = $id;
         $this->showDocumentModal = true;
         $this->url = $fileUrl;
         $this->checkApproved = $isApproved;
@@ -257,9 +271,9 @@ class SocietyStepper extends Component
     {
         $this->detailId = $id;
         $society = SocietyDetail::find($this->detailId);
-        $this->text='I have verified all details and documents. I hereby complete Verification of Application';
-        $this->comment=$society->comment;
-        $this->verificationModal=true;
+        $this->text = 'I have verified all details and documents. I hereby complete Verification of Application';
+        $this->comment = $society->comment;
+        $this->verificationModal = true;
     }
 
     public function setRejecting()
@@ -269,21 +283,21 @@ class SocietyStepper extends Component
 
     public function approveDetail($detailId)
     {
-        $this->detailId=$detailId;
-        $society = SocietyDetail::find($this->detailId); 
+        $this->detailId = $detailId;
+        $society = SocietyDetail::find($this->detailId);
         $data = json_decode($society->status, true);
         foreach ($data['tasks'] as &$task) {
-            if ($task['name']==$this->timelineValues[1]) {
+            if ($task['name'] == $this->timelineValues[1]) {
                 $task['Status'] = 'Approved';
             }
         }
         $society->status = json_encode($data);
         $society->save();
-        if($society){
+        if ($society) {
             $this->dispatch('show-success', message: 'Document with society details have been approved successfully!');
             $this->dispatch('status-updated');
-            $this->mount($this->societyId,$this->societyKey);
-        }else{
+            $this->mount($this->societyId, $this->societyKey);
+        } else {
             $this->dispatch('show-error', message: 'Something went wrong to approve document!');
         }
     }
@@ -293,34 +307,34 @@ class SocietyStepper extends Component
         $this->validate([
             'comment' => 'required|string|min:3',
         ]);
-        $this->detailId=$detailId;
-        $society = SocietyDetail::find($this->detailId); 
+        $this->detailId = $detailId;
+        $society = SocietyDetail::find($this->detailId);
         $data = json_decode($society->status, true);
         foreach ($data['tasks'] as &$task) {
-            if ($task['name']==$this->timelineValues[1]) {
+            if ($task['name'] == $this->timelineValues[1]) {
                 $task['Status'] = 'Rejected';
             }
 
-            if ($task['name']=='Verify Details' || $task['name']==$this->timelineValues[0]) {
+            if ($task['name'] == 'Verify Details' || $task['name'] == $this->timelineValues[0]) {
                 $task['Status'] = 'Pending';
             }
         }
         $society->status = json_encode($data);
         $society->comment = $this->comment;
         $society->save();
-        if($society){
+        if ($society) {
             $this->dispatch('show-success', message: 'Document rejected successfully!');
             $this->dispatch('status-updated');
-            $this->mount($this->societyId,$this->societyKey);
-        }else{
+            $this->mount($this->societyId, $this->societyKey);
+        } else {
             $this->dispatch('show-error', message: 'Something went wrong to reject document!');
         }
     }
 
-    public function updateFileStatus($detailId,$fileName,$fileStatus)
+    public function updateFileStatus($detailId, $fileName, $fileStatus)
     {
-        $this->detailId=$detailId;
-        $society = SocietyDetail::find($this->detailId); 
+        $this->detailId = $detailId;
+        $society = SocietyDetail::find($this->detailId);
         $societyData = json_decode($society->status, true);
         foreach ($societyData['tasks'] as &$task) {
             if ($task['name'] === $this->timelineValues[0]) {
@@ -341,19 +355,20 @@ class SocietyStepper extends Component
                     // Insert new entry
                     $task['subtasks'][] = [
                         "fileName" => trim((string) $fileName),
-                        "status"   => $fileStatus];
+                        "status"   => $fileStatus
+                    ];
                 }
             }
         }
 
         $society->status = json_encode($societyData);
         $society->save();
-        if($society){
-            $this->dispatch('show-success', message: 'Document '.$fileStatus.' successfully!');
+        if ($society) {
+            $this->dispatch('show-success', message: 'Document ' . $fileStatus . ' successfully!');
             $this->dispatch('status-updated');
-            $this->mount($this->societyId,$this->societyKey);
+            $this->mount($this->societyId, $this->societyKey);
             $this->showDocumentModal = false;
-        }else{
+        } else {
             $this->dispatch('show-error', message: 'Something went wrong to approve document!');
         }
     }
@@ -362,23 +377,23 @@ class SocietyStepper extends Component
     {
         $this->detailId = $id;
         $society = SocietyDetail::find($this->detailId);
-        if(!$society->no_of_shares){
+        if (!$society->no_of_shares) {
             $this->dispatch('show-error', message: 'Individual no of shares is empty. Please update to generate certificate!');
             return;
         }
         $data = json_decode($society->status, true);
         foreach ($data['tasks'] as &$task) {
-            if ($task['name']==$this->timelineValues[2]) {
+            if ($task['name'] == $this->timelineValues[2]) {
                 $task['Status'] = 'Approved';
             }
         }
         $society->status = json_encode($data);
         $society->save();
-        if($society){
+        if ($society) {
             $this->dispatch('show-success', message: 'All details have verified and certificate have been generated successfully!');
             $this->dispatch('status-updated');
-            $this->mount($this->societyId,$this->societyKey);
-        }else{
+            $this->mount($this->societyId, $this->societyKey);
+        } else {
             $this->dispatch('show-error', message: 'Something went wrong to approve document!');
         }
     }

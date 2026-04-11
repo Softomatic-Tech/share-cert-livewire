@@ -11,18 +11,23 @@ use App\Models\City;
 
 class CreateSociety extends Component
 {
-    public $society_name, $address_1, $address_2, $pincode, $state_id, $city_id, $total_building,$total_flats,$registration_no,$no_of_shares,$share_value, $i_register, $j_register;
-    public $states, $cities=[];
+    public $society_name, $address_1, $address_2, $pincode, $state_id, $city_id, $total_building, $total_flats, $registration_no, $no_of_shares, $share_value;
+    // $i_register, $j_register;
+    public $states, $cities = [];
     protected $validationAttributes = [
         'state_id' => 'state',
         'city_id'  => 'city',
     ];
+    public $is_list_of_signed_member_available = 'No';
+    public $is_byelaws_available = 'No';
+
     public function render()
     {
         return view('livewire.menus.create-society');
     }
 
-    public function mount(){
+    public function mount()
+    {
         $this->states = State::orderBy('name', 'asc')->get();
         $this->state_id = 32; // Maharashtra
         $this->cities = City::where('state_id', $this->state_id)->get();
@@ -53,16 +58,17 @@ class CreateSociety extends Component
             'registration_no' => 'required|string',
             'no_of_shares' => 'required|numeric',
             'share_value' => 'required|numeric|decimal:0,2',
-            'i_register' => 'nullable|string|max:255',
-            'j_register' => 'nullable|string|max:255',
+            'is_list_of_signed_member_available' => 'required|in:Yes,No',
+            'is_byelaws_available' => 'required|in:Yes,No',
+            // 'i_register' => 'nullable|string|max:255',
+            // 'j_register' => 'nullable|string|max:255',
         ]);
-        $society=Society::create($validated);
-        if($society){
+        $society = Society::create($validated);
+        if ($society) {
             $this->dispatch('show-success', message: 'Society information saved successfully!');
-            $this->reset(['society_name', 'address_1', 'address_2', 'pincode', 'state_id', 'city_id', 'total_building','total_flats','registration_no','no_of_shares','share_value', 'i_register', 'j_register']);
-        }else{
+            $this->reset(['society_name', 'address_1', 'address_2', 'pincode', 'state_id', 'city_id', 'total_building', 'total_flats', 'registration_no', 'no_of_shares', 'share_value', 'is_list_of_signed_member_available', 'is_byelaws_available']);
+        } else {
             $this->dispatch('show-error', message: 'Society information could not be saved due to some error!');
         }
-        
     }
 }

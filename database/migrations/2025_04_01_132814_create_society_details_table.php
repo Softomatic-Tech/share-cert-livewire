@@ -13,12 +13,15 @@ return new class extends Migration
     {
         Schema::create('society_details', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('society_id'); 
+            $table->unsignedBigInteger('society_id');
             $table->foreign('society_id')->references('id')->on('societies')->onDelete('cascade');
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('building_name');
             $table->string('apartment_number');
+            $table->string('is_membership_application_signed')->nullable();
+            $table->string('is_membership_application_signed_by_one_of_the_current_owners')->nullable();
+            $table->string('signed_member_name')->nullable();
             $table->string('owner1_name');
             $table->string('owner1_email')->nullable();
             $table->string('owner1_mobile')->nullable();
