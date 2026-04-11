@@ -105,8 +105,8 @@ class UpdateSocietyStatus extends Component
             $this->memberShipForm = $apartment->memberShipForm;
             $this->allotmentLetter = $apartment->allotmentLetter;
             $this->possessionLetter = $apartment->possessionLetter;
-            $this->is_byelaws_available = strtolower($apartment->society->is_byelaws_available ?? 'no');
-            if ($this->is_byelaws_available == 'yes') {
+            $this->is_byelaws_available = $apartment->society->is_byelaws_available ?? 'No';
+            if ($this->is_byelaws_available == 'Yes') {
                 $byelaws = ByeLawCase::where('society_detail_id', $apartmentId)->first();
                 $this->byelaws_id = $byelaws->id ?? null;
                 $this->membership_case = $byelaws->membership_case ?? null;
@@ -233,6 +233,7 @@ class UpdateSocietyStatus extends Component
                 $fileRules[$livewireField] = 'file|mimes:jpeg,png,jpg,pdf|max:2048';
             }
         }
+        log::info('is_byelaws_available:' . $this->is_byelaws_available);
 
         if ($this->is_byelaws_available === 'Yes') {
             $rules['membership_case'] = 'required';
@@ -397,6 +398,17 @@ class UpdateSocietyStatus extends Component
             $this->apartment_id
         );
         Log::info('Society details update response for apartment ID: ' . $this->apartment_id);
+
+        // Convert JsonResponse to array if necessary
+        if ($response instanceof \Illuminate\Http\JsonResponse) {
+            $response = json_decode($response->getContent(), true);
+        }
+
+        // If response is not an array, create an error response
+        if (!is_array($response)) {
+            $response = ['status' => false, 'message' => 'Invalid response format'];
+        }
+
         $uploadedFiles = [];
         $fieldLabels = [
             'agreementCopy' => 'Agreement Copy',
@@ -425,7 +437,9 @@ class UpdateSocietyStatus extends Component
                 }
             }
         }
-        if ($response['status'] || !empty($uploadedFiles)) {
+        log::info('Uploaded files for apartment ID: ' . $this->apartment_id . ', files: ' . implode(', ', $uploadedFiles));
+        log::info('Response data: ' . json_encode($response));
+        if (isset($response['status']) && ($response['status'] || !empty($uploadedFiles))) {
             $this->loadSocietyData($this->apartment_id);
             // Automatically update status based on uploaded documents
             $user = Auth::user();
@@ -502,7 +516,7 @@ class UpdateSocietyStatus extends Component
 
     public function updatedIsByelawsAvailable()
     {
-        if ($this->is_byelaws_available !== 'yes') {
+        if ($this->is_byelaws_available !== 'Yes') {
 
             $this->membership_case = null;
 

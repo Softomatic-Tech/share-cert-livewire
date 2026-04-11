@@ -11,7 +11,7 @@
         <div class="stepwizard">
             <div class="stepwizard-step">
                 <button type="button" @if ($currentStep == 1) disabled @endif>1</button>
-                <p @if ($currentStep == 1) disabled @endif>Basic</p>
+                <p @if ($currentStep == 1) disabled @endif>Basic </p>
             </div>
             <div class="stepwizard-step">
                 <button type="button" @if ($currentStep == 2) disabled @endif>2</button>
@@ -33,43 +33,50 @@
                         <div class="card-header">Step 1: Basic Information</div>
                         <div class="card-body">
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 my-2">
-                                <flux:input type="text" :label="__('Society Name :')"
+                                <flux:input type="text" :label="__('Society Name / सोसायटीचे नाव :')"
                                     wire:model="formData.society_name" />
-                                <flux:input type="number" :label="__('Total No Of Building :')"
+                                <flux:input type="number" :label="__('Total No Of Building / इमारतींची एकूण संख्या :')"
                                     wire:model="formData.total_building" />
-                                <flux:input type="number" :label="__('Total No Of Units :')"
+                                <flux:input type="number" :label="__('Total No Of Units / एककांची एकूण संख्या :')"
                                     wire:model="formData.total_flats" />
-                                <flux:textarea :label="__('Address Line 1 :')" wire:model="formData.address_1" />
-                                <flux:textarea type="text" :label="__('Address Line 2 :')"
+                                <flux:textarea :label="__('Address Line 1 / पत्ता ओळ 1 :')"
+                                    wire:model="formData.address_1" />
+                                <flux:textarea type="text" :label="__('Address Line 2 / पत्ता ओळ 2 :')"
                                     wire:model="formData.address_2" />
-                                <flux:select wire:model.live="formData.state_id" placeholder="Choose State..."
-                                    :label="__('State')">
-                                    <flux:select.option value="">Choose State...</flux:select.option>
+                                <flux:select wire:model.live="formData.state_id"
+                                    placeholder="Choose State... / राज्य निवडा..." :label="__('State / राज्य')">
+                                    <flux:select.option value="">Choose State...
+                                    </flux:select.option>
                                     @foreach ($states as $st)
                                         <flux:select.option value="{{ $st->id }}">{{ $st->name }}
                                         </flux:select.option>
                                     @endforeach
                                 </flux:select>
-                                <flux:select wire:model="formData.city_id" placeholder="Choose City..."
-                                    :label="__('City')">
-                                    <flux:select.option value="">Choose City...</flux:select.option>
+                                <flux:select wire:model="formData.city_id" placeholder="Choose City... / शहर निवडा..."
+                                    :label="__('City / शहर')">
+                                    <flux:select.option value="">Choose City...
+                                    </flux:select.option>
                                     @foreach ($cities as $ct)
                                         <flux:select.option value="{{ $ct->id }}">{{ $ct->name }}
                                         </flux:select.option>
                                     @endforeach
                                 </flux:select>
-                                <flux:input type="text" :label="__('Pincode :')" wire:model="formData.pincode" />
-                                <flux:input type="text" :label="__('Registration Certificate No :')"
+                                <flux:input type="text" :label="__('Pincode / पिनकोड :')"
+                                    wire:model="formData.pincode" />
+                                <flux:input type="text"
+                                    :label="__('Registration Certificate No / नोंदणी प्रमाणपत्र क्रमांक :')"
                                     wire:model="formData.registration_no" />
-                                <flux:input type="number" :label="__('Total No of Shares :')"
+                                <flux:input type="number" :label="__('Total No of Shares / शेअर्सची एकूण संख्या :')"
                                     wire:model="formData.no_of_shares" />
-                                <flux:input type="number" :label="__('Each Share Value :')"
+                                <flux:input type="number" :label="__('Each Share Value / प्रत्येक शेअरची किंमत :')"
                                     wire:model="formData.share_value" />
                                 {{-- <flux:input type="text" :label="__('I Register :')" wire:model="formData.i_register" />
                                 <flux:input type="text" :label="__('J Register :')" wire:model="formData.j_register" /> --}}
-                                <flux:select wire:model="formData.admin_id" placeholder="Choose Admin..."
-                                    :label="__('Assigned Admin')">
-                                    <flux:select.option value="">Choose Admin...</flux:select.option>
+                                <flux:select wire:model="formData.admin_id"
+                                    placeholder="Choose Admin... / प्रशासक निवडा..."
+                                    :label="__('Assigned Admin / नियुक्त प्रशासक')">
+                                    <flux:select.option value="">Choose Admin...
+                                    </flux:select.option>
                                     @foreach ($admins as $admin)
                                         <flux:select.option value="{{ $admin->id }}">{{ $admin->name }}
                                         </flux:select.option>
@@ -77,25 +84,28 @@
                                 </flux:select>
 
                                 <div>
-                                    <flux:label>{{ __('Is list of signed member available?') }}</flux:label>
+                                    <flux:label>
+                                        {{ __('Is list of signed member available? / स्वाक्षरी केलेल्या सदस्यांची यादी उपलब्ध आहे का?') }}
+                                    </flux:label>
                                     <flux:radio.group wire:model.live="formData.is_list_of_signed_member_available"
                                         class="flex gap-4">
-                                        <flux:radio value="Yes" label="Yes" />
-                                        <flux:radio value="No" label="No" />
+                                        <flux:radio value="Yes" label="Yes / होय" />
+                                        <flux:radio value="No" label="No / नाही" />
                                     </flux:radio.group>
                                 </div>
 
                                 <div>
-                                    <flux:label>{{ __('Is byelaws available?') }}</flux:label>
+                                    <flux:label>{{ __('Is byelaws available? / बायलॉज उपलब्ध आहेत का?') }}</flux:label>
                                     <flux:radio.group wire:model="formData.is_byelaws_available" class="flex gap-4">
-                                        <flux:radio value="Yes" label="Yes" />
-                                        <flux:radio value="No" label="No" />
+                                        <flux:radio value="Yes" label="Yes / होय" />
+                                        <flux:radio value="No" label="No / नाही" />
                                     </flux:radio.group>
                                 </div>
                             </div>
 
                             <div class="flex justify-end">
-                                <flux:button variant="primary" type="button" wire:click="nextStep">{{ __('Next') }}
+                                <flux:button variant="primary" type="button" wire:click="nextStep">
+                                    {{ __('Next') }}
                                 </flux:button>
                             </div>
                         </div>
@@ -112,36 +122,37 @@
                     <div class="card-body">
                         <div class="card">
                             <div class="card-body">
-                                <form wire:submit.prevent="csvImport">
-                                    @if (!$csvUploaded)
+                                <form wire:submit.prevent="excelImport">
+                                    @if (!$fileUploaded)
                                         <div class="w-full mb-4">
-                                            <label for="csv_file">Upload Document:</label>
-                                            <flux:input type="file" wire:model="csv_file"
+                                            <label for="excel_file">Upload Document / दस्तऐवज अपलोड करा:</label>
+                                            <flux:input type="file" wire:model="excel_file"
                                                 class="border border-gray-300 rounded px-2 py-1 w-full" />
-                                            @error('csv_file')
+                                            @error('excel_file')
                                                 <span class="text-red-500">{{ $message }}</span>
                                             @enderror
                                         </div>
                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
                                             <div class="p-4">
                                                 <flux:button variant="filled" class="w-full" type="button"
-                                                    wire:click="csvExport">
-                                                    {{ __('CSV EXPORT') }}
+                                                    wire:click="excelExport">
+                                                    {{ __('Excel EXPORT / एक्सेल निर्यात') }}
                                                 </flux:button>
                                             </div>
-                                            @if ($csv_file)
+                                            @if ($excel_file)
                                                 <div class="p-4 items-end">
                                                     <flux:button variant="primary" class="w-full" type="submit"
-                                                        wire:loading.attr="disabled">{{ __('CSV IMPORT') }}
+                                                        wire:loading.attr="disabled">
+                                                        {{ __('Excel IMPORT / एक्सेल आयात') }}
                                                     </flux:button>
                                                 </div>
                                             @endif
                                         @else
-                                            <flux:button variant="filled" type="button" wire:click="csvExport">
-                                                {{ __('CSV EXPORT') }}</flux:button>
-                                            <div class="text-green-600 font-semibold">CSV already uploaded
-                                                successfully.
-                                                No re-upload allowed.</div>
+                                            <flux:button variant="filled" type="button" wire:click="excelExport">
+                                                {{ __('Excel EXPORT / एक्सेल निर्यात') }}</flux:button>
+                                            <div class="text-green-600 font-semibold">Excel file already uploaded
+                                                successfully / एक्सेल फाइल यशस्वीरित्या अपलोड झाली आहे.
+                                                No re-upload allowed / पुन्हा अपलोड करण्यास परवानगी नाही.</div>
                                     @endif
                             </div>
                             </form>
@@ -150,7 +161,7 @@
 
                     <div class="flex justify-end mt-4">
                         <flux:button variant="filled" class="mr-2" type="button" wire:click="prevStep">
-                            {{ __('Back') }}</flux:button>
+                            {{ __('Back / मागे') }}</flux:button>
                         <flux:button variant="primary" type="button" wire:click="nextStep">{{ __('Next') }}
                         </flux:button>
                     </div>
@@ -164,7 +175,7 @@
     @if ($currentStep == 3)
         <div class="step-three">
             <div class="card">
-                <div class="card-header">Step 3: Verification</div>
+                <div class="card-header">Step 3: Verification </div>
                 <div class="card-body">
                     <div class="m-4">
                         @if ($this->societyDetails)
@@ -306,7 +317,7 @@
 
                     <div class="flex justify-end mt-4">
                         <flux:button variant="filled" class="mr-2" type="button" wire:click="prevStep">
-                            {{ __('Back') }}</flux:button>
+                            {{ __('Back / मागे') }}</flux:button>
                         <flux:button variant="primary" type="button" wire:click="done">{{ __('Done') }}
                         </flux:button>
                     </div>

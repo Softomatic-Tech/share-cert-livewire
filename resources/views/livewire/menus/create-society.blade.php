@@ -81,17 +81,19 @@
                                 data-for="share_value"></span>
                         </div>
                         <div>
-                            <flux:label>{{ __('Is list of signed member available?') }}</flux:label>
+                            <flux:label>
+                                {{ __('Is list of signed member available? / स्वाक्षरी केलेल्या सदस्यांची यादी उपलब्ध आहे का?') }}
+                            </flux:label>
                             <flux:radio.group wire:model.live="is_list_of_signed_member_available" class="flex gap-4">
-                                <flux:radio value="Yes" label="Yes" />
-                                <flux:radio value="No" label="No" />
+                                <flux:radio value="Yes" label="Yes / होय" />
+                                <flux:radio value="No" label="No / नाही" />
                             </flux:radio.group>
                         </div>
                         <div>
-                            <flux:label>{{ __('Is byelaws available?') }}</flux:label>
+                            <flux:label>{{ __('Is byelaws available? / बायलॉज उपलब्ध आहेत का?') }}</flux:label>
                             <flux:radio.group wire:model="is_byelaws_available" class="flex gap-4">
-                                <flux:radio value="Yes" label="Yes" />
-                                <flux:radio value="No" label="No" />
+                                <flux:radio value="Yes" label="Yes / होय" />
+                                <flux:radio value="No" label="No / नाही" />
                             </flux:radio.group>
                         </div>
                         {{-- <flux:input type="text" label="I Register / आय रजिस्टर" wire:model="i_register" />

@@ -45,7 +45,4 @@
             </div>
             <p class=" text-3xl text-center font-bold dark:text-white">{{ $totalUsers }}</p>
         </div>
-        {{-- <div class="mt-8">
-        <livewire:marathi.marathi-form />
-    </div> --}}
     </div>

@@ -778,42 +778,57 @@
                     <flux:input type="hidden" wire:model="apartment_id" />
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
-                    <flux:input type="text" :label="__('Building Name :')" wire:model="building_name" />
-                    <flux:input type="text" :label="__('Apartment Number :')" wire:model="apartment_number" />
-                    <flux:input type="text" :label="__('Certificate No :')" wire:model="certificate_no" />
+                    <flux:input type="text" :label="__('Building Name / इमारतीचे नाव :')"
+                        wire:model="building_name" />
+                    <flux:input type="text" :label="__('Apartment Number / अपार्टमेंट क्रमांक :')"
+                        wire:model="apartment_number" />
+                    <flux:input type="text" :label="__('Certificate No / प्रमाणपत्र क्रमांक :')"
+                        wire:model="certificate_no" />
                 </div>
                 @if (strtolower($is_society_signed_member_available) === 'yes')
-                    <h3 class="text-sm font-semibold text-gray-700 mb-3 border-b pb-1">Signed Member Information</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3 border-b pb-1">Signed Member Information /
+                        स्वाक्षरी केलेल्या सदस्याची माहिती</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
                         <flux:radio.group wire:model="is_membership_application_signed"
-                            :label="__('Is membership application signed?')">
+                            :label="__('Is membership application signed? / सदस्यत्व अर्जावर स्वाक्षरी आहे का?')">
                             <flux:radio value="Yes" label="Yes" />
                             <flux:radio value="No" label="No" />
                         </flux:radio.group>
 
                         <flux:radio.group wire:model="is_membership_application_signed_by_one_of_the_current_owners"
-                            :label="__('Signed by one of the current owners?')">
+                            :label="__('Signed by one of the current owners? / वर्तमान मालकांपैकी एकाने स्वाक्षरी केली आहे का?')">
                             <flux:radio value="Yes" label="Yes" />
                             <flux:radio value="No" label="No" />
                         </flux:radio.group>
 
                         <div class="md:col-span-2">
-                            <flux:input type="text" :label="__('Signed Member Name :')"
+                            <flux:input type="text"
+                                :label="__('Signed Member Name / स्वाक्षरी केलेल्या सदस्याचे नाव :')"
                                 wire:model="signed_member_name" />
                         </div>
                     </div>
                 @endif
-                <h3 class="text-sm font-semibold text-gray-700 mb-3 border-b pb-1 mt-2">Owners Details</h3>
+                <h3 class="text-sm font-semibold text-gray-700 mb-3 border-b pb-1 mt-2">Owners Details / मालकांची
+                    माहिती</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
-                    <flux:input type="text" :label="__('Owner 1 Name :')" wire:model="owner1_name" />
-                    <flux:input type="text" :label="__('Owner 1 Email :')" wire:model="owner1_email" />
-                    <flux:input type="text" :label="__('Owner 1 Mobile :')" wire:model="owner1_mobile" />
-                    <flux:input type="text" :label="__('Owner 2 Name :')" wire:model="owner2_name" />
-                    <flux:input type="text" :label="__('Owner 2 Email :')" wire:model="owner2_email" />
-                    <flux:input type="text" :label="__('Owner 2 Mobile :')" wire:model="owner2_mobile" />
-                    <flux:input type="text" :label="__('Owner 3 Name :')" wire:model="owner3_name" />
-                    <flux:input type="text" :label="__('Owner 3 Email :')" wire:model="owner3_email" />
-                    <flux:input type="text" :label="__('Owner 3 Mobile :')" wire:model="owner3_mobile" />
+                    <flux:input type="text" :label="__('Owner 1 Name / मालक 1 चे नाव :')"
+                        wire:model="owner1_name" />
+                    <flux:input type="text" :label="__('Owner 1 Email / मालक 1 चा ईमेल :')"
+                        wire:model="owner1_email" />
+                    <flux:input type="text" :label="__('Owner 1 Mobile / मालक 1 चा मोबाईल :')"
+                        wire:model="owner1_mobile" />
+                    <flux:input type="text" :label="__('Owner 2 Name / मालक 2 चे नाव :')"
+                        wire:model="owner2_name" />
+                    <flux:input type="text" :label="__('Owner 2 Email / मालक 2 चा ईमेल :')"
+                        wire:model="owner2_email" />
+                    <flux:input type="text" :label="__('Owner 2 Mobile / मालक 2 चा मोबाईल :')"
+                        wire:model="owner2_mobile" />
+                    <flux:input type="text" :label="__('Owner 3 Name / मालक 3 चे नाव :')"
+                        wire:model="owner3_name" />
+                    <flux:input type="text" :label="__('Owner 3 Email / मालक 3 चा ईमेल :')"
+                        wire:model="owner3_email" />
+                    <flux:input type="text" :label="__('Owner 3 Mobile / मालक 3 चा मोबाईल :')"
+                        wire:model="owner3_mobile" />
                 </div>
                 <div class="flex justify-end mt-4">
                     <flux:button variant="primary" type="submit">{{ __('Update') }}</flux:button>

@@ -105,29 +105,39 @@
                         <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm mx-1 mt-1 mb-2 p-4 md:p-5">
                             {{-- Title + badges --}}
                             <div class="grid grid-cols-1 xl:grid-cols-2 gap-2 mb-4 items-start">
-                                {{-- Society name --}}
-                                <div class="min-w-0">
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <h1
-                                            class="text-xl md:text-2xl font-bold text-blue-900 dark:text-white uppercase tracking-tight break-words">
-                                            {{ $societyById->society_name }}
-                                        </h1>
-                                        <span
-                                            class="inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider {{ strtolower($societyById->is_list_of_signed_member_available) === 'yes' ? 'bg-green-100 text-green-700' : 'bg-red-50 text-red-600' }}">
-                                            <flux:icon.users variant="mini" class="size-3 shrink-0" />
-                                            <span class="whitespace-nowrap">Signed Mbrs: {{ $societyById->is_list_of_signed_member_available ?? 'No' }}</span>
-                                        </span>
+                                <div class="flex flex-wrap items-start justify-between gap-2">
+                                    <div class="min-w-0">
+                                        <div class="flex flex-wrap items-center gap-2">
+                                            <h1
+                                                class="text-xl md:text-2xl font-bold text-blue-900 dark:text-white uppercase tracking-tight break-words">
+                                                {{ $societyById->society_name }}
+                                            </h1>
+                                            <span
+                                                class="inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider {{ strtolower($societyById->is_list_of_signed_member_available) === 'yes' ? 'bg-green-100 text-green-700' : 'bg-red-50 text-red-600' }}">
+                                                <flux:icon.users variant="mini" class="size-3 shrink-0" />
+                                                <span class="whitespace-nowrap">Signed Mbrs:
+                                                    {{ $societyById->is_list_of_signed_member_available ?? 'No' }}</span>
+                                            </span>
 
-                                        <span
-                                            class="inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider {{ strtolower($societyById->is_byelaws_available) === 'yes' ? 'bg-green-100 text-green-700' : 'bg-red-50 text-red-600' }}">
-                                            <flux:icon.document-text variant="mini" class="size-3 shrink-0" />
-                                            <span class="whitespace-nowrap">Byelaws: {{ $societyById->is_byelaws_available ?? 'No' }}</span>
-                                        </span>
+                                            <span
+                                                class="inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider {{ strtolower($societyById->is_byelaws_available) === 'yes' ? 'bg-green-100 text-green-700' : 'bg-red-50 text-red-600' }}">
+                                                <flux:icon.document-text variant="mini" class="size-3 shrink-0" />
+                                                <span class="whitespace-nowrap">Byelaws:
+                                                    {{ $societyById->is_byelaws_available ?? 'No' }}</span>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center justify-end">
+                                        <flux:button size="xs" variant="outline" class="flex items-center gap-2"
+                                            wire:click="editSociety">
+                                            <i class="fa-solid fa-edit text-sm"></i>
+                                        </flux:button>
                                     </div>
                                 </div>
 
                                 {{-- Badges --}}
-                                <div class="flex gap-2 overflow-x-auto xl:justify-end pb-1 w-full mt-2 xl:mt-0 items-center">
+                                <div class="flex gap-2 overflow-x-auto w-full mt-2">
                                     <flux:badge color="blue" size="sm" class="whitespace-nowrap flex-shrink-0">
                                         Reg No: {{ $societyById->registration_no ?? 'N/A' }}
                                     </flux:badge>
@@ -167,12 +177,12 @@
                                         <p class="text-gray-500 text-xs">{{ $societyById->admin->email }}</p>
                                     @endif
                                 </div>
-                                <div class="space-y-1">
+                                {{-- <div class="space-y-1">
                                     <p class="text-gray-400 font-medium uppercase text-[10px]">Management</p>
                                     <flux:button size="xs"
                                         wire:click="assignShareToApartment({{ $societyById->id }})">Assign
                                         Shares</flux:button>
-                                </div>
+                                </div> --}}
                             </div>
                         </div>
                         {{-- FILTER TABS --}}
@@ -266,13 +276,11 @@
             </div>
         </div>
 
-        <flux:modal wire:model="showAssignModal" class="!max-w-3xl w-full">
+        {{-- <flux:modal wire:model="showAssignModal" class="!max-w-3xl w-full">
             <div class="space-y-6">
                 <div class="text-lg font-bold">
                     <flux:heading size="lg">Assign Shares</flux:heading>
                 </div>
-                {{-- @if ($step === 1) --}}
-                <!-- STEP 1: Basic Share Details Form -->
                 <div>
                     <div class="mb-3">
                         <flux:input type="number" :label="__('Total No of Shares :')" wire:model="no_of_shares" />
@@ -287,10 +295,7 @@
                         <button wire:click="closeModal" class="px-3 py-1 border rounded-md text-sm">Close</button>
                     </div>
                 </div>
-                {{-- @endif --}}
 
-                {{-- @if ($step === 2)
-                <!-- STEP 2: Apartment-level Share Form -->
                 <div>
                     <h3 class="text-base font-semibold mb-3">Choose Share Assignment Type</h3>
                     <div class="space-y-2 mb-4">
@@ -327,7 +332,6 @@
                             </div>
                         @endif
 
-                        <!-- Individual shares -->
                         @if ($assignType === 'individual')
                             <div class="max-h-64 overflow-y-auto border rounded-md p-3 bg-gray-50">
                                 @foreach ($apartments as $index => $apt)
@@ -358,8 +362,138 @@
                         @endif
                     </div>
                 </div>
-            @endif --}}
 
+            </div>
+        </flux:modal> --}}
+
+        <flux:modal wire:model="showEditSocietyModal" class="!max-w-3xl w-full">
+            <div class="space-y-6">
+                <div class="text-lg font-bold">
+                    <flux:heading size="lg">Edit Society</flux:heading>
+                </div>
+
+                <form wire:submit.prevent="saveSocietyChanges">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <flux:input type="text" label="Society Name / सोसायटीचे नाव"
+                                wire:model="edit_society_name" id="edit_society_name" />
+                        </div>
+                        <div>
+                            <flux:input type="text" label="Registration Certificate No / नोंदणी प्रमाणपत्र क्रमांक"
+                                wire:model="edit_registration_no" id="edit_registration_no" />
+                        </div>
+                        <div>
+                            <flux:input type="number" label="Total No Of Building / इमारतींची एकूण संख्या"
+                                wire:model="edit_total_building" id="edit_total_building" />
+                        </div>
+                        <div>
+                            <flux:input type="number" label="Total No Of Units / युनिट्सची एकूण संख्या"
+                                wire:model="edit_total_flats" id="edit_total_flats" />
+                            @if ($selectedSocietyId)
+                                @php
+                                    $currentCount = \App\Models\SocietyDetail::where(
+                                        'society_id',
+                                        $selectedSocietyId,
+                                    )->count();
+                                @endphp
+                                @if ($currentCount > 0)
+                                    <p class="text-xs text-gray-500 mt-1">Current society details entries:
+                                        {{ $currentCount }}. Cannot set below this number.</p>
+                                @endif
+                            @endif
+                        </div>
+                        <div class="md:col-span-2">
+                            <flux:textarea label="Address Line 1 / पत्ता ओळ 1" wire:model="edit_address_1"
+                                id="edit_address_1"></flux:textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <flux:textarea label="Address Line 2 / पत्ता ओळ 2" wire:model="edit_address_2"
+                                id="edit_address_2"></flux:textarea>
+                        </div>
+                        <div>
+                            <flux:select wire:model.live="edit_state_id" placeholder="Choose State... / राज्य निवडा..."
+                                label="State / राज्य">
+                                <flux:select.option value="">Choose State... / राज्य निवडा...</flux:select.option>
+                                @foreach ($states as $st)
+                                    <flux:select.option value="{{ $st->id }}">{{ $st->name }}
+                                    </flux:select.option>
+                                @endforeach
+                            </flux:select>
+                        </div>
+                        <div>
+                            <flux:select wire:model="edit_city_id" placeholder="Choose City... / शहर निवडा..."
+                                label="City / शहर">
+                                <flux:select.option value="">Choose City...</flux:select.option>
+                                @foreach ($cities as $ct)
+                                    <flux:select.option value="{{ $ct->id }}">{{ $ct->name }}
+                                    </flux:select.option>
+                                @endforeach
+                            </flux:select>
+                        </div>
+                        <div>
+                            <flux:input type="text" label="Pincode / पिनकोड" wire:model="edit_pincode"
+                                id="edit_pincode" />
+                        </div>
+                        <div>
+                            <flux:input type="number" label="Total No of Shares / शेअर्सची एकूण संख्या"
+                                wire:model="edit_no_of_shares" id="edit_no_of_shares" />
+                        </div>
+                        <div>
+                            <flux:input type="number" label="Each Share Value / प्रत्येक शेअरची किंमत"
+                                wire:model="edit_share_value" id="edit_share_value" />
+                        </div>
+                        <div class="md:col-span-2">
+                            <flux:label>
+                                {{ __('Is list of signed member available? / स्वाक्षरी केलेल्या सदस्यांची यादी उपलब्ध आहे का?') }}
+                            </flux:label>
+                            <flux:radio.group wire:model.live="edit_is_list_of_signed_member_available"
+                                class="flex gap-4">
+                                <flux:radio value="Yes" label="Yes / होय" />
+                                <flux:radio value="No" label="No / नाही" />
+                            </flux:radio.group>
+                        </div>
+                        @if ($signedMembersMessage)
+                            <div class="md:col-span-2 mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm">
+                                {!! nl2br(e($signedMembersMessage)) !!}
+                            </div>
+                        @endif
+                        @if ($showSignedMembersUploader)
+                            <div class="md:col-span-2 mt-4">
+                                <flux:input type="file"
+                                    label="Upload Signed Members Excel File / स्वाक्षरी केलेल्या सदस्यांचा एक्सेल फाइल अपलोड करा"
+                                    wire:model="signedMembersFile" accept=".xlsx,.xls" />
+                                @error('signedMembersFile')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                                <div class="text-xs text-gray-600 mt-1">
+                                    Required columns: building name, apartment number, certificate no<br>
+                                    Optional: is membership application signed (Yes/No),
+                                    is membership application signed by one of the current owners (Yes/No),
+                                    signed_member_name
+                                </div>
+                                <flux:button variant="primary" wire:click="uploadSignedMembers" class="mt-2"
+                                    wire:loading.attr="disabled">
+                                    <span wire:loading.remove>Upload Signed Members / स्वाक्षरी केलेले सदस्य अपलोड
+                                        करा</span>
+                                    <span wire:loading>Uploading... / अपलोड करत आहे...</span>
+                                </flux:button>
+                            </div>
+                        @endif
+                        <div class="md:col-span-2">
+                            <flux:label>{{ __('Is byelaws available? / बायलॉज उपलब्ध आहेत का?') }}</flux:label>
+                            <flux:radio.group wire:model.live="edit_is_byelaws_available" class="flex gap-4">
+                                <flux:radio value="Yes" label="Yes / होय" />
+                                <flux:radio value="No" label="No / नाही" />
+                            </flux:radio.group>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end gap-2 mt-4">
+                        <button type="button" wire:click="closeEditSocietyModal"
+                            class="px-3 py-2 rounded-md border text-sm">Cancel</button>
+                        <flux:button variant="primary" type="submit">Save Changes</flux:button>
+                    </div>
+                </form>
             </div>
         </flux:modal>
     </div>
