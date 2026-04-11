@@ -66,6 +66,10 @@ class Login extends Component
             if ($this->attemptSocietyOwnerLogin($mobile)) {
                 return;
             }
+        } else {
+            // Handle email login (for web admin users)
+            $this->attemptWebLogin($login_type);
+            return;
         }
     }
 
