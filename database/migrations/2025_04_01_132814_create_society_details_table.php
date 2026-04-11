@@ -22,7 +22,6 @@ return new class extends Migration
             $table->string('is_membership_application_signed')->nullable();
             $table->string('is_membership_application_signed_by_one_of_the_current_owners')->nullable();
             $table->string('signed_member_name')->nullable();
-            $table->string('apartment_number');
             $table->string('owner1_name');
             $table->string('owner1_email')->nullable();
             $table->string('owner1_mobile')->nullable();
