@@ -4,10 +4,10 @@ namespace App\Livewire\Menus;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Log;
-use Livewire\WithFileUploads;
 use App\Models\Society;
 use App\Models\State;
 use App\Models\City;
+use Illuminate\Support\Facades\Auth;
 
 class CreateSociety extends Component
 {
@@ -63,6 +63,10 @@ class CreateSociety extends Component
             // 'i_register' => 'nullable|string|max:255',
             // 'j_register' => 'nullable|string|max:255',
         ]);
+
+        // Set admin_id to current authenticated user
+        $validated['admin_id'] = Auth::id();
+
         $society = Society::create($validated);
         if ($society) {
             $this->dispatch('show-success', message: 'Society information saved successfully!');

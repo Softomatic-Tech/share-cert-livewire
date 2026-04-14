@@ -13,8 +13,12 @@ class SocietyStepper extends Component
     public $comment, $text, $checkApproved, $timelines, $timelineValues;
     public $isRejecting = false;
     public $verificationModal = false;
-    public $apartment_id, $building_name, $apartment_number, $certificate_no, $individual_no_of_share, $share_capital_amount, $owner1_name, $owner1_mobile, $owner1_email, $owner2_name, $owner2_mobile, $owner2_email, $owner3_name, $owner3_mobile, $owner3_email;
-    public $is_membership_application_signed, $is_membership_application_signed_by_one_of_the_current_owners, $signed_member_name;
+    public $apartment_id, $building_name, $apartment_number, $certificate_no, $owner1_name, $owner1_mobile, $owner1_email, $owner2_name, $owner2_mobile, $owner2_email, $owner3_name, $owner3_mobile, $owner3_email;
+    public $did_you_purchase_the_apartment_before_the_society_was_registered = 'No';
+    public $did_you_sign_at_the_time_of_the_society_registration = 'No';
+    public $did_the_previous_owner_sign_the_registration_documents = 'No';
+    public $has_the_flat_transfer_related_fee_been_paid_to_the_society = 'No';
+    public $have_physical_documents_been_submitted_to_the_society = 'No';
     public $is_society_signed_member_available = 'No';
     public $showDocumentModal = false;
     public $editOwnersModal = false;
@@ -150,8 +154,6 @@ class SocietyStepper extends Component
             $this->building_name = $apartment->building_name;
             $this->apartment_number = $apartment->apartment_number;
             $this->certificate_no = $apartment->certificate_no;
-            $this->individual_no_of_share = $apartment->no_of_shares;
-            // $this->share_capital_amount = $apartment->share_capital_amount;
             $this->owner1_name = $apartment->owner1_name;
             $this->owner1_mobile = $apartment->owner1_mobile;
             $this->owner1_email = $apartment->owner1_email;
@@ -161,10 +163,12 @@ class SocietyStepper extends Component
             $this->owner3_name = $apartment->owner3_name;
             $this->owner3_mobile = $apartment->owner3_mobile;
             $this->owner3_email = $apartment->owner3_email;
-            $this->is_membership_application_signed = $apartment->is_membership_application_signed ?? 'No';
-            $this->is_membership_application_signed_by_one_of_the_current_owners = $apartment->is_membership_application_signed_by_one_of_the_current_owners ?? 'No';
-            $this->signed_member_name = $apartment->signed_member_name;
-            
+            $this->did_you_purchase_the_apartment_before_the_society_was_registered = $apartment->did_you_purchase_the_apartment_before_the_society_was_registered ?? 'No';
+            $this->did_you_sign_at_the_time_of_the_society_registration = $apartment->did_you_sign_at_the_time_of_the_society_registration ?? 'No';
+            $this->did_the_previous_owner_sign_the_registration_documents = $apartment->did_the_previous_owner_sign_the_registration_documents ?? 'No';
+            $this->has_the_flat_transfer_related_fee_been_paid_to_the_society = $apartment->has_the_flat_transfer_related_fee_been_paid_to_the_society ?? 'No';
+            $this->have_physical_documents_been_submitted_to_the_society = $apartment->have_physical_documents_been_submitted_to_the_society ?? 'No';
+
             $society = Society::find($this->societyId);
             $this->is_society_signed_member_available = $society ? $society->is_list_of_signed_member_available : 'No';
         }
@@ -185,9 +189,11 @@ class SocietyStepper extends Component
             'owner3_name' => 'nullable|string|max:255',
             'owner3_email' => 'nullable|string|email|max:255',
             'owner3_mobile' => 'nullable|digits:10',
-            'is_membership_application_signed' => 'required|in:Yes,No',
-            'is_membership_application_signed_by_one_of_the_current_owners' => 'required|in:Yes,No',
-            'signed_member_name' => 'nullable|string|max:255',
+            'did_you_purchase_the_apartment_before_the_society_was_registered' => 'required|in:Yes,No',
+            'did_you_sign_at_the_time_of_the_society_registration' => 'required|in:Yes,No',
+            'did_the_previous_owner_sign_the_registration_documents' => 'required|in:Yes,No',
+            'has_the_flat_transfer_related_fee_been_paid_to_the_society' => 'required|in:Yes,No',
+            'have_physical_documents_been_submitted_to_the_society' => 'required|in:Yes,No',
         ]);
 
         $apartment = SocietyDetail::findOrFail($this->apartment_id);
@@ -198,43 +204,10 @@ class SocietyStepper extends Component
             ];
         }
         $society = Society::find($this->societyId);
-        if (empty($society->no_of_shares) || empty($society->share_value)) {
-            $this->dispatch('show-error', message: "Society shares or share value is not set. Please update society details first.");
-            $this->editOwnersModal = false;
-            return;
-        }
-        $expectedShares = (float) $society->no_of_shares;
-        $expectedAmount = (float) ($society->no_of_shares * $society->share_value ?? 0);
-        $givenShares = $this->individual_no_of_share;
-        // $givenAmount = $this->share_capital_amount;
-        $existingShares = SocietyDetail::where('society_id', $this->societyId)
-            ->when($this->detailId, fn($q) => $q->where('id', '!=', $this->detailId))
-            ->sum('no_of_shares');
-
-        // $existingAmount = SocietyDetail::where('society_id', $this->societyId)
-        //     ->when($this->detailId, fn($q) => $q->where('id', '!=', $this->detailId))
-        //     ->sum('share_capital_amount');
-        $totalSharesAfter = $existingShares + $givenShares;
-        // $totalAmountAfter = $existingAmount + $givenAmount;
-        if ($totalSharesAfter > $expectedShares) {
-            $excess = $totalSharesAfter - $expectedShares;
-            $this->dispatch('show-error', message: "Total allocated shares cannot exceed {$expectedShares}. Current total = {$existingShares}, entered = {$givenShares} (exceeds by {$excess}).");
-            $this->editOwnersModal = false;
-            return;
-        }
-
-        // if ($totalAmountAfter  > $expectedAmount) {
-        //     $excess = $totalAmountAfter - $expectedAmount;
-        //     $this->dispatch('show-error', message: "Total allocated share capital cannot exceed {$expectedAmount}. Current total = {$existingAmount}, entered = {$givenAmount} (exceeds by {$excess}).");
-        //     $this->editOwnersModal = false;
-        //     return;
-        // }
         $response = $apartment->update([
             'building_name'     => $this->building_name,
             'apartment_number'  => $this->apartment_number,
             'certificate_no' => $this->certificate_no,
-            'no_of_shares' => $this->individual_no_of_share,
-            // 'share_capital_amount' => $this->share_capital_amount,
             'owner1_name'       => $this->owner1_name,
             'owner1_mobile'     => $this->owner1_mobile,
             'owner1_email'      => $this->owner1_email ?? null,
@@ -244,9 +217,11 @@ class SocietyStepper extends Component
             'owner3_name'       => $this->owner3_name ?? null,
             'owner3_mobile'     => $this->owner3_mobile ?? null,
             'owner3_email'      => $this->owner3_email ?? null,
-            'is_membership_application_signed' => $this->is_membership_application_signed,
-            'is_membership_application_signed_by_one_of_the_current_owners' => $this->is_membership_application_signed_by_one_of_the_current_owners,
-            'signed_member_name' => $this->signed_member_name,
+            'did_you_purchase_the_apartment_before_the_society_was_registered' => $this->did_you_purchase_the_apartment_before_the_society_was_registered,
+            'did_you_sign_at_the_time_of_the_society_registration' => $this->did_you_sign_at_the_time_of_the_society_registration,
+            'did_the_previous_owner_sign_the_registration_documents' => $this->did_the_previous_owner_sign_the_registration_documents,
+            'has_the_flat_transfer_related_fee_been_paid_to_the_society' => $this->has_the_flat_transfer_related_fee_been_paid_to_the_society,
+            'have_physical_documents_been_submitted_to_the_society' => $this->have_physical_documents_been_submitted_to_the_society,
         ]);
 
         if ($response) {

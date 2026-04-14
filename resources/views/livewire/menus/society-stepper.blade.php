@@ -215,11 +215,62 @@
                             </button>
                         </flux:tooltip>
                     </div>
-
-                    {{-- <flux:tooltip content="Edit Apartment">
-                <button class="font-bold absolute top-0 right-0 px-2 py-1 border rounded-md" wire:click="fetchOwnersDetail('{{ $details->id }}')"><i class="fa-solid fa-edit text-sm"></i></button>
-            </flux:tooltip> --}}
                 </div>
+
+                <!--signed memebr details grid-->
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-2 pt-4 px-2">
+                    <div
+                        class="p-2 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                        <p
+                            class="text-[10px] uppercase font-semibold tracking-widest text-slate-500 dark:text-slate-400 mb-1">
+                            Did you purchase the apartment before the society was registered?</p>
+                        <span
+                            class="inline-flex rounded-full px-3 py-1 text-[11px] font-semibold {{ ($details->did_you_purchase_the_apartment_before_the_society_was_registered ?? 'No') === 'Yes' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300' : 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300' }}">
+                            {{ $details->did_you_purchase_the_apartment_before_the_society_was_registered ?? 'No' }}
+                        </span>
+                    </div>
+                    <div
+                        class="p-2 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                        <p
+                            class="text-[10px] uppercase font-semibold tracking-widest text-slate-500 dark:text-slate-400 mb-1">
+                            Did you sign at the time of the society registration?</p>
+                        <span
+                            class="inline-flex rounded-full px-3 py-1 text-[11px] font-semibold {{ ($details->did_you_sign_at_the_time_of_the_society_registration ?? 'No') === 'Yes' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300' : 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300' }}">
+                            {{ $details->did_you_sign_at_the_time_of_the_society_registration ?? 'No' }}
+                        </span>
+                    </div>
+                    <div
+                        class="p-2 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                        <p
+                            class="text-[10px] uppercase font-semibold tracking-widest text-slate-500 dark:text-slate-400 mb-1">
+                            Did the previous owner sign the registration documents?</p>
+                        <span
+                            class="inline-flex rounded-full px-3 py-1 text-[11px] font-semibold {{ ($details->did_the_previous_owner_sign_the_registration_documents ?? 'No') === 'Yes' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300' : 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300' }}">
+                            {{ $details->did_the_previous_owner_sign_the_registration_documents ?? 'No' }}
+                        </span>
+                    </div>
+                    <div
+                        class="p-2 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                        <p
+                            class="text-[10px] uppercase font-semibold tracking-widest text-slate-500 dark:text-slate-400 mb-1">
+                            Has the flat transfer-related fee been paid to the Society?</p>
+                        <span
+                            class="inline-flex rounded-full px-3 py-1 text-[11px] font-semibold {{ ($details->has_the_flat_transfer_related_fee_been_paid_to_the_society ?? 'No') === 'Yes' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300' : 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300' }}">
+                            {{ $details->has_the_flat_transfer_related_fee_been_paid_to_the_society ?? 'No' }}
+                        </span>
+                    </div>
+                    <div
+                        class="p-2 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                        <p
+                            class="text-[10px] uppercase font-semibold tracking-widest text-slate-500 dark:text-slate-400 mb-1">
+                            Have physical documents been submitted to the society?</p>
+                        <span
+                            class="inline-flex rounded-full px-3 py-1 text-[11px] font-semibold {{ ($details->have_physical_documents_been_submitted_to_the_society ?? 'No') === 'Yes' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-300' : 'bg-rose-100 text-rose-800 dark:bg-rose-900/60 dark:text-rose-300' }}">
+                            {{ $details->have_physical_documents_been_submitted_to_the_society ?? 'No' }}
+                        </span>
+                    </div>
+                </div>
+
                 <!--Documents Section (below the grid) -->
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-2 p-2">
                     @php
@@ -310,18 +361,18 @@
                         </div>
                     @endif
                     {{-- @php
-            $allApproved = $this->areAllFourFilesApproved($statusData, [$details->agreementCopy,$details->memberShipForm,$details->allotmentLetter,$details->possessionLetter]);
-            $showVerificationButton = ($allApproved && $verifyStatus === 'Approved' && $applicationStatus === 'Approved' && $verificationStatus === 'Pending');
-            @endphp
-            @if ($showVerificationButton) 
-            <div class="flex items-center text-xs justify-center cursor-pointer" wire:click="setDocument('{{ $details->id }}')">Verify Documents</div>
-            @endif --}}
+                    $allApproved = $this->areAllFourFilesApproved($statusData, [$details->agreementCopy,$details->memberShipForm,$details->allotmentLetter,$details->possessionLetter]);
+                    $showVerificationButton = ($allApproved && $verifyStatus === 'Approved' && $applicationStatus === 'Approved' && $verificationStatus === 'Pending');
+                    @endphp
+                    @if ($showVerificationButton) 
+                    <div class="flex items-center text-xs justify-center cursor-pointer" wire:click="setDocument('{{ $details->id }}')">Verify Documents</div>
+                    @endif --}}
                     {{-- @php
-            $showCertificateGenerateButton = ($verifyStatus === 'Approved' && $applicationStatus === 'Approved' && $verificationStatus === 'Approved' && $generationStatus==='Pending');
-            @endphp
-            @if ($showCertificateGenerateButton)
-            <div class="flex items-center text-xs justify-center cursor-pointer" wire:click="generateCertificate('{{ $details->id }}')">Generate Certificate</div>
-            @endif --}}
+                    $showCertificateGenerateButton = ($verifyStatus === 'Approved' && $applicationStatus === 'Approved' && $verificationStatus === 'Approved' && $generationStatus==='Pending');
+                    @endphp
+                    @if ($showCertificateGenerateButton)
+                    <div class="flex items-center text-xs justify-center cursor-pointer" wire:click="generateCertificate('{{ $details->id }}')">Generate Certificate</div>
+                    @endif --}}
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-2 p-3">
                     @if ($details->byeLawCase && $details->byeLawCase->membership_case == 'case_a')
@@ -789,23 +840,35 @@
                     <h3 class="text-sm font-semibold text-gray-700 mb-3 border-b pb-1">Signed Member Information /
                         स्वाक्षरी केलेल्या सदस्याची माहिती</h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 my-2">
-                        <flux:radio.group wire:model="is_membership_application_signed"
-                            :label="__('Is membership application signed? / सदस्यत्व अर्जावर स्वाक्षरी आहे का?')">
+                        <flux:radio.group wire:model="did_you_purchase_the_apartment_before_the_society_was_registered"
+                            :label="__('Did you purchase the apartment before the society was registered? / समाज स्थापनेपूर्वी अपार्टमेंट खरेदी केले का?')">
                             <flux:radio value="Yes" label="Yes" />
                             <flux:radio value="No" label="No" />
                         </flux:radio.group>
 
-                        <flux:radio.group wire:model="is_membership_application_signed_by_one_of_the_current_owners"
-                            :label="__('Signed by one of the current owners? / वर्तमान मालकांपैकी एकाने स्वाक्षरी केली आहे का?')">
+                        <flux:radio.group wire:model="did_you_sign_at_the_time_of_the_society_registration"
+                            :label="__('Did you sign at the time of the society registration? / समाज नोंदणी वेळी आपण स्वाक्षरी केली का?')">
                             <flux:radio value="Yes" label="Yes" />
                             <flux:radio value="No" label="No" />
                         </flux:radio.group>
 
-                        <div class="md:col-span-2">
-                            <flux:input type="text"
-                                :label="__('Signed Member Name / स्वाक्षरी केलेल्या सदस्याचे नाव :')"
-                                wire:model="signed_member_name" />
-                        </div>
+                        <flux:radio.group wire:model="did_the_previous_owner_sign_the_registration_documents"
+                            :label="__('Did the previous owner sign the registration documents? / मागील मालकाने नोंदणी कागदपत्रांवर स्वाक्षरी केली का?')">
+                            <flux:radio value="Yes" label="Yes" />
+                            <flux:radio value="No" label="No" />
+                        </flux:radio.group>
+
+                        <flux:radio.group wire:model="has_the_flat_transfer_related_fee_been_paid_to_the_society"
+                            :label="__('Has the flat transfer-related fee been paid to the Society? / अपार्टमेंट हस्तांतरण संबंधी शुल्क समितीला दिले गेले आहे का?')">
+                            <flux:radio value="Yes" label="Yes" />
+                            <flux:radio value="No" label="No" />
+                        </flux:radio.group>
+
+                        <flux:radio.group wire:model="have_physical_documents_been_submitted_to_the_society"
+                            :label="__('Have physical documents been submitted to the society? / भौतिक कागदपत्रे समितीसमवेत सादर झाली आहेत का?')">
+                            <flux:radio value="Yes" label="Yes" />
+                            <flux:radio value="No" label="No" />
+                        </flux:radio.group>
                     </div>
                 @endif
                 <h3 class="text-sm font-semibold text-gray-700 mb-3 border-b pb-1 mt-2">Owners Details / मालकांची
