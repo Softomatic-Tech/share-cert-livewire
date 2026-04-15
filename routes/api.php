@@ -6,8 +6,8 @@ use App\Http\Controllers\SocietyController;
 use App\Http\Controllers\CertificateController;
 
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/mobile-login', [AuthController::class, 'mobile_login']);
+// Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'mobile_login']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -24,4 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/certificate', [CertificateController::class, 'show']);
     Route::post('/approve-certificate', [CertificateController::class, 'approveCertificate']);
     Route::post('/submit-remarks', [CertificateController::class, 'submitRemarks']);
+    Route::post('/member-details', [SocietyController::class, 'memberDetails']);
+    Route::get('states', [SocietyController::class, 'states']);
+    Route::get('cities', [SocietyController::class, 'cities']);
 });
