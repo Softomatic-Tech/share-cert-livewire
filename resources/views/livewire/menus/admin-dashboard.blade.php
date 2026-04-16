@@ -17,7 +17,7 @@
         </div>
         <flux:separator variant="subtle" />
         <div class="my-2">
-            <livewire:menus.alerts />
+            <livewire:menus.alerts type="success" />
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
             <!-- Sidebar -->
@@ -372,6 +372,7 @@
                 <div class="text-lg font-bold">
                     <flux:heading size="lg">Edit Society</flux:heading>
                 </div>
+
                 @if ($edit_is_list_of_signed_member_available === 'Yes')
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                         <h3 class="text-yellow-800 font-semibold text-lg mb-2">
@@ -562,9 +563,10 @@
                             </div>
                         </div>
                     </div>
-
                     <!-- Action Buttons -->
-                    <div class="flex justify-end gap-2">
+                    <!-- Error Messages Above Submit Button -->
+                    <livewire:menus.alerts type="error" />
+                    <div class="flex justify-end gap-2 mt-2">
                         <button type="button" wire:click="closeEditSocietyModal"
                             class="px-4 py-2 rounded-md border text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 transition">Cancel</button>
                         <flux:button variant="primary" type="submit">Save Changes</flux:button>
