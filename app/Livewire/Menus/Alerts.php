@@ -8,7 +8,20 @@ class Alerts extends Component
 {
     public $success;
     public $error;
-    protected $listeners = ['showSuccess', 'showError'];
+    public $type; // 'success', 'error', or null for both
+    protected $listeners = [];
+
+    public function mount($type = null)
+    {
+        $this->type = $type;
+        if ($this->type === 'success') {
+            $this->listeners = ['showSuccess'];
+        } elseif ($this->type === 'error') {
+            $this->listeners = ['showError'];
+        } else {
+            $this->listeners = ['showSuccess', 'showError'];
+        }
+    }
     public function render()
     {
         return view('livewire.menus.alerts');

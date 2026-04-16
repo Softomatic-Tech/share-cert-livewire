@@ -65,6 +65,10 @@ class Login extends Component
 
             if ($this->attemptSocietyOwnerLogin($mobile)) {
                 return;
+            } else {
+                throw ValidationException::withMessages([
+                    'authIdentifier' => __('auth.failed'),
+                ]);
             }
         } else {
             // Handle email login (for web admin users)
@@ -97,10 +101,6 @@ class Login extends Component
         // First, check if a User record already exists for this mobile as Society User
         $existingUser = User::where('phone', $mobile)->first();
         log::info('Existing user check for mobile: ' . $mobile . ', found user: ' . ($existingUser ? 'yes' : 'no') . ', role: ' . ($existingUser && $existingUser->role ? $existingUser->role->role : 'N/A'));
-        if ($existingUser && $existingUser->role->role === 'Society User') {
-            Log::info('User record exists for mobile: ' . $mobile . ', falling back to users table auth');
-            return false; // Let attemptWebLogin handle it
-        }
 
         $societyDetail = SocietyDetail::where('owner1_mobile', $mobile)
             ->orWhere('owner2_mobile', $mobile)
@@ -123,8 +123,22 @@ class Login extends Component
             $expectedPassword = $statusData['password'] ?? null;
         }
         log::info('Expected password for mobile: ' . $mobile . ' is ' . ($expectedPassword ? 'set' : 'not set'));
-        if (! $expectedPassword || ! hash_equals((string) $expectedPassword, (string) $this->password)) {
-            log::info('Password mismatch for mobile: ' . $mobile . ', expected: ' . ($expectedPassword ?? 'NULL') . ', provided: ' . $this->password);
+        $passwordMatches = false;
+
+        if ($existingUser) {
+            // If user exists, only check user password
+            if (Hash::check($this->password, $existingUser->password)) {
+                $passwordMatches = true;
+                log::info('User password match for mobile: ' . $mobile);
+            }
+        } elseif ($expectedPassword && hash_equals((string) $expectedPassword, (string) $this->password)) {
+            // If no user exists, check society password
+            $passwordMatches = true;
+            log::info('Society password match for mobile: ' . $mobile);
+        }
+
+        if (!$passwordMatches) {
+            log::info('Password mismatch for mobile: ' . $mobile . ', expected: ' . ($existingUser ? 'user password' : ($expectedPassword ?? 'NULL')) . ', provided: ' . $this->password);
             return false;
         }
 
