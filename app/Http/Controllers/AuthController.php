@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use App\Models\SecondUser;
 use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -197,74 +198,234 @@ class AuthController extends Controller
 
     public function mobile_login(Request $request)
     {
-        Log::info('Login API Data', $request->all());
-        // 1. Check API Secret Key from Header
-        $secretKey = $request->header('X-API-KEY');
-        Log::info('secretKey ' . $secretKey);
-        Log::info('secretKey ' . config('app.api_secret_key'));
-        if (!$secretKey) {
-            return response()->json([
-                'status' => false,
-                'message' => 'API secret key missing'
-            ], 401);
-        }
-        if ($secretKey !== config('app.api_secret_key')) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Invalid API access key'
-            ], 401);
-        }
+        try {
+            Log::info('Login API Request', [
+                'payload' => $request->all(),
+                'ip' => $request->ip()
+            ]);
 
-        // 2. Validate Request
-        $validator = Validator::make($request->all(), [
-            'phone' => 'required|digits:10'
-        ]);
+            // 1. Validate API Key
+            $secretKey = $request->header('X-API-KEY');
 
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => false,
-                'message' => $validator->errors()
-            ], 400);
-        }
-
-        // 3. Check User
-        $user1 = DB::connection('mysql_second')
-            ->table('users')
-            ->where('mobile_no', $request->phone)
-            ->first();
-
-        // $user = User::where('phone', $request->phone)->first();
-        if (!$user1) {
-            return response()->json([
-                'status' => false,
-                'message' => 'Mobile number not registered'
-            ], 404);
-        }
-
-        // 4. Check Role
-        $user2 = User::where('phone', $request->phone)->first();
-        if ($user2->role_id == 3) {
-            $existsInSociety = SocietyDetail::where('owner1_mobile', $request->phone)
-                ->orWhere('owner2_mobile', $request->phone)
-                ->orWhere('owner3_mobile', $request->phone)
-                ->exists();
-
-            if (!$existsInSociety) {
+            if (!$secretKey || $secretKey !== config('app.api_secret_key')) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'This mobile number is not registered as an owner in any society.'
+                    'message' => 'Invalid or missing API key'
                 ], 401);
             }
-        }
 
-        // 5. Generate Token
-        $token = $user2->createToken('auth_token')->plainTextToken;
-        return response()->json([
-            'status' => true,
-            'token' => $token,
-            'user' => $user1
-        ], 200);
+            // 2. Validate Request Data
+            $validator = Validator::make($request->all(), [
+                'phone' => 'required|digits:10'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => $validator->errors()->first()
+                ], 422);
+            }
+
+            $phone = $request->phone;
+
+            // 3. FIRST: Check in MAIN DB
+            $user = User::with('role')->where('phone', $phone)->first();
+
+            if (!$user) {
+                // Check SocietyDetail
+                $societyDetail = SocietyDetail::where('owner1_mobile', $phone)
+                    ->orWhere('owner2_mobile', $phone)
+                    ->orWhere('owner3_mobile', $phone)
+                    ->first();
+                if ($societyDetail && $societyDetail->status) {
+                    // Get name/email based on matched owner
+                    $matchedName = null;
+                    $matchedEmail = null;
+
+                    $expectedPassword = null;
+                    if ($societyDetail->owner1_mobile == $phone) {
+                        $matchedName = $societyDetail->owner1_name;
+                        $matchedEmail = $societyDetail->owner1_email;
+                    } elseif ($societyDetail->owner2_mobile == $phone) {
+                        $matchedName = $societyDetail->owner2_name;
+                        $matchedEmail = $societyDetail->owner2_email;
+                    } elseif ($societyDetail->owner3_mobile == $phone) {
+                        $matchedName = $societyDetail->owner3_name;
+                        $matchedEmail = $societyDetail->owner3_email;
+                    }
+
+                    // Extract password
+                    $statusData = json_decode($societyDetail->status, true);
+                    $expectedPassword = $statusData['password'] ?? null;
+
+                    // fallback if missing
+                    $finalPassword = $expectedPassword ? bcrypt($expectedPassword) : bcrypt($phone);
+
+                    $societyUserRoleId = Role::where('role', 'Society User')->value('id');
+
+                    $user = User::firstOrCreate(
+                        ['phone' => $phone],
+                        [
+                            'name' => $matchedName ?: 'Society Owner',
+                            'email' => $matchedEmail,
+                            'password' => $finalPassword,
+                            'role_id' => $societyUserRoleId,
+                        ]
+                    );
+                }
+            }
+
+            // If still not found → check external DB
+            if (!$user) {
+                $externalUser = SecondUser::where('mobile_no', $phone)->first();
+                if (!$externalUser) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Mobile number not registered'
+                    ], 404);
+                }
+
+
+                // Get password from external DB
+                $finalPassword = $externalUser->password ? bcrypt($externalUser->password) : bcrypt($phone);
+
+                $user = User::firstOrCreate(
+                    ['phone' => $phone],
+                    [
+                        'name' => $externalUser->name ?? 'User',
+                        'email' => $externalUser->email ?? null,
+                        'password' => $finalPassword,
+                        'role_id' => 3
+                    ]
+                );
+
+                Log::info('User created from external DB', [
+                    'phone' => $phone,
+                    'user_id' => $user->id
+                ]);
+            }
+
+
+            // Delete previous tokens
+            $user->tokens()->delete();
+            // Generate Token
+            $token = $user->createToken('auth_token')->plainTextToken;
+            return response()->json([
+                'status' => true,
+                'message' => 'Login successful',
+                'token' => $token,
+                'user' => $user
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Login API Exception', [
+                'message' => $e->getMessage(),
+                'line' => $e->getLine(),
+                'file' => $e->getFile()
+            ]);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'An error occurred while processing the request'
+            ], 500);
+        }
     }
+
+    // public function mobile_login(Request $request)
+    // {
+    //     try {
+    //         Log::info('Login API Request', [
+    //             'payload' => $request->all(),
+    //             'ip' => $request->ip()
+    //         ]);
+
+    //         // 1. Validate API Key
+    //         $secretKey = $request->header('X-API-KEY');
+
+    //         if (!$secretKey || $secretKey !== config('app.api_secret_key')) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'Invalid or missing API key'
+    //             ], 401);
+    //         }
+
+    //         // 2. Validate Request Data
+    //         $validator = Validator::make($request->all(), [
+    //             'phone' => 'required|digits:10'
+    //         ]);
+
+    //         if ($validator->fails()) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => $validator->errors()->first()
+    //             ], 422);
+    //         }
+
+    //         $phone = $request->phone;
+
+    //         // 3. Check User in Secondary DB
+    //         $externalUser = DB::connection('mysql_second')
+    //             ->table('users')
+    //             ->where('mobile_no', $phone)
+    //             ->first();
+
+    //         if (!$externalUser) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'Mobile number not registered'
+    //             ], 404);
+    //         }
+
+    //         // 4. Check User in Main DB
+    //         $user = User::where('phone', $phone)->first();
+
+    //         if (!$user) {
+    //             Log::warning('User exists in external DB but not in main DB', [
+    //                 'phone' => $phone
+    //             ]);
+
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'User not found in main system'
+    //             ], 404);
+    //         }
+
+    //         // 5. Role-Based Check
+    //         if ($user->role_id == 3) {
+    //             $existsInSociety = SocietyDetail::where(function ($q) use ($phone) {
+    //                 $q->where('owner1_mobile', $phone)
+    //                     ->orWhere('owner2_mobile', $phone)
+    //                     ->orWhere('owner3_mobile', $phone);
+    //             })->exists();
+
+    //             if (!$existsInSociety) {
+    //                 return response()->json([
+    //                     'status' => false,
+    //                     'message' => 'This mobile number is not registered as an owner in any society.'
+    //                 ], 403);
+    //             }
+    //         }
+
+    //         // 6. Generate Token
+    //         $token = $user->createToken('auth_token')->plainTextToken;
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => 'Login successful',
+    //             'token' => $token,
+    //             'user' => $externalUser
+    //         ], 200);
+    //     } catch (\Exception $e) {
+    //         Log::error('Login API Exception', [
+    //             'message' => $e->getMessage(),
+    //             'line' => $e->getLine(),
+    //             'file' => $e->getFile()
+    //         ]);
+
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'An error occurred while processing the request'
+    //         ], 500);
+    //     }
+    // }
 
     public function logout(Request $request)
     {

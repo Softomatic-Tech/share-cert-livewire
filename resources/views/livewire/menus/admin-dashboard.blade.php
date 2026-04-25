@@ -40,8 +40,9 @@
                             class="p-2 rounded-lg border hover:shadow-md transition-all cursor-pointer @if ($selectedSocietyId == $society->id) active-society @endif">
                             {{-- Society name (left) & Reg No (right) on same line --}}
                             <div class="flex items-start justify-between gap-1 mb-0.5">
-                                <p class="text-blue-800 dark:text-white text-sm font-bold leading-tight">
-                                    {{ $society->society_name }}
+                                <p class="text-blue-800 dark:text-white text-sm font-bold leading-tight"
+                                    title="{{ $society->society_name }}">
+                                    {{ \Illuminate\Support\Str::limit($society->society_name, 20, '...') }}
                                 </p>
                                 <p class="text-gray-400 dark:text-gray-500 text-[10px] font-mono shrink-0 mt-0.5">
                                     {{ $society->registration_no ?? 'N/A' }}
@@ -104,53 +105,49 @@
                         {{-- HEADER --}}
                         <div class="bg-white dark:bg-gray-800 rounded-xl border shadow-sm mx-1 mt-1 mb-2 p-4 md:p-5">
                             {{-- Title + badges --}}
-                            <div class="grid grid-cols-1 xl:grid-cols-2 gap-2 mb-4 items-start">
-                                <div class="flex flex-wrap items-start justify-between gap-2">
-                                    <div class="min-w-0">
-                                        <div class="flex flex-wrap items-center gap-2">
-                                            <h1
-                                                class="text-xl md:text-2xl font-bold text-blue-900 dark:text-white uppercase tracking-tight break-words">
-                                                {{ $societyById->society_name }}
-                                            </h1>
-                                            <span
-                                                class="inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider {{ strtolower($societyById->is_list_of_signed_member_available) === 'yes' ? 'bg-green-100 text-green-700' : 'bg-red-50 text-red-600' }}">
-                                                <flux:icon.users variant="mini" class="size-3 shrink-0" />
-                                                <span class="whitespace-nowrap">Signed Mbrs:
-                                                    {{ $societyById->is_list_of_signed_member_available ?? 'No' }}</span>
-                                            </span>
+                            <div class="flex items-start justify-between gap-2 mb-4 flex-nowrap">
+                                <div class="min-w-0 flex flex-wrap items-center gap-2">
+                                    <h1
+                                        class="text-xl md:text-2xl font-bold text-blue-900 dark:text-white uppercase tracking-tight break-words">
+                                        {{ $societyById->society_name }}
+                                    </h1>
+                                    <span
+                                        class="inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider {{ strtolower($societyById->is_list_of_signed_member_available) === 'yes' ? 'bg-green-100 text-green-700' : 'bg-red-50 text-red-600' }}">
+                                        <flux:icon.users variant="mini" class="size-3 shrink-0" />
+                                        <span class="whitespace-nowrap">Signed Mbrs:
+                                            {{ $societyById->is_list_of_signed_member_available ?? 'No' }}</span>
+                                    </span>
 
-                                            <span
-                                                class="inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider {{ strtolower($societyById->is_byelaws_available) === 'yes' ? 'bg-green-100 text-green-700' : 'bg-red-50 text-red-600' }}">
-                                                <flux:icon.document-text variant="mini" class="size-3 shrink-0" />
-                                                <span class="whitespace-nowrap">Byelaws:
-                                                    {{ $societyById->is_byelaws_available ?? 'No' }}</span>
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div class="flex items-center justify-end">
-                                        <flux:tooltip content="Edit Society">
-                                            <button class="font-bold px-2 py-1 border rounded-md" wire:click="editSociety">
-                                                <i class="fa-solid fa-edit text-sm"></i>
-                                            </button>
-                                        </flux:tooltip>
-                                    </div>
+                                    <span
+                                        class="inline-flex items-center gap-1 rounded-sm px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider {{ strtolower($societyById->is_byelaws_available) === 'yes' ? 'bg-green-100 text-green-700' : 'bg-red-50 text-red-600' }}">
+                                        <flux:icon.document-text variant="mini" class="size-3 shrink-0" />
+                                        <span class="whitespace-nowrap">Byelaws:
+                                            {{ $societyById->is_byelaws_available ?? 'No' }}</span>
+                                    </span>
                                 </div>
 
-                                {{-- Badges --}}
-                                <div class="flex gap-2 overflow-x-auto w-full mt-2">
-                                    <flux:badge color="blue" size="sm" class="whitespace-nowrap flex-shrink-0">
-                                        Reg No: {{ $societyById->registration_no ?? 'N/A' }}
-                                    </flux:badge>
-
-                                    <flux:badge color="green" size="sm" class="whitespace-nowrap flex-shrink-0">
-                                        Flats: {{ $societyById->total_flats }}
-                                    </flux:badge>
-
-                                    <flux:badge color="purple" size="sm" class="whitespace-nowrap flex-shrink-0">
-                                        Shares: {{ $societyById->no_of_shares ?? '0' }}
-                                    </flux:badge>
+                                <div class="flex items-center justify-end flex-shrink-0">
+                                    <flux:tooltip content="Edit Society">
+                                        <button class="font-bold px-2 py-1 border rounded-md" wire:click="editSociety">
+                                            <i class="fa-solid fa-edit text-sm"></i>
+                                        </button>
+                                    </flux:tooltip>
                                 </div>
+                            </div>
+
+                            {{-- Badges --}}
+                            <div class="flex gap-2 overflow-x-auto w-full mt-2">
+                                <flux:badge color="blue" size="sm" class="whitespace-nowrap flex-shrink-0">
+                                    Reg No: {{ $societyById->registration_no ?? 'N/A' }}
+                                </flux:badge>
+
+                                <flux:badge color="green" size="sm" class="whitespace-nowrap flex-shrink-0">
+                                    Flats: {{ $societyById->total_flats }}
+                                </flux:badge>
+
+                                <flux:badge color="purple" size="sm" class="whitespace-nowrap flex-shrink-0">
+                                    Shares: {{ $societyById->no_of_shares ?? '0' }}
+                                </flux:badge>
                             </div>
 
                             {{-- DETAILS GRID --}}
@@ -186,6 +183,8 @@
                                 </div> --}}
                             </div>
                         </div>
+
+
                         {{-- FILTER TABS --}}
                         <div class="flex gap-2 overflow-x-auto border-t py-2">
                             {{-- 1. Pending Verification --}}
